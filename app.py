@@ -209,8 +209,7 @@ with st.sidebar:
 
     # Reset button
     if st.button("🔄 New Case"):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
+        st.session_state.clear()
         st.rerun()
 
 # ─── Main Layout ──────────────────────────────────────────────────────────────
@@ -296,16 +295,12 @@ with col2:
         st.markdown(f"**Weapon:** {weapon}")
         st.markdown(f"**Key clue:** {clue}")
         if st.button("Play Again"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
+            st.session_state.clear()
             st.rerun()
-
-    elif st.session_state.solved is False:
         culprit = st.session_state.case["culprit"]
         st.error(f"❌ Wrong. The culprit was **{culprit}**.")
         if st.button("Play Again"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
+            st.session_state.clear()
             st.rerun()
 
     st.markdown("---")
