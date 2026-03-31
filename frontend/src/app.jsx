@@ -1,52 +1,57 @@
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+// App.jsx — root component
+// Manages: view (landing/game), game state, API calls
+// Renders: LandingPage → scroll → GamePage
+
+import { useState, useEffect, useCallback, useRef } from 'react'
 import axios from 'axios'
-import Sidebar from './components/Sidebar.jsx'
-import DossierPanel from './components/DossierPanel.jsx'
-import ChatRoom from './components/ChatRoom.jsx'
-import RightPanel from './components/RightPanel.jsx'
+import LandingPage from './components/LandingPage.jsx'
+import GamePage    from './components/GamePage.jsx'
 
 const API = '/api'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (i = 0) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-  })
-}
-
 export default function App() {
-  const [gameState, setGameState] = useState('loading') // loading | playing | gameover | solved | failed
-  const [case_, setCase] = useState(null)
-  const [caseFile, setCaseFile] = useState('')
-  const [history, setHistory] = useState([])
-  const [startTime, setStartTime] = useState(null)
+  const [view,       setView]       = useState('landing')
+  const [gameState,  setGameState]  = useState('idle')   // idle|loading|playing|solved|failed|gameover
+  const [case_,      setCase]       = useState(null)
+  const [caseFile,   setCaseFile]   = useState('')
+  const [history,    setHistory]    = useState([])
   const [isThinking, setIsThinking] = useState(false)
-  const [error, setError] = useState(null)
+  const [startTime,  setStartTime]  = useState(null)
+  const gameRef = useRef(null)
 
-  // ── Start a new case ────────────────────────────────────────────────────────
+  // ── Scroll to game ───────────────────────────────────────────────────────────
+  const goToGame = () => {
+    setView('game')
+    setTimeout(() => gameRef.current?.scrollIntoView({ behavior: 'smooth' }), 60)
+  }
+
+  // ── Generate new case ────────────────────────────────────────────────────────
   const startNewCase = useCallback(async () => {
     setGameState('loading')
     setHistory([])
-    setError(null)
+    setCase(null)
+    setCaseFile('')
+    setStartTime(null)
     try {
       const res = await axios.post(`${API}/new-case`)
       setCase(res.data.case)
       setCaseFile(res.data.case_file)
       setStartTime(Date.now())
       setGameState('playing')
-    } catch (e) {
-      setError('Could not connect to backend. Is FastAPI running on port 8000?')
-      setGameState('error')
+    } catch {
+      setCaseFile('⚠️ Backend not reachable. Start FastAPI on port 8000.')
+      setGameState('playing')
     }
   }, [])
 
-  useEffect(() => { startNewCase() }, [])
+  // Auto-start case when game view appears
+  useEffect(() => {
+    if (view === 'game' && gameState === 'idle') startNewCase()
+  }, [view, gameState, startNewCase])
 
   // ── Send chat message ────────────────────────────────────────────────────────
   const sendMessage = useCallback(async (message) => {
-    if (!message.trim() || isThinking) return
+    if (!message.trim() || isThinking || gameState !== 'playing' || !case_) return
 
     const userMsg = { role: 'user', content: message }
     setHistory(prev => [...prev, userMsg])
@@ -57,139 +62,162 @@ export default function App() {
         message,
         case: case_,
         case_file: caseFile,
-        history: [...history, userMsg]
+        history: [...history, userMsg],
       })
       setCaseFile(res.data.updated_case_file)
       setHistory(prev => [...prev, {
-        role: 'assistant',
+        role:    'assistant',
         content: res.data.response,
-        agent: res.data.agent
+        agent:   res.data.agent,
       }])
-    } catch (e) {
+    } catch {
       setHistory(prev => [...prev, {
-        role: 'assistant',
-        content: 'The connection to the precinct went dark. Try again.',
-        agent: '⚠️ System'
+        role:    'assistant',
+        content: 'Connection lost. Try again.',
+        agent:   '⚠️ System',
       }])
     } finally {
       setIsThinking(false)
     }
-  }, [case_, caseFile, history, isThinking])
+  }, [case_, caseFile, history, isThinking, gameState])
 
   // ── Accuse ───────────────────────────────────────────────────────────────────
   const accuse = useCallback((guess) => {
-    const culprit = case_?.culprit || ''
-    if (guess.toLowerCase().includes(culprit.toLowerCase()) ||
-        culprit.toLowerCase().includes(guess.toLowerCase())) {
-      setGameState('solved')
-    } else {
-      setGameState('failed')
-    }
+    if (!case_) return
+    const c = case_.culprit.toLowerCase()
+    const g = guess.toLowerCase()
+    setGameState(g.includes(c) || c.includes(g) ? 'solved' : 'failed')
   }, [case_])
 
-  // ── Timer expiry ─────────────────────────────────────────────────────────────
+  // ── Timer up ─────────────────────────────────────────────────────────────────
   const handleTimeUp = useCallback(() => {
     if (gameState === 'playing') setGameState('gameover')
   }, [gameState])
 
-  // ── Loading screen ───────────────────────────────────────────────────────────
-  if (gameState === 'loading') {
-    return (
-      <div style={{
-        height: '100vh', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', gap: '24px'
-      }}>
-        <motion.div
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', color: 'var(--gold)' }}
-        >
-          CSI VEGAS
-        </motion.div>
-        <motion.div
-          animate={{ opacity: [0.2, 0.8, 0.2] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
-          style={{ fontFamily: 'var(--font-stamp)', fontSize: '0.85rem', color: 'var(--cream-dim)', letterSpacing: '0.2em' }}
-        >
-          GENERATING CRIME SCENE...
-        </motion.div>
-      </div>
-    )
-  }
+  // ── Loading screen — glitchy typewriter ─────────────────────────────────────
+  const LoadingScreen = () => {
+    const [displayed, setDisplayed] = useState('')
+    const [glitch, setGlitch]       = useState(false)
+    const full = 'GENERATING CRIME SCENE...'
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&!'
 
-  // ── Error screen ─────────────────────────────────────────────────────────────
-  if (gameState === 'error') {
+    useEffect(() => {
+      let i = 0
+      const type = setInterval(() => {
+        if (i >= full.length) { clearInterval(type); return }
+        setDisplayed(full.slice(0, i + 1))
+        i++
+      }, 65)
+      return () => clearInterval(type)
+    }, [])
+
+    // Random glitch flicker
+    useEffect(() => {
+      const flicker = setInterval(() => {
+        setGlitch(true)
+        setTimeout(() => setGlitch(false), 80)
+      }, 1800)
+      return () => clearInterval(flicker)
+    }, [])
+
+    // Scramble effect on top of typed text
+    const scrambled = displayed.split('').map((ch, i) =>
+      glitch && Math.random() > 0.7 ? chars[Math.floor(Math.random() * chars.length)] : ch
+    ).join('')
+
     return (
       <div style={{
         height: '100vh', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', gap: '16px',
-        padding: '40px'
+        alignItems: 'center', justifyContent: 'center',
+        gap: '28px', background: 'var(--black)',
+        position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: '#c0392b' }}>
-          Connection Failed
-        </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--cream-dim)', textAlign: 'center', maxWidth: '400px' }}>
-          {error}
-        </div>
-        <button onClick={startNewCase} style={{
-          marginTop: '16px', padding: '10px 24px',
-          background: 'transparent', border: '1px solid var(--gold)',
-          color: 'var(--gold)', fontFamily: 'var(--font-stamp)',
-          letterSpacing: '0.1em', cursor: 'pointer', fontSize: '0.85rem'
+        {/* Scanlines */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 6px)',
+        }} />
+
+        {/* Glitchy text */}
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+          color: glitch ? 'var(--cyan)' : 'var(--purple-light)',
+          letterSpacing: '0.18em',
+          textShadow: glitch
+            ? '2px 0 var(--orange), -2px 0 var(--cyan), 0 0 20px var(--cyan)'
+            : '0 0 14px rgba(192,112,192,0.6)',
+          transition: 'color 0.05s, text-shadow 0.05s',
+          minHeight: '2rem',
+          textAlign: 'center',
+          padding: '0 20px',
         }}>
-          RETRY
-        </button>
+          {scrambled}
+          {/* Blinking cursor */}
+          <span style={{
+            display: 'inline-block',
+            width: '2px', height: '1.2em',
+            background: 'var(--purple-light)',
+            marginLeft: '4px',
+            verticalAlign: 'middle',
+            animation: 'bounce 0.8s step-end infinite',
+          }} />
+        </div>
+
+        {/* Sub label */}
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.65rem',
+          color: 'var(--grey-dim)',
+          letterSpacing: '0.25em',
+        }}>
+          ACCESSING BELLAGIO SECURITY FILES...
+        </div>
+
+        {/* Progress bar */}
+        <div style={{
+          width: '260px', height: '2px',
+          background: 'var(--grey-dim)',
+          borderRadius: '2px',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            height: '100%',
+            background: 'var(--purple-light)',
+            boxShadow: '0 0 8px var(--purple-light)',
+            animation: 'progressBar 2.5s ease-in-out infinite',
+          }} />
+        </div>
       </div>
     )
   }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="show"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '200px 1fr 2fr 320px',
-        height: '100vh',
-        overflow: 'hidden',
-        gap: '0',
-      }}
-    >
-      {/* Left Sidebar — timer + controls */}
-      <motion.div variants={fadeUp} custom={0}>
-        <Sidebar
-          startTime={startTime}
-          gameState={gameState}
-          onTimeUp={handleTimeUp}
-          onNewCase={startNewCase}
-        />
-      </motion.div>
+    <div>
+      {/* Page 1 — Landing */}
+      <div style={{ minHeight: '100vh' }}>
+        <LandingPage onStart={goToGame} />
+      </div>
 
-      {/* Dossier — victim + suspects */}
-      <motion.div variants={fadeUp} custom={1} style={{ overflowY: 'auto', borderRight: '1px solid var(--dark-border)' }}>
-        <DossierPanel case_={case_} />
-      </motion.div>
-
-      {/* Chat — investigation room */}
-      <motion.div variants={fadeUp} custom={2} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <ChatRoom
-          history={history}
-          isThinking={isThinking}
-          gameState={gameState}
-          onSend={sendMessage}
-        />
-      </motion.div>
-
-      {/* Right — case file + reveal + accusation */}
-      <motion.div variants={fadeUp} custom={3} style={{ overflowY: 'auto', borderLeft: '1px solid var(--dark-border)' }}>
-        <RightPanel
-          case_={case_}
-          caseFile={caseFile}
-          gameState={gameState}
-          onAccuse={accuse}
-          onNewCase={startNewCase}
-        />
-      </motion.div>
-    </motion.div>
+      {/* Page 2 — Game */}
+      <div ref={gameRef}>
+        {view === 'game' && (
+          gameState === 'loading'
+            ? <LoadingScreen />
+            : <GamePage
+                case_={case_}
+                caseFile={caseFile}
+                history={history}
+                isThinking={isThinking}
+                gameState={gameState}
+                startTime={startTime}
+                onSend={sendMessage}
+                onNewCase={startNewCase}
+                onAccuse={accuse}
+                onTimeUp={handleTimeUp}
+              />
+        )}
+      </div>
+    </div>
   )
 }
