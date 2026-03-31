@@ -6,8 +6,7 @@ on:
       - main
 
 permissions:
-  pages: write
-  id-token: write
+  contents: write   # <-- critical fix
 
 jobs:
   build:
@@ -15,16 +14,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '20'
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Build the project
         working-directory: ./frontend
