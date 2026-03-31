@@ -1,4 +1,4 @@
-// Sidebar.jsx
+// Sidebar.jsx — timer + location + new case only
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -17,10 +17,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
     return () => clearInterval(id)
   }, [startTime, gameState, onTimeUp])
 
-  // Reset remaining when new case starts
-  useEffect(() => {
-    if (startTime) setRemaining(TOTAL)
-  }, [startTime])
+  useEffect(() => { if (startTime) setRemaining(TOTAL) }, [startTime])
 
   const mins = String(Math.floor(remaining / 60)).padStart(2, '0')
   const secs = String(remaining % 60).padStart(2, '0')
@@ -39,27 +36,6 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       alignItems: 'center',
       padding: '24px 14px 20px',
     }}>
-      {/* Title */}
-      <div style={{
-        fontFamily: 'var(--font-hero)',
-        fontSize: '1.1rem',
-        color: 'var(--gold)',
-        letterSpacing: '0.06em',
-        textAlign: 'center',
-        marginBottom: '4px',
-      }}>
-        CSI VEGAS
-      </div>
-      <div style={{
-        fontFamily: 'var(--font-stamp)',
-        fontSize: '0.58rem',
-        color: 'var(--grey)',
-        letterSpacing: '0.2em',
-        textAlign: 'center',
-        marginBottom: '28px',
-      }}>
-        MURDER MYSTERY
-      </div>
 
       {/* Timer label */}
       <div style={{
@@ -68,62 +44,48 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         color: 'var(--grey)',
         letterSpacing: '0.14em',
         marginBottom: '10px',
-      }}>
-        ⏱ TIME REMAINING
-      </div>
+      }}>⏱ TIME REMAINING</div>
 
       {/* SVG Ring timer */}
-      <div style={{ position: 'relative', width: '90px', height: '90px', marginBottom: '8px' }}>
+      <div style={{ position: 'relative', width: '90px', height: '90px', marginBottom: '16px' }}>
         <svg width="90" height="90" style={{ transform: 'rotate(-90deg)' }}>
           <circle cx="45" cy="45" r={r} fill="none" stroke="var(--grey-dim)" strokeWidth="3" />
           <motion.circle
-            cx="45" cy="45" r={r}
-            fill="none"
-            stroke={timerColor}
-            strokeWidth="3"
-            strokeLinecap="round"
+            cx="45" cy="45" r={r} fill="none"
+            stroke={timerColor} strokeWidth="3" strokeLinecap="round"
             strokeDasharray={circ}
             animate={{ strokeDashoffset: circ * (1 - pct) }}
             transition={{ duration: 0.9, ease: 'linear' }}
             style={{ filter: `drop-shadow(0 0 5px ${timerColor})` }}
           />
         </svg>
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <AnimatePresence mode="wait">
             <motion.span
               key={secs}
               initial={{ scale: 0.9, opacity: 0.7 }}
               animate={{ scale: 1, opacity: 1 }}
               style={{
-                fontFamily: 'var(--font-stamp)',
-                fontSize: '1.2rem',
-                fontWeight: 700,
-                color: timerColor,
-                filter: `drop-shadow(0 0 6px ${timerColor})`,
+                fontFamily: 'var(--font-stamp)', fontSize: '1.2rem', fontWeight: 700,
+                color: timerColor, filter: `drop-shadow(0 0 6px ${timerColor})`,
               }}
-            >
-              {mins}:{secs}
-            </motion.span>
+            >{mins}:{secs}</motion.span>
           </AnimatePresence>
         </div>
       </div>
 
-      <div style={{ width: '100%', height: '1px', background: 'var(--border)', margin: '20px 0' }} />
+      <div style={{ width: '100%', height: '1px', background: 'var(--border)', marginBottom: '16px' }} />
 
-      {/* Location */}
+      {/* Location — bigger label */}
       <div style={{
         fontFamily: 'var(--font-stamp)',
-        fontSize: '0.58rem',
+        fontSize: '1rem',
+        fontWeight: 700,
         color: 'var(--gold)',
-        letterSpacing: '0.14em',
-        marginBottom: '6px',
+        letterSpacing: '0.1em',
+        marginBottom: '8px',
         alignSelf: 'flex-start',
-      }}>
-        📍 LOCATION
-      </div>
+      }}>📍 LOCATION</div>
       <div style={{
         width: '100%',
         background: 'var(--black)',
@@ -136,9 +98,31 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         textAlign: 'center',
         lineHeight: 1.6,
         marginBottom: '20px',
-      }}>
-        The Bellagio<br />Las Vegas Strip
-      </div>
+      }}>The Bellagio<br />Las Vegas Strip</div>
+
+      {/* New Case — yellow pill, black text — right below location */}
+      <motion.button
+        whileHover={{ scale: 1.03, backgroundColor: '#e6c000' }}
+        whileTap={{ scale: 0.96 }}
+        onClick={onNewCase}
+        style={{
+          width: '100%',
+          padding: '12px',
+          background: 'var(--yellow)',
+          border: 'none',
+          color: 'var(--black)',
+          fontFamily: 'var(--font-stamp)',
+          fontWeight: 700,
+          fontSize: '0.85rem',
+          letterSpacing: '0.12em',
+          cursor: 'pointer',
+          borderRadius: '999px',
+          transition: 'background 0.2s',
+          marginBottom: '20px',
+        }}
+      >
+        NEW CASE
+      </motion.button>
 
       {/* Tip */}
       <div style={{
@@ -152,29 +136,6 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       }}>
         Start with "ask",<br />"found", or "analyze"
       </div>
-
-      {/* New Case */}
-      <motion.button
-        whileHover={{ backgroundColor: 'var(--gold)', color: 'var(--black)' }}
-        whileTap={{ scale: 0.96 }}
-        onClick={onNewCase}
-        style={{
-          width: '100%',
-          padding: '10px',
-          background: 'transparent',
-          border: '1px solid var(--grey-dim)',
-          color: 'var(--gold)',
-          fontFamily: 'var(--font-stamp)',
-          fontWeight: 700,
-          fontSize: '0.72rem',
-          letterSpacing: '0.12em',
-          cursor: 'pointer',
-          borderRadius: '3px',
-          transition: 'background 0.2s, color 0.2s',
-        }}
-      >
-        [ NEW CASE ]
-      </motion.button>
     </div>
   )
 }

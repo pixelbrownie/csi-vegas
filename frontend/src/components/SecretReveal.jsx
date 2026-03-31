@@ -53,7 +53,6 @@ export default function SecretReveal({ secretText }) {
           textAlign: 'center',
           padding: '0 12px',
         }}>
-          [ CLASSIFIED EVIDENCE ]
         </span>
 
         {/* Revealed neon layer */}
