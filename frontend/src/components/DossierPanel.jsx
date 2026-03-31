@@ -10,27 +10,27 @@ function VictimCard({ victim }) {
       style={{
         background: 'var(--card)',
         border: '1px solid var(--border-2)',
-        borderRadius: '24px',
-        padding: '12px',
+        borderRadius: '18px',
+        padding: '10px',
         display: 'flex',
-        gap: '12px',
+        gap: '9px',
         alignItems: 'flex-start',
-        marginBottom: '20px',
+        marginBottom: '16px',
         minWidth: 0,
       }}
     >
       <div
         style={{
-          width: '68px',
-          height: '76px',
+          width: '40px',
+          height: '46px',
           flexShrink: 0,
           background: 'var(--black-3)',
           border: '1px solid var(--border)',
-          borderRadius: '16px',
+          borderRadius: '10px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '2.1rem',
+          fontSize: '1.2rem',
         }}
       >
         🕵️
@@ -40,7 +40,7 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.6rem',
+            fontSize: '0.5rem',
             color: 'var(--orange)',
             letterSpacing: '0.12em',
             marginBottom: '3px',
@@ -53,7 +53,7 @@ function VictimCard({ victim }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
-            fontSize: '1rem',
+            fontSize: '0.88rem',
             color: 'var(--white)',
             lineHeight: 1.2,
             marginBottom: '3px',
@@ -67,7 +67,7 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-ui)',
-            fontSize: '0.75rem',
+            fontSize: '0.66rem',
             color: 'var(--orange)',
             fontStyle: 'italic',
             marginBottom: '7px',
@@ -81,7 +81,7 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.63rem',
+            fontSize: '0.56rem',
             color: 'var(--grey)',
             marginBottom: '2px',
             wordBreak: 'break-word',
@@ -94,7 +94,7 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.63rem',
+            fontSize: '0.56rem',
             color: 'var(--grey)',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
@@ -117,10 +117,10 @@ function SuspectCard({ suspect, icon, index }) {
       style={{
         background: 'var(--black)',
         border: '1px solid var(--border)',
-        borderRadius: '24px',
-        padding: '10px',
+        borderRadius: '16px',
+        padding: '9px',
         display: 'flex',
-        gap: '10px',
+        gap: '8px',
         alignItems: 'flex-start',
         marginBottom: '8px',
         minWidth: 0,
@@ -128,16 +128,16 @@ function SuspectCard({ suspect, icon, index }) {
     >
       <div
         style={{
-          width: '52px',
-          height: '60px',
+          width: '30px',
+          height: '40px',
           flexShrink: 0,
           background: 'var(--black-3)',
           border: '1px solid var(--border)',
-          borderRadius: '12px',
+          borderRadius: '9px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '1.7rem',
+          fontSize: '0.95rem',
         }}
       >
         {icon}
@@ -148,7 +148,7 @@ function SuspectCard({ suspect, icon, index }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
-            fontSize: '0.9rem',
+            fontSize: '0.76rem',
             color: 'var(--white)',
             marginBottom: '4px',
             lineHeight: 1.2,
@@ -162,7 +162,7 @@ function SuspectCard({ suspect, icon, index }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.62rem',
+            fontSize: '0.56rem',
             color: 'var(--grey)',
             lineHeight: 1.5,
             marginBottom: '2px',
@@ -170,28 +170,28 @@ function SuspectCard({ suspect, icon, index }) {
             overflowWrap: 'anywhere',
           }}
         >
-          Motive: {suspect.motive.slice(0, 55)}
-          {suspect.motive.length > 55 ? '…' : ''}
+          Motive: {suspect.motive.slice(0, 48)}
+          {suspect.motive.length > 48 ? '…' : ''}
         </div>
 
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.62rem',
+            fontSize: '0.56rem',
             color: 'var(--grey)',
             lineHeight: 1.5,
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
         >
-          Alibi: {suspect.alibi.slice(0, 55)}
-          {suspect.alibi.length > 55 ? '…' : ''}
+          Alibi: {suspect.alibi.slice(0, 48)}
+          {suspect.alibi.length > 48 ? '…' : ''}
         </div>
 
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.58rem',
+            fontSize: '0.52rem',
             color: 'var(--orange)',
             fontStyle: 'italic',
             marginTop: '5px',
@@ -201,7 +201,7 @@ function SuspectCard({ suspect, icon, index }) {
             overflowWrap: 'anywhere',
           }}
         >
-          🎮 Start msgs with "ask", "found" or "analyze"
+          Start msgs with "ask", "found" or "analyze"
         </div>
       </div>
     </motion.div>
@@ -214,9 +214,9 @@ export default function DossierPanel({ case_ }) {
   return (
     <div
       style={{
-        padding: '20px 16px',
+        padding: '18px 14px',
         height: '100%',
-        background: 'var(--black-2)',
+        background: '#0b0c0e',
         overflowX: 'hidden',
         minWidth: 0,
       }}
@@ -227,13 +227,14 @@ export default function DossierPanel({ case_ }) {
         transition={{ duration: 0.4 }}
         style={{
           fontFamily: 'var(--font-hero)',
-          fontSize: '1.6rem',
+          fontSize: '1.45rem',
           color: 'var(--white)',
           letterSpacing: '0.04em',
-          marginBottom: '14px',
+          marginBottom: '10px',
+          textTransform: 'uppercase',
         }}
       >
-        victim
+        VICTIM
       </motion.div>
 
       <VictimCard victim={case_.victim} />
@@ -244,13 +245,14 @@ export default function DossierPanel({ case_ }) {
         transition={{ duration: 0.4, delay: 0.1 }}
         style={{
           fontFamily: 'var(--font-hero)',
-          fontSize: '1.3rem',
+          fontSize: '1.25rem',
           color: 'var(--white)',
           letterSpacing: '0.04em',
-          marginBottom: '10px',
+          marginBottom: '8px',
+          textTransform: 'uppercase',
         }}
       >
-        suspects
+        SUSPECTS
       </motion.div>
 
       {[case_.suspect_a, case_.suspect_b].map((s, i) => (

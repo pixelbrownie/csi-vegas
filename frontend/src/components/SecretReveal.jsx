@@ -21,7 +21,7 @@ export default function SecretReveal({ secretText }) {
         letterSpacing: '0.14em',
         marginBottom: '5px',
       }}>
-        🔦 SECRET CLUE — hover to reveal
+        SECRET CLUE - hover to reveal
       </div>
 
       <div

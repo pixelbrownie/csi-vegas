@@ -9,6 +9,7 @@ import RightPanel from './RightPanel.jsx'
 function TickerTape() {
   const chunk = 'KEEP OUT  '
   const text = chunk.repeat(25)
+  const durationSec = 30
 
   return (
     <div
@@ -25,7 +26,7 @@ function TickerTape() {
       <div
         style={{
           display: 'inline-block',
-          animation: 'scrollLeft 30s linear infinite',
+          animation: `scrollLeft ${durationSec}s linear infinite`,
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
           fontSize: '0.95rem',
@@ -68,7 +69,8 @@ export default function GamePage({
         style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '220px 320px minmax(0, 1fr) 340px',
+          gridTemplateColumns: '208px 320px minmax(0, 1fr) 300px',
+          columnGap: '10px',
           overflow: 'hidden',
           minHeight: 0,
           width: '100%',

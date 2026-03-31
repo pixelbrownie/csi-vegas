@@ -29,34 +29,58 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
   return (
     <div style={{
       height: '100%',
-      background: 'var(--black-2)',
+      background: '#08090b',
       borderRight: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      padding: '24px 14px 20px',
+      padding: '22px 14px 16px',
     }}>
+      <div style={{
+        width: '100%',
+        marginBottom: '22px',
+      }}>
+        <div style={{
+          fontFamily: 'var(--font-hero)',
+          fontSize: '1.2rem',
+          letterSpacing: '0.06em',
+          color: 'var(--white)',
+          lineHeight: 1,
+        }}>
+          CSI VEGAS
+        </div>
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.46rem',
+          color: 'var(--grey)',
+          letterSpacing: '0.2em',
+          marginTop: '4px',
+          textTransform: 'uppercase',
+        }}>
+          Murder Mystery
+        </div>
+      </div>
 
       {/* Timer label */}
       <div style={{
         fontFamily: 'var(--font-stamp)',
-        fontSize: '0.6rem',
+        fontSize: '0.5rem',
         color: 'var(--grey)',
         letterSpacing: '0.14em',
-        marginBottom: '10px',
-      }}>⏱ TIME REMAINING</div>
+        marginBottom: '8px',
+        alignSelf: 'flex-start',
+      }}>TIME REMAINING</div>
 
       {/* SVG Ring timer */}
-      <div style={{ position: 'relative', width: '90px', height: '90px', marginBottom: '16px' }}>
-        <svg width="90" height="90" style={{ transform: 'rotate(-90deg)' }}>
-          <circle cx="45" cy="45" r={r} fill="none" stroke="var(--grey-dim)" strokeWidth="3" />
+      <div style={{ position: 'relative', width: '84px', height: '84px', marginBottom: '16px' }}>
+        <svg width="84" height="84" style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx="42" cy="42" r={r} fill="none" stroke="var(--grey-dim)" strokeWidth="2.2" />
           <motion.circle
-            cx="45" cy="45" r={r} fill="none"
-            stroke={timerColor} strokeWidth="3" strokeLinecap="round"
+            cx="42" cy="42" r={r} fill="none"
+            stroke={timerColor} strokeWidth="2.2" strokeLinecap="round"
             strokeDasharray={circ}
             animate={{ strokeDashoffset: circ * (1 - pct) }}
             transition={{ duration: 0.9, ease: 'linear' }}
-            style={{ filter: `drop-shadow(0 0 5px ${timerColor})` }}
           />
         </svg>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -66,7 +90,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
               initial={{ scale: 0.9, opacity: 0.7 }}
               animate={{ scale: 1, opacity: 1 }}
               style={{
-                fontFamily: 'var(--font-stamp)', fontSize: '1.2rem', fontWeight: 700,
+                fontFamily: 'var(--font-stamp)', fontSize: '1rem', fontWeight: 700,
                 color: timerColor, filter: `drop-shadow(0 0 6px ${timerColor})`,
               }}
             >{mins}:{secs}</motion.span>
@@ -79,24 +103,24 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       {/* Location — bigger label */}
       <div style={{
         fontFamily: 'var(--font-stamp)',
-        fontSize: '1rem',
+        fontSize: '0.52rem',
         fontWeight: 700,
-        color: 'var(--gold)',
-        letterSpacing: '0.1em',
-        marginBottom: '8px',
+        color: 'var(--grey)',
+        letterSpacing: '0.14em',
+        marginBottom: '6px',
         alignSelf: 'flex-start',
-      }}>📍 LOCATION</div>
+      }}>LOCATION</div>
       <div style={{
         width: '100%',
-        background: 'var(--black)',
+        background: '#0d0f12',
         border: '1px solid var(--border)',
-        borderRadius: '12px',
+        borderRadius: '3px',
         padding: '8px',
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.65rem',
-        color: 'var(--grey)',
+        fontSize: '0.58rem',
+        color: 'var(--white-dim)',
         textAlign: 'center',
-        lineHeight: 1.6,
+        lineHeight: 1.45,
         marginBottom: '20px',
       }}>The Bellagio<br />Las Vegas Strip</div>
 
@@ -107,18 +131,18 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         onClick={onNewCase}
         style={{
           width: '100%',
-          padding: '12px',
+          padding: '9px 10px',
           background: 'var(--yellow)',
-          border: 'none',
+          border: '1px solid #c8a000',
           color: 'var(--black)',
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
-          fontSize: '0.85rem',
-          letterSpacing: '0.12em',
+          fontSize: '0.65rem',
+          letterSpacing: '0.14em',
           cursor: 'pointer',
           borderRadius: '999px',
           transition: 'background 0.2s',
-          marginBottom: '20px',
+          marginBottom: '14px',
         }}
       >
         NEW CASE
@@ -127,14 +151,16 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       {/* Tip */}
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.6rem',
+        fontSize: '0.48rem',
         color: 'var(--grey-dim)',
-        lineHeight: 1.7,
-        textAlign: 'center',
+        lineHeight: 1.5,
+        textAlign: 'left',
         marginBottom: 'auto',
-        padding: '0 4px',
+        width: '100%',
       }}>
-        Start with "ask",<br />"found", or "analyze"
+        Hint keys: "ask"
+        <br />
+        "found" "analyze"
       </div>
     </div>
   )

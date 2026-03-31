@@ -150,7 +150,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: 'var(--black-3)',
+        background: '#0b0c0f',
         minWidth: 0,
         minHeight: 0,
         overflow: 'hidden',
@@ -159,7 +159,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
       {/* Header */}
       <div
         style={{
-          padding: '18px 22px 14px',
+          padding: '18px 22px 12px',
           borderBottom: '1px solid var(--border)',
           flexShrink: 0,
           textAlign: 'center',
@@ -169,7 +169,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
         <div
           style={{
             fontFamily: 'var(--font-hero)',
-            fontSize: '2.2rem',
+            fontSize: '2rem',
             color: 'var(--white)',
             lineHeight: 1,
             letterSpacing: '0.04em',
@@ -181,7 +181,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
         <div
           style={{
             fontFamily: 'var(--font-ui)',
-            fontSize: '0.82rem',
+            fontSize: '0.8rem',
             color: 'var(--grey)',
             fontStyle: 'italic',
             marginTop: '2px',
@@ -195,12 +195,12 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
-            fontSize: '1rem',
+            fontSize: '0.9rem',
             color: 'var(--white)',
             letterSpacing: '0.06em',
           }}
         >
-          🕯 INVESTIGATION ROOM
+          INVESTIGATION ROOM
         </div>
       </div>
 
@@ -223,10 +223,11 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
               textAlign: 'center',
               margin: 'auto',
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.7rem',
+              fontSize: '0.64rem',
               color: 'var(--grey-dim)',
               letterSpacing: '0.15em',
               lineHeight: 2.2,
+              textTransform: 'uppercase',
             }}
           >
             CASE FILE OPEN.
@@ -293,7 +294,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
               padding: '11px 16px',
               background: 'var(--card)',
               border: '1px solid var(--border-2)',
-              borderRadius: '24px',
+              borderRadius: '999px',
               color: 'var(--white)',
               fontFamily: 'var(--font-ui)',
               fontSize: '0.88rem',
@@ -310,13 +311,13 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
             onClick={send}
             disabled={isThinking || !input.trim()}
             style={{
-              width: '44px',
-              height: '44px',
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
               background: input.trim() ? 'var(--white)' : 'var(--grey-dim)',
               border: 'none',
               color: 'var(--black)',
-              fontSize: '1rem',
+              fontSize: '0.9rem',
               cursor: input.trim() ? 'pointer' : 'default',
               display: 'flex',
               alignItems: 'center',
@@ -325,7 +326,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
               flexShrink: 0,
             }}
           >
-            ᯓ➤
+            ▶
           </motion.button>
         </div>
       )}

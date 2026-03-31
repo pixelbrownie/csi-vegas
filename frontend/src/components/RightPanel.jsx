@@ -42,7 +42,7 @@ function CaseFile({ text }) {
         style={{
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
-          fontSize: '0.95rem',
+          fontSize: '0.9rem',
           color: '#2a1808',
           display: 'flex',
           alignItems: 'center',
@@ -52,7 +52,7 @@ function CaseFile({ text }) {
           paddingBottom: '7px',
         }}
       >
-        🔑 Live Case File
+        Live Case File
       </div>
 
       <AnimatePresence mode="wait">
@@ -63,7 +63,7 @@ function CaseFile({ text }) {
           transition={{ duration: 0.35 }}
           style={{
             fontFamily: 'var(--font-ui)',
-            fontSize: '0.8rem',
+            fontSize: '0.76rem',
             color: '#2a1808',
             lineHeight: 1.75,
             maxHeight: '160px',
@@ -223,7 +223,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
       style={{
         background: 'var(--card)',
         border: '1px solid var(--border-2)',
-        borderRadius: '24px',
+        borderRadius: '16px',
         padding: '14px',
         marginBottom: '10px',
         minWidth: 0,
@@ -233,7 +233,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
         style={{
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
-          fontSize: '0.95rem',
+          fontSize: '0.9rem',
           color: 'var(--white)',
           display: 'flex',
           alignItems: 'center',
@@ -241,7 +241,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
           marginBottom: '12px',
         }}
       >
-        🔫 Make Your Accusation
+        Make Your Accusation
       </div>
 
       {!shown ? (
@@ -260,7 +260,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             fontSize: '0.72rem',
             letterSpacing: '0.1em',
             cursor: 'pointer',
-            borderRadius: '3px',
+                borderRadius: '10px',
             transition: 'all 0.2s',
           }}
         >
@@ -311,7 +311,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
                 fontSize: '0.82rem',
                 letterSpacing: '0.14em',
                 cursor: selected ? 'pointer' : 'default',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 transition: 'background 0.2s',
               }}
             >
@@ -337,7 +337,7 @@ function HowToPlay({ victimName }) {
       style={{
         background: 'var(--black)',
         border: '1px solid var(--border)',
-        borderRadius: '24px',
+        borderRadius: '16px',
         padding: '12px',
         minWidth: 0,
       }}
@@ -346,7 +346,7 @@ function HowToPlay({ victimName }) {
         style={{
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
-          fontSize: '0.88rem',
+          fontSize: '0.84rem',
           color: 'var(--gold)',
           display: 'flex',
           alignItems: 'center',
@@ -354,7 +354,7 @@ function HowToPlay({ victimName }) {
           marginBottom: '10px',
         }}
       >
-        💡 How to Play
+        How to Play
       </div>
 
       {items.map((item, i) => (
@@ -401,9 +401,9 @@ export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNew
   return (
     <div
       style={{
-        padding: '16px 14px',
+        padding: '12px 10px',
         height: '100%',
-        background: 'var(--black-2)',
+        background: '#090a0d',
         overflowY: 'auto',
         overflowX: 'hidden',
         minWidth: 0,

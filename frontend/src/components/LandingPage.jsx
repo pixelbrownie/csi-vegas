@@ -33,46 +33,49 @@ export default function LandingPage({ onStart }) {
     <div style={{
       minHeight: '100vh',
       display: 'grid',
-      gridTemplateColumns: '1fr 420px',
-      background: 'var(--black)',
+      gridTemplateColumns: '1fr 440px',
+      background: 'radial-gradient(circle at 20% 30%, #131420 0%, #08090b 58%, #050506 100%)',
       overflow: 'hidden',
       position: 'relative',
     }}>
-      {/* Subtle purple radial bg */}
+      {/* Ambient overlays */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse at 30% 50%, rgba(124,63,124,0.12) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse at 30% 45%, rgba(124,63,124,0.18) 0%, transparent 68%)',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.14) 3px, rgba(0,0,0,0.14) 6px)',
       }} />
 
       {/* ── LEFT: Hero ─────────────────────────────────────────────── */}
       <div style={{
-        padding: '48px 48px 60px',
+        padding: '52px 56px 64px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
         zIndex: 1,
       }}>
-        {/* Quote marks */}
+        {/* Top meta */}
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: '4.5rem',
-            color: 'var(--white)',
-            lineHeight: 0.8,
-            letterSpacing: '-0.04em',
-            userSelect: 'none',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.64rem',
+            color: 'var(--grey)',
+            letterSpacing: '0.24em',
+            textTransform: 'uppercase',
           }}
         >
-          ❝❝
+          Bellagio Case Simulation // Multi-Agent
         </motion.div>
 
         {/* Big hero text */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: '-20px' }}>
-          {['CRIME', 'SCENE'].map((word, i) => (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: '-24px' }}>
+          {['CSI', 'VEGAS'].map((word, i) => (
             <motion.div
               key={word}
               initial={{ opacity: 0, y: 50 }}
@@ -80,11 +83,11 @@ export default function LandingPage({ onStart }) {
               transition={{ duration: 0.75, delay: 0.15 + i * 0.18, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 fontFamily: 'var(--font-hero)',
-                fontSize: 'clamp(7rem, 15vw, 13rem)',
-                color: 'var(--purple)',
-                lineHeight: 0.88,
-                letterSpacing: '0.01em',
-                textShadow: '3px 3px 0px var(--purple-dim), 0 0 60px rgba(124,63,124,0.3)',
+                fontSize: 'clamp(6.8rem, 14vw, 12rem)',
+                color: i === 0 ? '#f6f6f6' : 'var(--purple-light)',
+                lineHeight: 0.86,
+                letterSpacing: '0.04em',
+                textShadow: i === 0 ? '0 0 24px rgba(255,255,255,0.16)' : '0 0 28px rgba(192,112,192,0.3)',
               }}
             >
               {word}
@@ -96,46 +99,69 @@ export default function LandingPage({ onStart }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.55 }}
             style={{
-              fontFamily: 'var(--font-stamp)',
+              fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              fontSize: 'clamp(1rem, 2.5vw, 1.8rem)',
-              color: 'var(--purple-light)',
-              letterSpacing: '0.3em',
-              marginTop: '16px',
+              fontSize: 'clamp(0.75rem, 1.3vw, 1rem)',
+              color: 'var(--grey)',
+              letterSpacing: '0.22em',
+              marginTop: '14px',
+              textTransform: 'uppercase',
             }}
           >
-            INVESTIGATION.......
+            Interrogate. Analyze. Deduce.
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            style={{
+              maxWidth: '620px',
+              marginTop: '18px',
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.94rem',
+              color: 'var(--white-dim)',
+              lineHeight: 1.7,
+            }}
+          >
+            Enter the investigation room and solve a live murder case. Every action updates the case file in real time.
           </motion.div>
         </div>
 
-        {/* START button */}
+        {/* Start CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          style={{ display: 'flex', justifyContent: 'center' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
         >
           <motion.button
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.94 }}
+            whileHover={{ scale: 1.02, borderColor: 'var(--white-dim)' }}
+            whileTap={{ scale: 0.98 }}
             onClick={onStart}
             style={{
-              width: '155px', height: '155px',
-              borderRadius: '50%',
-              background: 'var(--orange)',
-              border: 'none',
-              color: 'var(--black)',
-              fontFamily: 'var(--font-hero)',
-              fontSize: '2.2rem',
-              letterSpacing: '0.06em',
+              padding: '14px 22px',
+              borderRadius: '999px',
+              background: '#0b0d10',
+              border: '1px solid var(--border-2)',
+              color: '#f2f2f2',
+              fontFamily: 'var(--font-stamp)',
+              fontSize: '0.86rem',
+              letterSpacing: '0.18em',
               cursor: 'pointer',
-              animation: 'pulseGlow 2.2s ease-in-out infinite',
-              position: 'relative',
-              zIndex: 10,
             }}
           >
-            START
+            START INVESTIGATION
           </motion.button>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.58rem',
+            color: 'var(--grey)',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+          }}>
+            Scrolls to live case room
+          </div>
         </motion.div>
       </div>
 
@@ -145,22 +171,24 @@ export default function LandingPage({ onStart }) {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, delay: 0.3 }}
         style={{
-          background: 'var(--black-2)',
+          background: '#0a0b0e',
           borderLeft: '1px solid var(--border)',
-          padding: '48px 32px',
+          padding: '48px 34px',
           overflowY: 'auto',
           position: 'relative',
           zIndex: 1,
         }}
       >
         <div style={{
-          fontSize: '1.3rem',
+          fontFamily: 'var(--font-stamp)',
+          fontSize: '1.15rem',
           fontWeight: 700,
           color: 'var(--white)',
           lineHeight: 1.35,
-          marginBottom: '36px',
+          marginBottom: '28px',
+          letterSpacing: '0.05em',
         }}>
-          😱 What happens in the<br />investigation room?
+          How the Investigation Works
         </div>
 
         {AGENTS.map((agent, i) => (
@@ -175,11 +203,13 @@ export default function LandingPage({ onStart }) {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
+              fontFamily: 'var(--font-stamp)',
               fontWeight: 700,
-              fontSize: '0.82rem',
-              letterSpacing: '0.04em',
+              fontSize: '0.78rem',
+              letterSpacing: '0.08em',
               color: 'var(--white)',
-              marginBottom: '10px',
+              marginBottom: '9px',
+              textTransform: 'uppercase',
             }}>
               <span style={{ color: 'var(--grey)' }}>{agent.num}</span>
               <span>{agent.icon}</span>
@@ -187,7 +217,7 @@ export default function LandingPage({ onStart }) {
             </div>
             <div style={{
               paddingLeft: '18px',
-              borderLeft: '2px solid var(--border-2)',
+              borderLeft: '1px solid var(--border-2)',
             }}>
               <p style={{ fontSize: '0.88rem', color: 'var(--white-dim)', marginBottom: '6px', lineHeight: 1.65 }}>
                 {agent.desc}

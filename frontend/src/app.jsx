@@ -8,6 +8,7 @@ import LandingPage from './components/LandingPage.jsx'
 import GamePage    from './components/GamePage.jsx'
 
 const API = '/api'
+const MIN_LOADING_MS = 10000
 
 export default function App() {
   const [view,       setView]       = useState('landing')
@@ -27,6 +28,14 @@ export default function App() {
 
   // ── Generate new case ────────────────────────────────────────────────────────
   const startNewCase = useCallback(async () => {
+    const startedAt = Date.now()
+    const waitForMinimumLoading = async () => {
+      const elapsed = Date.now() - startedAt
+      if (elapsed < MIN_LOADING_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_LOADING_MS - elapsed))
+      }
+    }
+
     setGameState('loading')
     setHistory([])
     setCase(null)
@@ -34,11 +43,13 @@ export default function App() {
     setStartTime(null)
     try {
       const res = await axios.post(`${API}/new-case`)
+      await waitForMinimumLoading()
       setCase(res.data.case)
       setCaseFile(res.data.case_file)
       setStartTime(Date.now())
       setGameState('playing')
     } catch {
+      await waitForMinimumLoading()
       setCaseFile('⚠️ Backend not reachable. Start FastAPI on port 8000.')
       setGameState('playing')
     }
