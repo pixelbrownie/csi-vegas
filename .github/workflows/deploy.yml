@@ -2,38 +2,35 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: write   # <-- fix permissions for gh-pages push
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'   # <-- upgrade Node version
 
       - name: Install dependencies
-        working-directory: frontend
+        working-directory: ./frontend
         run: npm ci
 
-      - name: Fix permissions
-        working-directory: frontend
-        run: chmod +x node_modules/.bin/vite
-
-      - name: Build
-        working-directory: frontend
+      - name: Build the project
+        working-directory: ./frontend
         run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: frontend/dist
+          publish_dir: ./frontend/dist
