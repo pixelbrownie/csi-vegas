@@ -1,7 +1,4 @@
 # app.py
-# Phase 4 & 5 — Streamlit UI with Vegas dark theme + countdown timer
-# Run with: streamlit run app.py
-
 import time
 import streamlit as st
 from scenario_generator import generate_case
