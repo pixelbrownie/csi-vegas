@@ -329,7 +329,7 @@ function HowToPlay({ victimName }) {
   const items = [
     { icon: '🔍', agent: 'Witness Agent', desc: '– Question suspects', eg: `"Where were you when ${victimName} died?"` },
     { icon: '🧬', agent: 'Analyst Agent', desc: '– Submit clues', eg: '"I found a loyalty card. Analyze it."' },
-    { icon: '🎙', agent: 'Narrator Agent', desc: '– Advance the story', eg: 'Anything else you type' },
+    { icon: '🎙', agent: 'Narrator Agent', desc: '– Advance the story', eg: 'Any other info you type' },
   ]
 
   return (
