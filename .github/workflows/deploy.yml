@@ -16,12 +16,15 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
+
+      - name: Fix permissions
+        working-directory: frontend
+        run: chmod +x node_modules/.bin/vite
 
       - name: Build
         working-directory: frontend
-        run: npx vite build
-
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
