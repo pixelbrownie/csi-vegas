@@ -109,10 +109,11 @@ export default function App() {
   const LoadingScreen = () => {
     const [displayed, setDisplayed] = useState('')
     const [glitch, setGlitch]       = useState(false)
-    const full = 'GENERATING CRIME SCENE...'
+    const full = 'CONNECTING TO BELLAGIO SERVERS...'
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&!'
 
     useEffect(() => {
+      axios.get(`${API}/health`).catch(() => {})
       let i = 0
       const type = setInterval(() => {
         if (i >= full.length) { clearInterval(type); return }
