@@ -326,7 +326,7 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
               flexShrink: 0,
             }}
           >
-            ▶
+            ➤
           </motion.button>
         </div>
       )}
