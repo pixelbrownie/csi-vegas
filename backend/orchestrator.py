@@ -3,10 +3,12 @@
 # Uses LLM-based intent classification for true agentic routing
 
 import os
-from langchain_community.llms import Ollama
+from langchain_groq import ChatGroq
+llm = ChatGroq(
+    model="mixtral-8x7b-32768",
+    api_key=os.environ.get("GROQ_API_KEY")
+)
 from agents import witness_agent, analyst_agent, narrator_agent
-
-llm = Ollama(model="mistral")
 
 
 def classify_intent_keyword(user_input: str) -> str:

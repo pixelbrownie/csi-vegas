@@ -6,9 +6,11 @@ import re
 import json
 import os
 import random
-from langchain_community.llms import Ollama
-
-llm = Ollama(model="mistral")
+from langchain_groq import ChatGroq
+llm = ChatGroq(
+    model="mixtral-8x7b-32768",
+    api_key=os.environ.get("GROQ_API_KEY")
+)
 
 FALLBACK_CASE = {
     "victim": {"name": "Marco Delgado", "role": "high-stakes poker dealer"},
