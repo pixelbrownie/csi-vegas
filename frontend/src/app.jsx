@@ -7,7 +7,7 @@ import axios from 'axios'
 import LandingPage from './components/LandingPage.jsx'
 import GamePage    from './components/GamePage.jsx'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL || 'https://csi-vegas.vercel.app'
 const MIN_LOADING_MS = 10000
 
 export default function App() {
