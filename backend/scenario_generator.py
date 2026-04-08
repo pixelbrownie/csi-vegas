@@ -4,13 +4,9 @@
 
 import re
 import json
-import os
-import random
-from langchain_groq import ChatGroq
-llm = ChatGroq(
-    model="mixtral-8x7b-32768",
-    api_key=os.environ.get("GROQ_API_KEY")
-)
+from langchain_community.llms import Ollama
+
+llm = Ollama(model="mistral")
 
 FALLBACK_CASE = {
     "victim": {"name": "Marco Delgado", "role": "high-stakes poker dealer"},
@@ -29,78 +25,6 @@ FALLBACK_CASE = {
     "key_clue": "A monogrammed casino loyalty card found under the victim"
 }
 
-CASE_TEMPLATES = [
-    {
-        "victim": {"name": "Samantha 'Luck' Thompson", "role": "high roller manager at the Golden Chip Casino"},
-        "suspect_a": {
-            "name": "Vincent 'The Chipper' Coinflip",
-            "motive": "Luck uncovered his cheating ring in the VIP pit",
-            "alibi": "Claims he was settling a marker at the cashier desk"
-        },
-        "suspect_b": {
-            "name": "Nicky 'The Dealer' Dice",
-            "motive": "Luck suspended him after repeated table irregularities",
-            "alibi": "Says she was closing blackjack table six with surveillance nearby"
-        },
-        "culprit": "Vincent 'The Chipper' Coinflip",
-        "murder_weapon": "a sharpened dealer cut card",
-        "key_clue": "A stack of marked chips hidden in a valet envelope"
-    },
-    {
-        "victim": {"name": "Marco Delgado", "role": "high-stakes poker dealer"},
-        "suspect_a": {
-            "name": "Veronica Sloane",
-            "motive": "Delgado witnessed her skimming chips",
-            "alibi": "Claims she was in the spa all evening"
-        },
-        "suspect_b": {
-            "name": "Danny 'Two-Shoes' Ricci",
-            "motive": "Delgado owed him $200,000",
-            "alibi": "Says he was at a craps table with friends"
-        },
-        "culprit": "Danny 'Two-Shoes' Ricci",
-        "murder_weapon": "a weighted poker chip sleeve",
-        "key_clue": "A monogrammed casino loyalty card found under the victim"
-    },
-    {
-        "victim": {"name": "Elena Voss", "role": "Bellagio security shift captain"},
-        "suspect_a": {
-            "name": "Caleb Wynn",
-            "motive": "Voss was preparing to report his fake baccarat wins",
-            "alibi": "Says he was in the VIP lounge during the blackout"
-        },
-        "suspect_b": {
-            "name": "Mira Vale",
-            "motive": "Voss blocked her access to restricted camera feeds",
-            "alibi": "Claims she was in a rideshare heading to Fremont"
-        },
-        "culprit": "Mira Vale",
-        "murder_weapon": "a broken champagne flute stem",
-        "key_clue": "A stolen access badge with fresh blood on the lanyard"
-    },
-    {
-        "victim": {"name": "Troy Benson", "role": "casino accounting auditor"},
-        "suspect_a": {
-            "name": "Lana Pierce",
-            "motive": "Benson traced her shell accounts to missing casino funds",
-            "alibi": "Says she was meeting a host in the rooftop bar"
-        },
-        "suspect_b": {
-            "name": "Rico Salazar",
-            "motive": "Benson threatened to freeze his high-limit credit line",
-            "alibi": "Claims he was in a poker tournament livestream"
-        },
-        "culprit": "Lana Pierce",
-        "murder_weapon": "a brass roulette spindle",
-        "key_clue": "A forged transfer receipt signed minutes after death"
-    },
-]
-
-
-def generate_fast_case():
-    """Return a pre-authored case instantly for snappy game starts."""
-    return random.choice(CASE_TEMPLATES)
-
 
 def generate_case():
     """
@@ -117,11 +41,6 @@ def generate_case():
 - key_clue: string, one piece of hidden evidence
 
 Make it dramatic and Vegas-flavored. Return ONLY valid JSON. No intro text, no markdown, no explanation."""
-
-    # Default behavior is fast local case generation.
-    # Set CSI_USE_LLM_CASE_GEN=1 to restore dynamic LLM-authored case generation.
-    if os.getenv("CSI_USE_LLM_CASE_GEN", "0") != "1":
-        return generate_fast_case()
 
     try:
         raw = llm.invoke(prompt)

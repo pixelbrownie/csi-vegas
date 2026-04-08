@@ -2,12 +2,9 @@
 # Phase 3 — Three specialized LangChain agents
 # Each agent wraps an LLM call with a specific persona and role
 
-import os
-from langchain_groq import ChatGroq
-llm = ChatGroq(
-    model="mixtral-8x7b-32768",
-    api_key=os.environ.get("GROQ_API_KEY")
-)
+from langchain_community.llms import Ollama
+
+llm = Ollama(model="mistral")
 
 # ─────────────────────────────────────────
 # WITNESS AGENT

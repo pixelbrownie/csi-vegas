@@ -7,20 +7,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import json
+import os
 
 from scenario_generator import generate_case
 from orchestrator import orchestrate
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
-# Allow React dev server to call the API
+# Browser origins allowed to call this API (your GitHub Pages site, local dev, etc.)
+_cors = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://pixelbrownie.github.io",
+]
+_extra = os.getenv("CORS_ORIGINS", "")
+if _extra:
+    _cors.extend(o.strip() for o in _extra.split(",") if o.strip())
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-    "http://localhost:5173",
-    "https://pixelbrownie.github.io",
-    "https://csi-vegas-xxxx.onrender.com",
-],
+    allow_origins=_cors,
     allow_methods=["*"],
     allow_headers=["*"],
 )
