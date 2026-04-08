@@ -42,9 +42,21 @@ Reply with only one word. No punctuation."""
 
     # Fallback: keyword routing
     ui_lower = user_input.lower()
-    if any(w in ui_lower for w in ["ask", "question", "where", "did you", "were you", "tell me", "who are", "why did", "suspect"]):
+
+    witness_keywords = [
+        "where", "when", "who", "did you", "were you", "can confirm",
+        "alibi", "why did", "what were you", "who saw", "suspect",
+        "interrogate", "tell me", "question",
+    ]
+    analyst_keywords = [
+        "clue", "evidence", "found", "analyze", "analysis", "check",
+        "cross-check", "examine", "lab", "forensic", "fingerprint",
+        "dna", "timeline", "entry log", "logs", "camera", "footage",
+    ]
+
+    if any(w in ui_lower for w in witness_keywords):
         return "witness"
-    elif any(w in ui_lower for w in ["clue", "evidence", "found", "analyze", "check", "examine", "lab", "forensic"]):
+    elif any(w in ui_lower for w in analyst_keywords):
         return "analyst"
     else:
         return "narrator"

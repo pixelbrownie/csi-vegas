@@ -92,11 +92,24 @@ YOUR TASK:
 
 Be brief, clinical, and analytical. 4-5 sentences max. No dramatic flair."""
 
+    clue_lower = clue.lower()
+    contradiction = "YES" if any(k in clue_lower for k in ["contradict", "doesn't match", "does not match", "inconsistent"]) else "NO"
+    if any(k in clue_lower for k in ["dna", "fingerprint", "camera", "footage", "entry log", "logs", "badge", "keycard"]):
+        importance = "HIGH"
+        reason = "it can directly verify presence, identity, or timeline."
+    elif any(k in clue_lower for k in ["maybe", "think", "heard", "possibly"]):
+        importance = "LOW"
+        reason = "it is suggestive but not strongly verifiable yet."
+    else:
+        importance = "MEDIUM"
+        reason = "it narrows hypotheses but still needs corroboration."
+
+    history_note = "No prior clues on record." if not case_history.strip() else "Cross-referenced with existing notes for timeline consistency."
     fallback = (
-        "Contradiction check: NO clear contradiction found from current case history. "
-        "The clue should be treated as timeline-supporting evidence and cross-checked with witness alibis. "
-        "Most likely implication: it links suspect movement to the scene window. "
-        "Importance: MEDIUM, because it narrows possibilities but does not directly identify the killer."
+        f"Contradiction check: {contradiction}. {history_note} "
+        f"Clue assessed: '{clue[:140]}'. "
+        "Most likely implication: this clue should be used to pressure alibi verification and movement around the crime window. "
+        f"Importance: {importance}, because {reason}"
     )
     return _safe_invoke(prompt, fallback)
 
