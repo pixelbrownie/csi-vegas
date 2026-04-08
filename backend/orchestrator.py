@@ -6,6 +6,7 @@ from langchain_community.llms import Ollama
 from agents import witness_agent, analyst_agent, narrator_agent
 
 llm = Ollama(model="mistral")
+LLM_AVAILABLE = True
 
 
 def classify_intent(user_input: str) -> str:
@@ -26,13 +27,17 @@ Classify which agent should handle this message. Reply with EXACTLY one word:
 
 Reply with only one word. No punctuation."""
 
+    global LLM_AVAILABLE
     try:
+        if not LLM_AVAILABLE:
+            raise RuntimeError("LLM unavailable")
         result = llm.invoke(prompt).strip().lower()
         # Clean up in case LLM adds punctuation or extra words
         for agent in ["witness", "analyst", "narrator"]:
             if agent in result:
                 return agent
     except Exception:
+        LLM_AVAILABLE = False
         pass
 
     # Fallback: keyword routing

@@ -12,6 +12,13 @@ const API =
   'https://csi-vegas.onrender.com'
 const MIN_LOADING_MS = 10000
 
+function getApiErrorMessage(error, fallback) {
+  const detail = error?.response?.data?.detail
+  if (typeof detail === 'string' && detail.trim()) return detail.trim()
+  if (Array.isArray(detail) && detail.length) return String(detail[0]?.msg || fallback)
+  return fallback
+}
+
 export default function App() {
   const [view,       setView]       = useState('landing')
   const [gameState,  setGameState]  = useState('idle')   // idle|loading|playing|solved|failed|gameover
@@ -50,9 +57,10 @@ export default function App() {
       setCaseFile(res.data.case_file)
       setStartTime(Date.now())
       setGameState('playing')
-    } catch {
+    } catch (error) {
       await waitForMinimumLoading()
-      setCaseFile('⚠️ Backend not reachable. Start FastAPI on port 8000.')
+      const msg = getApiErrorMessage(error, 'Backend not reachable. Check API URL and backend logs.')
+      setCaseFile(`⚠️ ${msg}`)
       setGameState('playing')
     }
   }, [])
@@ -83,10 +91,11 @@ export default function App() {
         content: res.data.response,
         agent:   res.data.agent,
       }])
-    } catch {
+    } catch (error) {
+      const msg = getApiErrorMessage(error, 'Connection lost. Try again.')
       setHistory(prev => [...prev, {
         role:    'assistant',
-        content: 'Connection lost. Try again.',
+        content: `System error: ${msg}`,
         agent:   '⚠️ System',
       }])
     } finally {

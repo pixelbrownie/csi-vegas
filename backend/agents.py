@@ -5,6 +5,22 @@
 from langchain_community.llms import Ollama
 
 llm = Ollama(model="mistral")
+LLM_AVAILABLE = True
+
+
+def _safe_invoke(prompt: str, fallback: str) -> str:
+    """
+    Run the LLM call if available; otherwise return a deterministic fallback.
+    This keeps production usable when Ollama is not running.
+    """
+    global LLM_AVAILABLE
+    if not LLM_AVAILABLE:
+        return fallback
+    try:
+        return llm.invoke(prompt)
+    except Exception:
+        LLM_AVAILABLE = False
+        return fallback
 
 # ─────────────────────────────────────────
 # WITNESS AGENT
@@ -42,7 +58,13 @@ INSTRUCTIONS:
 Detective's question: {question}
 Your response:"""
 
-    return llm.invoke(prompt)
+    fallback = (
+        f"{suspect['name']} shifts in their seat and avoids eye contact. "
+        f'"I told you, I was at {suspect["alibi"]}... mostly. '
+        f'The only thing I remember clearly is someone arguing with {victim["name"]} '
+        f'right before everything went bad."'
+    )
+    return _safe_invoke(prompt, fallback)
 
 
 # ─────────────────────────────────────────
@@ -70,7 +92,13 @@ YOUR TASK:
 
 Be brief, clinical, and analytical. 4-5 sentences max. No dramatic flair."""
 
-    return llm.invoke(prompt)
+    fallback = (
+        "Contradiction check: NO clear contradiction found from current case history. "
+        "The clue should be treated as timeline-supporting evidence and cross-checked with witness alibis. "
+        "Most likely implication: it links suspect movement to the scene window. "
+        "Importance: MEDIUM, because it narrows possibilities but does not directly identify the killer."
+    )
+    return _safe_invoke(prompt, fallback)
 
 
 # ─────────────────────────────────────────
@@ -97,7 +125,11 @@ Think Raymond Chandler meets Vegas neon lights.
 Start directly with the new addition — do NOT repeat the existing case file.
 Keep it evocative and punchy."""
 
-    return llm.invoke(prompt)
+    fallback = (
+        "Neon bled across the evidence board as another thread snapped into place. "
+        "In Vegas, every answer buys two new questions, and the night keeps its secrets close."
+    )
+    return _safe_invoke(prompt, fallback)
 
 
 if __name__ == "__main__":

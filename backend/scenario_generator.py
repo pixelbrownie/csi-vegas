@@ -7,6 +7,7 @@ import json
 from langchain_community.llms import Ollama
 
 llm = Ollama(model="mistral")
+LLM_AVAILABLE = True
 
 FALLBACK_CASE = {
     "victim": {"name": "Marco Delgado", "role": "high-stakes poker dealer"},
@@ -42,7 +43,10 @@ def generate_case():
 
 Make it dramatic and Vegas-flavored. Return ONLY valid JSON. No intro text, no markdown, no explanation."""
 
+    global LLM_AVAILABLE
     try:
+        if not LLM_AVAILABLE:
+            raise RuntimeError("LLM unavailable")
         raw = llm.invoke(prompt)
 
         # Extract JSON block even if the LLM adds surrounding text
@@ -61,6 +65,7 @@ Make it dramatic and Vegas-flavored. Return ONLY valid JSON. No intro text, no m
         return case
 
     except Exception as e:
+        LLM_AVAILABLE = False
         print(f"[scenario_generator] Failed to parse LLM response: {e}")
         print("[scenario_generator] Using fallback case.")
         return FALLBACK_CASE
