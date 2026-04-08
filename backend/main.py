@@ -24,9 +24,12 @@ _extra = os.getenv("CORS_ORIGINS", "")
 if _extra:
     _cors.extend(o.strip() for o in _extra.split(",") if o.strip())
 
+# Regex covers GitHub Pages (Origin is always https://<user>.github.io, no path).
+# If Render shows a CORS error, redeploy this service so this code is live.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors,
+    allow_origin_regex=r"^https://[a-zA-Z0-9-]+\.github\.io$",
     allow_methods=["*"],
     allow_headers=["*"],
 )
