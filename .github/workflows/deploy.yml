@@ -22,11 +22,12 @@ jobs:
         working-directory: frontend
         run: chmod +x node_modules/.bin/vite
 
+      # Bakes API URL into the static build. Override with GitHub secret VITE_API_URL if you change hosts.
       - name: Build the project
         working-directory: frontend
         run: npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://csi-vegas.onrender.com' }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

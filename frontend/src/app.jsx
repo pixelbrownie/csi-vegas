@@ -7,7 +7,9 @@ import axios from 'axios'
 import LandingPage from './components/LandingPage.jsx'
 import GamePage    from './components/GamePage.jsx'
 
-const API = import.meta.env.VITE_API_URL || 'https://csi-vegas-xxxx.onrender.com'
+const API =
+  import.meta.env.VITE_API_URL?.trim() ||
+  'https://csi-vegas.onrender.com'
 const MIN_LOADING_MS = 10000
 
 export default function App() {

@@ -46,6 +46,16 @@ class ChatResponse(BaseModel):
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
 
+@app.get("/")
+def root():
+    """So the service URL in a browser and HEAD probes are not 404."""
+    return {
+        "service": "CSI Vegas API",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "message": "CSI Vegas backend running"}
