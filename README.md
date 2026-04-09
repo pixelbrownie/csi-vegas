@@ -81,7 +81,7 @@ ollama serve   # starts on http://localhost:11434 by default
 uvicorn main:app --reload --port 8000
 ```
 
-The API will be available at `http://localhost:8000`. Visit `/docs` for the interactive Swagger UI.
+The API will be available at `http://localhost:8000`. 
 
 **Available endpoints:**
 
