@@ -113,7 +113,7 @@ VITE_API_URL=http://localhost:8000
 For production (e.g. Render backend + GitHub Pages frontend):
 
 ```env
-VITE_API_URL=https://your-backend.onrender.com
+VITE_API_URL=https://csi-vegas.onrender.com
 ```
 
 ### 3. Start the dev server
