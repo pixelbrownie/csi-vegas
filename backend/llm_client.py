@@ -7,7 +7,6 @@ from urllib.parse import urljoin
 class LLMUnavailableError(RuntimeError):
     """Raised when live Ollama inference is required but unavailable."""
 
-
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral:latest").strip() or "mistral:latest"
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").strip() or "http://127.0.0.1:11434"
 OLLAMA_RETRIES = int(os.getenv("OLLAMA_RETRIES", "3"))
