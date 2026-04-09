@@ -1,7 +1,6 @@
 FROM ollama/ollama:latest
 
-# Keep model configurable from Render env vars.
+# Default model (can be overridden in Render env vars)
 ENV OLLAMA_MODEL=llama3.2:1b
-
-# Start Ollama, ensure the model exists, then keep serving.
-CMD ["sh", "-c", "ollama serve & sleep 3 && ollama pull \"$OLLAMA_MODEL\" && wait"]
+ENV OLLAMA_HOST=0.0.0.0
+CMD ["sh", "-c", "ollama serve & sleep 5 && ollama pull \"$OLLAMA_MODEL\" && wait"]
