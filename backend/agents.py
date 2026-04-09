@@ -1,26 +1,8 @@
 # agents.py
 # Phase 3 — Three specialized LangChain agents
-# Each agent wraps an LLM call with a specific persona and role
+# Each agent wraps a strict live Ollama call with a specific persona and role
 
-from langchain_community.llms import Ollama
-
-llm = Ollama(model="mistral")
-LLM_AVAILABLE = True
-
-
-def _safe_invoke(prompt: str, fallback: str) -> str:
-    """
-    Run the LLM call if available; otherwise return a deterministic fallback.
-    This keeps production usable when Ollama is not running.
-    """
-    global LLM_AVAILABLE
-    if not LLM_AVAILABLE:
-        return fallback
-    try:
-        return llm.invoke(prompt)
-    except Exception:
-        LLM_AVAILABLE = False
-        return fallback
+from llm_client import invoke_llm
 
 # ─────────────────────────────────────────
 # WITNESS AGENT
@@ -58,13 +40,7 @@ INSTRUCTIONS:
 Detective's question: {question}
 Your response:"""
 
-    fallback = (
-        f"{suspect['name']} shifts in their seat and avoids eye contact. "
-        f'"I told you, I was at {suspect["alibi"]}... mostly. '
-        f'The only thing I remember clearly is someone arguing with {victim["name"]} '
-        f'right before everything went bad."'
-    )
-    return _safe_invoke(prompt, fallback)
+    return invoke_llm(prompt, "witness_agent")
 
 
 # ─────────────────────────────────────────
@@ -92,26 +68,7 @@ YOUR TASK:
 
 Be brief, clinical, and analytical. 4-5 sentences max. No dramatic flair."""
 
-    clue_lower = clue.lower()
-    contradiction = "YES" if any(k in clue_lower for k in ["contradict", "doesn't match", "does not match", "inconsistent"]) else "NO"
-    if any(k in clue_lower for k in ["dna", "fingerprint", "camera", "footage", "entry log", "logs", "badge", "keycard"]):
-        importance = "HIGH"
-        reason = "it can directly verify presence, identity, or timeline."
-    elif any(k in clue_lower for k in ["maybe", "think", "heard", "possibly"]):
-        importance = "LOW"
-        reason = "it is suggestive but not strongly verifiable yet."
-    else:
-        importance = "MEDIUM"
-        reason = "it narrows hypotheses but still needs corroboration."
-
-    history_note = "No prior clues on record." if not case_history.strip() else "Cross-referenced with existing notes for timeline consistency."
-    fallback = (
-        f"Contradiction check: {contradiction}. {history_note} "
-        f"Clue assessed: '{clue[:140]}'. "
-        "Most likely implication: this clue should be used to pressure alibi verification and movement around the crime window. "
-        f"Importance: {importance}, because {reason}"
-    )
-    return _safe_invoke(prompt, fallback)
+    return invoke_llm(prompt, "analyst_agent")
 
 
 # ─────────────────────────────────────────
@@ -138,11 +95,7 @@ Think Raymond Chandler meets Vegas neon lights.
 Start directly with the new addition — do NOT repeat the existing case file.
 Keep it evocative and punchy."""
 
-    fallback = (
-        "Neon bled across the evidence board as another thread snapped into place. "
-        "In Vegas, every answer buys two new questions, and the night keeps its secrets close."
-    )
-    return _safe_invoke(prompt, fallback)
+    return invoke_llm(prompt, "narrator_agent")
 
 
 if __name__ == "__main__":

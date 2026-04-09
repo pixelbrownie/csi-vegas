@@ -1,17 +1,18 @@
-# Deploy the FastAPI backend on Render (GitHub Pages cannot run Python).
-# Dashboard: New → Blueprint → connect this repo, or create a Web Service manually:
-#   Root Directory: backend
-#   Build:  pip install -r requirements.txt
-#   Start:  uvicorn main:app --host 0.0.0.0 --port $PORT
-#   (Never use 8000 or $8000 — Render assigns PORT; health checks require it.)
-#
-# After deploy, set GitHub repo secret VITE_API_URL to your Render URL (no trailing slash),
-# e.g. https://csi-vegas-api.onrender.com
-#
-# Note: This app calls Ollama by default; Render has no local Ollama. For a working live LLM
-# you need a cloud model (e.g. Groq/OpenAI) with API keys in Render Environment, or a remote Ollama URL.
-
 services:
+  # Private Ollama service with persistent model storage.
+  - type: pserv
+    name: csi-vegas-ollama
+    env: docker
+    dockerfilePath: ./ollama/Dockerfile
+    disk:
+      name: ollama-data
+      mountPath: /root/.ollama
+      sizeGB: 20
+    envVars:
+      - key: OLLAMA_MODEL
+        value: llama3.2:1b
+
+  # FastAPI backend exposed publicly.
   - type: web
     name: csi-vegas-api
     runtime: python
@@ -20,3 +21,8 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
+    envVars:
+      - key: OLLAMA_BASE_URL
+        value: http://csi-vegas-ollama:11434
+      - key: OLLAMA_MODEL
+        value: llama3.2:1b

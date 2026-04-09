@@ -2,11 +2,8 @@
 # Phase 3 — Routes user input to the correct agent
 # Uses LLM-based intent classification for true agentic routing
 
-from langchain_community.llms import Ollama
 from agents import witness_agent, analyst_agent, narrator_agent
-
-llm = Ollama(model="mistral")
-LLM_AVAILABLE = True
+from llm_client import invoke_llm
 
 
 def classify_intent(user_input: str) -> str:
@@ -14,8 +11,7 @@ def classify_intent(user_input: str) -> str:
     Uses a small LLM call to classify the user's intent.
     Returns one of: 'witness', 'analyst', 'narrator'
 
-    This is TRUE agentic routing — impresses judges more than keyword matching.
-    Falls back to keyword routing if LLM response is unclear.
+    This is TRUE agentic routing — no keyword fallback.
     """
     prompt = f"""You are a routing system for a murder mystery game.
 A detective just said: "{user_input}"
@@ -27,39 +23,11 @@ Classify which agent should handle this message. Reply with EXACTLY one word:
 
 Reply with only one word. No punctuation."""
 
-    global LLM_AVAILABLE
-    try:
-        if not LLM_AVAILABLE:
-            raise RuntimeError("LLM unavailable")
-        result = llm.invoke(prompt).strip().lower()
-        # Clean up in case LLM adds punctuation or extra words
-        for agent in ["witness", "analyst", "narrator"]:
-            if agent in result:
-                return agent
-    except Exception:
-        LLM_AVAILABLE = False
-        pass
-
-    # Fallback: keyword routing
-    ui_lower = user_input.lower()
-
-    witness_keywords = [
-        "where", "when", "who", "did you", "were you", "can confirm",
-        "alibi", "why did", "what were you", "who saw", "suspect",
-        "interrogate", "tell me", "question",
-    ]
-    analyst_keywords = [
-        "clue", "evidence", "found", "analyze", "analysis", "check",
-        "cross-check", "examine", "lab", "forensic", "fingerprint",
-        "dna", "timeline", "entry log", "logs", "camera", "footage",
-    ]
-
-    if any(w in ui_lower for w in witness_keywords):
-        return "witness"
-    elif any(w in ui_lower for w in analyst_keywords):
-        return "analyst"
-    else:
-        return "narrator"
+    result = invoke_llm(prompt, "classify_intent").lower()
+    for agent in ["witness", "analyst", "narrator"]:
+        if agent in result:
+            return agent
+    raise RuntimeError(f"Invalid routing label from model: {result}")
 
 
 def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) -> dict:
