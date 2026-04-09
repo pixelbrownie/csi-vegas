@@ -5,7 +5,6 @@
 from agents import witness_agent, analyst_agent, narrator_agent
 from llm_client import invoke_llm
 
-
 def classify_intent(user_input: str) -> str:
     """
     Uses a small LLM call to classify the user's intent.
