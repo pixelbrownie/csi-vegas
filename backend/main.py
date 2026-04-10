@@ -11,7 +11,7 @@ import os
 
 from scenario_generator import generate_case
 from orchestrator import orchestrate
-from llm_client import check_ollama_connection, LLMUnavailableError
+from llm_client import LLMUnavailableError, llm_health_status
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
@@ -26,7 +26,7 @@ if _extra:
     _cors.extend(o.strip() for o in _extra.split(",") if o.strip())
 
 # Regex covers GitHub Pages (Origin is always https://<user>.github.io, no path).
-# If Render shows a CORS error, redeploy this service so this code is live.
+# Add more origins with CORS_ORIGINS=comma,separated if needed.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors,
@@ -62,12 +62,10 @@ def root():
 
 @app.get("/health")
 def health():
-    llm_health = check_ollama_connection()
-    status = "ok" if llm_health.get("ok") else "degraded"
     return {
-        "status": status,
+        "status": "ok",
         "message": "CSI Vegas backend running",
-        "llm": llm_health,
+        "llm": llm_health_status(),
     }
 
 
