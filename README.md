@@ -54,7 +54,7 @@ csi-vegas/
 - **Python 3.9+**
 - **Node.js 18+** and npm
 
-**Live AI (Groq):** Set `GROQ_API_KEY` on the server. Every new case, agent reply, and router decision then goes through [Groq’s OpenAI-compatible API](https://console.groq.com/docs/openai) using `GROQ_MODEL` (default `llama-3.3-70b-versatile`). If your Groq account lists a Mistral-family model, set `GROQ_MODEL` to that id. With no key, the backend uses offline scripted scenarios and templates.
+**Live AI (Groq):** Set `GROQ_API_KEY` on the server. Every new case, agent reply, and router decision then goes through [Groq’s OpenAI-compatible API](https://console.groq.com/docs/openai) using `GROQ_MODEL` (default `llama-3.3-70b-versatile`). If your Groq account lists a Mistral-family model, set `GROQ_MODEL` to that id. With **no** key, the backend uses offline scripted scenarios and templates. If a key **is** set but Groq returns errors (for example Cloudflare **403 / error 1010** from datacenter IPs), the server uses a **browser-like `User-Agent`**, retries, then **falls back to the same offline scripts** so the game UI still loads and chat still works.
 
 ---
 
@@ -77,7 +77,7 @@ On your Render web service, set at least:
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` | Model id from [Groq models](https://console.groq.com/docs/models) |
 | _(CORS)_ | _(none)_ | API allows all origins (`Access-Control-Allow-Origin: *`) for simple browser access from any static host |
 
-Optional tuning: `GROQ_TEMPERATURE`, `GROQ_MAX_TOKENS`, `GROQ_TIMEOUT_S`, `GROQ_RETRIES`.
+Optional tuning: `GROQ_TEMPERATURE`, `GROQ_MAX_TOKENS`, `GROQ_TIMEOUT_S`, `GROQ_RETRIES`, `GROQ_USER_AGENT` (override only if Groq/Cloudflare still blocks your host).
 
 ### 3. Start the backend
 
@@ -140,6 +140,7 @@ The app will be available at `http://localhost:5173`.
 | `GROQ_API_KEY` | _(none)_ | If set, all scenario + chat + routing use Groq |
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` | Chat completions model id |
 | `GROQ_BASE_URL` | `https://api.groq.com/openai/v1` | Override only if Groq changes the base URL |
+| `GROQ_USER_AGENT` | _(default: Chrome-like string)_ | Sent on Groq HTTP requests; helps avoid Cloudflare **403 / 1010** blocks |
 
 ### Frontend
 
@@ -203,3 +204,6 @@ Check that the backend is running and `VITE_API_URL` points to the correct addre
 
 **Blank game page / loading forever**
 Open the browser console and check for API errors. Confirm the `/new-case` endpoint returns a valid response at your configured `VITE_API_URL`.
+
+**Groq `403` / `error code: 1010` in the error text**
+That response is from **Groq (Cloudflare)**, not your React app. Ensure `GROQ_API_KEY` is valid and the model id exists for your account. After deploying the latest backend, requests include a normal `User-Agent` and retries on 403. If it still fails, remove `GROQ_API_KEY` on Render to run **fully offline**, or contact Groq support with the `cf-ray` id from the error response.

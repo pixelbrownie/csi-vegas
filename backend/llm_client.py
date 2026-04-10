@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import time
 import urllib.error
 import urllib.request
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 class LLMUnavailableError(RuntimeError):
     """Raised when Groq inference fails after retries or the API key is missing."""
@@ -21,6 +24,12 @@ GROQ_RETRIES = int(os.getenv("GROQ_RETRIES", "3"))
 GROQ_RETRY_DELAY_MS = int(os.getenv("GROQ_RETRY_DELAY_MS", "500"))
 GROQ_TEMPERATURE = float(os.getenv("GROQ_TEMPERATURE", "0.75"))
 GROQ_MAX_TOKENS = int(os.getenv("GROQ_MAX_TOKENS", "4096"))
+# Groq sits behind Cloudflare; bare urllib user-agents often get HTTP 403 / error 1010.
+_DEFAULT_UA = (
+    "Mozilla/5.0 (compatible; CSI-Vegas/1.0; +https://github.com) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+)
+GROQ_USER_AGENT = (os.getenv("GROQ_USER_AGENT", "").strip() or _DEFAULT_UA)
 
 
 def is_live_llm_enabled() -> bool:
@@ -45,7 +54,9 @@ def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
             data=data,
             headers={
                 "Content-Type": "application/json",
+                "Accept": "application/json",
                 "Authorization": f"Bearer {GROQ_API_KEY}",
+                "User-Agent": GROQ_USER_AGENT,
             },
             method="POST",
         )
@@ -72,7 +83,9 @@ def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
             except Exception:
                 msg = err_body[:300] or str(exc)
             last_error = RuntimeError(f"Groq HTTP {exc.code}: {msg}")
-            if exc.code in (429, 500, 502, 503) and attempt < GROQ_RETRIES:
+            # Cloudflare blocks (403) sometimes clear after retry; rate limits and server errors too.
+            if exc.code in (403, 429, 500, 502, 503) and attempt < GROQ_RETRIES:
+                logger.warning("Groq request failed (%s), retrying attempt %s/%s", last_error, attempt, GROQ_RETRIES)
                 time.sleep(GROQ_RETRY_DELAY_MS / 1000.0)
                 continue
             raise LLMUnavailableError(f"{purpose}: {last_error}") from last_error

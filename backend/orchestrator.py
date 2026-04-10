@@ -2,7 +2,7 @@
 # Phase 3 — Routes user input to the correct agent
 
 from agents import witness_agent, analyst_agent, narrator_agent
-from llm_client import invoke_llm, is_live_llm_enabled
+from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
 
 
 def _classify_intent_keywords(user_input: str) -> str:
@@ -59,11 +59,14 @@ Classify which agent should handle this message. Reply with EXACTLY one word:
 
 Reply with only one word. No punctuation."""
 
-    result = invoke_llm(prompt, "classify_intent").lower()
+    try:
+        result = invoke_llm(prompt, "classify_intent").lower()
+    except LLMUnavailableError:
+        return _classify_intent_keywords(user_input)
     for agent in ["witness", "analyst", "narrator"]:
         if agent in result:
             return agent
-    raise RuntimeError(f"Invalid routing label from model: {result}")
+    return _classify_intent_keywords(user_input)
 
 
 def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) -> dict:

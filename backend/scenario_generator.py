@@ -4,7 +4,11 @@
 import json
 import random
 import re
+import logging
+
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
+
+logger = logging.getLogger(__name__)
 
 FALLBACK_CASES = [
     {
@@ -119,7 +123,11 @@ def generate_case():
     Uses a remote LLM when enabled; otherwise rotates through scripted cases.
     """
     if is_live_llm_enabled():
-        return _generate_case_llm()
+        try:
+            return _generate_case_llm()
+        except LLMUnavailableError as e:
+            logger.warning("Groq case generation failed, using scripted case: %s", e)
+            return random.choice(FALLBACK_CASES)
     return random.choice(FALLBACK_CASES)
 
 

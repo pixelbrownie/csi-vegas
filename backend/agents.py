@@ -1,7 +1,11 @@
 # agents.py
 # Phase 3 — Three specialized agents (live LLM when enabled, else in-character templates)
 
-from llm_client import invoke_llm, is_live_llm_enabled
+import logging
+
+from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
+
+logger = logging.getLogger(__name__)
 
 
 def _witness_scripted(question: str, case: dict) -> str:
@@ -66,7 +70,11 @@ Your response:"""
 
     if not is_live_llm_enabled():
         return _witness_scripted(question, case)
-    return invoke_llm(prompt, "witness_agent")
+    try:
+        return invoke_llm(prompt, "witness_agent")
+    except LLMUnavailableError as e:
+        logger.warning("witness_agent: Groq failed, scripted fallback: %s", e)
+        return _witness_scripted(question, case)
 
 
 def analyst_agent(clue: str, case_history: str) -> str:
@@ -87,7 +95,11 @@ Be brief, clinical, and analytical. 4-5 sentences max. No dramatic flair."""
 
     if not is_live_llm_enabled():
         return _analyst_scripted(clue, case_history)
-    return invoke_llm(prompt, "analyst_agent")
+    try:
+        return invoke_llm(prompt, "analyst_agent")
+    except LLMUnavailableError as e:
+        logger.warning("analyst_agent: Groq failed, scripted fallback: %s", e)
+        return _analyst_scripted(clue, case_history)
 
 
 def narrator_agent(event: str, case_file: str) -> str:
@@ -107,7 +119,11 @@ Keep it evocative and punchy."""
 
     if not is_live_llm_enabled():
         return _narrator_scripted(event, case_file)
-    return invoke_llm(prompt, "narrator_agent")
+    try:
+        return invoke_llm(prompt, "narrator_agent")
+    except LLMUnavailableError as e:
+        logger.warning("narrator_agent: Groq failed, scripted fallback: %s", e)
+        return _narrator_scripted(event, case_file)
 
 
 if __name__ == "__main__":
