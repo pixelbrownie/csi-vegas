@@ -208,7 +208,60 @@ function SuspectCard({ suspect, icon, index }) {
   )
 }
 
-export default function DossierPanel({ case_ }) {
+export default function DossierPanel({ case_, connectionError }) {
+  if (!case_ && connectionError) {
+    return (
+      <div
+        style={{
+          padding: '24px 16px',
+          height: '100%',
+          background: '#0b0c0e',
+          overflowX: 'hidden',
+          minWidth: 0,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--font-hero)',
+            fontSize: '1.1rem',
+            color: 'var(--orange)',
+            letterSpacing: '0.06em',
+            marginBottom: '12px',
+            textTransform: 'uppercase',
+          }}
+        >
+          Case file unavailable
+        </div>
+        <p
+          style={{
+            fontFamily: 'var(--font-ui)',
+            fontSize: '0.82rem',
+            color: 'var(--white-dim)',
+            lineHeight: 1.65,
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+          }}
+        >
+          The dossier loads after the backend returns a new case. Use <strong style={{ color: 'var(--white)' }}>NEW CASE</strong> or{' '}
+          <strong style={{ color: 'var(--white)' }}>RETRY</strong> in the chat column once the API is reachable.
+        </p>
+        <p
+          style={{
+            marginTop: '14px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.62rem',
+            color: 'var(--grey)',
+            lineHeight: 1.6,
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+          }}
+        >
+          {connectionError}
+        </p>
+      </div>
+    )
+  }
+
   if (!case_) return null
 
   return (

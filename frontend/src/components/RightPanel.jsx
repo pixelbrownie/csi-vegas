@@ -72,6 +72,7 @@ function CaseFile({ text }) {
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
             minWidth: 0,
+            whiteSpace: 'pre-wrap',
           }}
         >
           {text}
@@ -395,7 +396,26 @@ function HowToPlay({ victimName }) {
 }
 
 // ── Main export ────────────────────────────────────────────────────────────────
-export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNewCase }) {
+export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNewCase, connectionError, apiBaseUrl }) {
+  if (!case_ && connectionError) {
+    return (
+      <div
+        style={{
+          padding: '12px 10px',
+          height: '100%',
+          background: '#090a0d',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          minWidth: 0,
+        }}
+      >
+        <CaseFile
+          text={`⚠️ ${connectionError}\n\nAPI base URL:\n${apiBaseUrl || '(not set)'}\n\nTip: set repo secret VITE_API_URL or edit frontend/public/api-config.json, then redeploy Pages.`}
+        />
+      </div>
+    )
+  }
+
   if (!case_) return null
 
   return (

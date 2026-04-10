@@ -6,8 +6,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
-import json
 import os
 
 from scenario_generator import generate_case
@@ -16,21 +14,11 @@ from llm_client import LLMUnavailableError, llm_health_status
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
-_cors = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://pixelbrownie.github.io",
-]
-
-_extra = os.getenv("CORS_ORIGINS", "")
-if _extra:
-    _cors.extend(o.strip() for o in _extra.split(",") if o.strip())
-
+# Public JSON API (no cookie auth). Wildcard avoids broken handshakes from
+# GitHub Pages custom domains, other static hosts, or forked deployments.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_cors,
-    # GitHub Pages + any user/organization Pages subdomain over HTTPS.
-    allow_origin_regex=r"^https://.*\.github\.io$",
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

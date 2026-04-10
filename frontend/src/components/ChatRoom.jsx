@@ -129,7 +129,15 @@ function Bubble({ msg }) {
   )
 }
 
-export default function ChatRoom({ history, isThinking, gameState, onSend }) {
+export default function ChatRoom({
+  history,
+  isThinking,
+  gameState,
+  onSend,
+  connectionError,
+  apiBaseUrl,
+  onConnectionRetry,
+}) {
   const [input, setInput] = useState('')
   const bottomRef = useRef(null)
   const isLocked = gameState !== 'playing'
@@ -217,7 +225,80 @@ export default function ChatRoom({ history, isThinking, gameState, onSend }) {
           minHeight: 0,
         }}
       >
-        {history.length === 0 && (
+        {connectionError && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              alignSelf: 'center',
+              maxWidth: '420px',
+              margin: '12px 0 20px',
+              padding: '18px 20px',
+              background: '#1a0808',
+              border: '1px solid var(--orange)',
+              borderRadius: '16px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-stamp)',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                color: 'var(--orange)',
+                letterSpacing: '0.12em',
+                marginBottom: '10px',
+              }}
+            >
+              CANNOT REACH BACKEND
+            </div>
+            <p
+              style={{
+                fontFamily: 'var(--font-ui)',
+                fontSize: '0.82rem',
+                color: 'var(--white-dim)',
+                lineHeight: 1.55,
+                marginBottom: '10px',
+                wordBreak: 'break-word',
+                overflowWrap: 'anywhere',
+              }}
+            >
+              {connectionError}
+            </p>
+            <p
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.58rem',
+                color: 'var(--grey)',
+                marginBottom: '14px',
+                wordBreak: 'break-all',
+              }}
+            >
+              API base: {apiBaseUrl || '(not set)'}
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onConnectionRetry}
+              style={{
+                padding: '10px 20px',
+                background: 'var(--orange)',
+                border: 'none',
+                borderRadius: '999px',
+                color: 'var(--black)',
+                fontFamily: 'var(--font-stamp)',
+                fontWeight: 700,
+                fontSize: '0.72rem',
+                letterSpacing: '0.14em',
+                cursor: 'pointer',
+              }}
+            >
+              RETRY CONNECTION
+            </motion.button>
+          </motion.div>
+        )}
+
+        {history.length === 0 && !connectionError && (
           <div
             style={{
               textAlign: 'center',

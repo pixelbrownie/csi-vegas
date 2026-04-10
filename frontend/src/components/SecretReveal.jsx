@@ -6,11 +6,39 @@ export default function SecretReveal({ secretText }) {
   const boxRef = useRef(null)
   const [pos, setPos] = useState({ x: -999, y: -999 })
   const [hovering, setHovering] = useState(false)
+  const [touchReveal, setTouchReveal] = useState(false)
+
+  const updatePosFromClient = (clientX, clientY) => {
+    const el = boxRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    setPos({ x: clientX - r.left, y: clientY - r.top })
+  }
 
   const onMove = e => {
-    const r = boxRef.current.getBoundingClientRect()
-    setPos({ x: e.clientX - r.left, y: e.clientY - r.top })
+    updatePosFromClient(e.clientX, e.clientY)
   }
+
+  const onTouchMove = e => {
+    if (!e.touches?.length) return
+    updatePosFromClient(e.touches[0].clientX, e.touches[0].clientY)
+    setTouchReveal(true)
+  }
+
+  const onTouchStart = e => {
+    if (!e.touches?.length) return
+    updatePosFromClient(e.touches[0].clientX, e.touches[0].clientY)
+    setTouchReveal(true)
+    setHovering(true)
+  }
+
+  const onTouchEnd = () => {
+    setHovering(false)
+    setTouchReveal(false)
+    setPos({ x: -999, y: -999 })
+  }
+
+  const showPulse = hovering && (pos.x > 0 || touchReveal)
 
   return (
     <div style={{ marginBottom: '14px' }}>
@@ -28,7 +56,10 @@ export default function SecretReveal({ secretText }) {
         ref={boxRef}
         onMouseMove={onMove}
         onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => { setHovering(false); setPos({ x: -999, y: -999 }) }}
+        onMouseLeave={() => { setHovering(false); setTouchReveal(false); setPos({ x: -999, y: -999 }) }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
         style={{
           position: 'relative',
           width: '100%',
@@ -82,7 +113,7 @@ export default function SecretReveal({ secretText }) {
         }} />
 
         {/* Pulse ring on hover */}
-        {hovering && pos.x > 0 && (
+        {showPulse && (
           <motion.div
             animate={{ scale: [1, 1.5], opacity: [0.4, 0] }}
             transition={{ duration: 1.2, repeat: Infinity }}

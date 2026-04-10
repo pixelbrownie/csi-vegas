@@ -24,6 +24,13 @@ jobs:
         working-directory: frontend
         run: chmod +x node_modules/.bin/vite
 
+      - name: Write API base for GitHub Pages
+        working-directory: frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: |
+          node -e "const fs=require('fs'); const u=(process.env.VITE_API_URL||'').trim(); const api=u||'https://csi-vegas.onrender.com'; fs.mkdirSync('public',{recursive:true}); fs.writeFileSync('public/api-config.json', JSON.stringify({apiBaseUrl: api}, null, 2));"
+
       - name: Build the project
         working-directory: frontend
         run: npm run build

@@ -75,7 +75,7 @@ On your Render web service, set at least:
 |---|---|---|
 | `GROQ_API_KEY` | `gsk_...` | Required for live scenarios and agents |
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` | Model id from [Groq models](https://console.groq.com/docs/models) |
-| `CORS_ORIGINS` | `https://pixelbrownie.github.io` | Extra allowed origin if needed (repo already allows `*.github.io`) |
+| _(CORS)_ | _(none)_ | API allows all origins (`Access-Control-Allow-Origin: *`) for simple browser access from any static host |
 
 Optional tuning: `GROQ_TEMPERATURE`, `GROQ_MAX_TOKENS`, `GROQ_TIMEOUT_S`, `GROQ_RETRIES`.
 
@@ -117,9 +117,9 @@ VITE_API_URL=http://localhost:8000
 
 If you omit it, the dev app uses `http://localhost:8000` (see `src/app.jsx`).
 
-For a production build, set `VITE_API_URL` to wherever the FastAPI app is hosted (and add that origin to backend `CORS_ORIGINS` if needed).
+For a production build, set `VITE_API_URL` to wherever the FastAPI app is hosted.
 
-**GitHub Pages note:** the frontend also includes a **safe production fallback** API URL (see `frontend/src/app.jsx`) so the game can still boot if the `VITE_API_URL` secret isn't set — but you should still set the secret to your real Render URL to avoid accidentally pointing at the wrong service.
+**GitHub Pages:** the workflow writes `frontend/public/api-config.json` from the `VITE_API_URL` secret (or a default Render URL). The app also reads that file at runtime if `VITE_API_URL` was not baked in, so forks can edit `api-config.json` and redeploy without secrets.
 
 ### 3. Start the dev server
 
@@ -140,7 +140,6 @@ The app will be available at `http://localhost:5173`.
 | `GROQ_API_KEY` | _(none)_ | If set, all scenario + chat + routing use Groq |
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` | Chat completions model id |
 | `GROQ_BASE_URL` | `https://api.groq.com/openai/v1` | Override only if Groq changes the base URL |
-| `CORS_ORIGINS` | _(none)_ | Comma-separated list of additional allowed origins (e.g. your deployed frontend URL) |
 
 ### Frontend
 
@@ -163,7 +162,7 @@ Use root directory `backend`, build `pip install -r requirements.txt`, start `uv
 
 ### Self-hosted
 
-Run FastAPI with uvicorn (`--host 0.0.0.0` and the port your host expects). Set `CORS_ORIGINS` if your frontend origin is not covered by `backend/main.py`.
+Run FastAPI with uvicorn (`--host 0.0.0.0` and the port your host expects).
 
 ---
 
@@ -197,7 +196,7 @@ Run FastAPI with uvicorn (`--host 0.0.0.0` and the port your host expects). Set 
 ## Troubleshooting
 
 **CORS errors in the browser**
-Make sure your frontend origin is listed in `CORS_ORIGINS` on the backend, or matches the `allow_origin_regex` pattern (`*.github.io`).
+The API is configured to allow any origin. If you still see CORS errors, confirm the browser is actually talking to your FastAPI app (correct `VITE_API_URL` / `api-config.json`) and that no corporate extension is blocking requests.
 
 **"Backend not reachable" in the game**
 Check that the backend is running and `VITE_API_URL` points to the correct address. Visit `<your-api-url>/health` to verify.

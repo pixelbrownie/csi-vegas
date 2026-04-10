@@ -2,47 +2,40 @@
 // Manages: view (landing/game), game state, API calls
 // Renders: LandingPage → scroll → GamePage
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import axios from 'axios'
 import LandingPage from './components/LandingPage.jsx'
 import GamePage    from './components/GamePage.jsx'
 
-// Vite injects this at build time. Keep a production fallback so GitHub Pages still works
-// even if the `VITE_API_URL` Actions secret isn't configured.
+// Build-time override (e.g. GitHub Actions secret). Runtime override: `public/api-config.json`.
 const PRODUCTION_API_FALLBACK = 'https://csi-vegas.onrender.com'
 const MIN_LOADING_MS = 1500
+
+const ENV_API_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL)
 
 function normalizeApiBaseUrl(raw) {
   let base = String(raw || '').trim()
   if (!base) return ''
 
-  // If someone pasted a deep link or Pages URL by mistake, keep only the origin.
   try {
     if (base.includes('://')) {
       const u = new URL(base)
       base = `${u.protocol}//${u.host}`
     }
   } catch {
-    // ignore — we'll still attempt to use the string as-is
+    // ignore
   }
 
   return base.replace(/\/+$/, '')
 }
 
-const configuredApiUrl = normalizeApiBaseUrl(import.meta.env.VITE_API_URL)
-const apiBaseUrl = normalizeApiBaseUrl(
-  configuredApiUrl
-    || (import.meta.env.DEV ? 'http://localhost:8000' : PRODUCTION_API_FALLBACK)
-)
-
-const api = axios.create({
-  baseURL: apiBaseUrl,
-  // Render cold starts + LLM calls can exceed axios' default timeout.
-  timeout: 180000,
-})
-
 function getApiErrorMessage(error, fallback) {
-  if (error?.code === 'ECONNABORTED') return 'Request timed out. Is the backend still waking up? Try again in a few seconds.'
+  if (!error?.response && typeof error?.message === 'string' && error.message.includes('Network Error')) {
+    return 'Network error — blocked or wrong API URL. Check CORS and that the Render URL matches this app.'
+  }
+  if (error?.code === 'ECONNABORTED') {
+    return 'Request timed out. Is the backend still waking up? Try again in a few seconds.'
+  }
   const detail = error?.response?.data?.detail
   if (typeof detail === 'string' && detail.trim()) return detail.trim()
   if (Array.isArray(detail) && detail.length) return String(detail[0]?.msg || fallback)
@@ -50,40 +43,72 @@ function getApiErrorMessage(error, fallback) {
 }
 
 export default function App() {
+  const [apiBaseUrl, setApiBaseUrl] = useState(() => {
+    if (ENV_API_URL) return ENV_API_URL
+    if (import.meta.env.DEV) return 'http://localhost:8000'
+    return PRODUCTION_API_FALLBACK
+  })
+
   const [view,       setView]       = useState('landing')
-  const [gameState,  setGameState]  = useState('idle')   // idle|loading|playing|solved|failed|gameover
+  // idle | loading | playing | error | solved | failed | gameover
+  const [gameState,  setGameState]  = useState('idle')
   const [case_,      setCase]       = useState(null)
   const [caseFile,   setCaseFile]   = useState('')
+  const [loadError,  setLoadError]  = useState('')
   const [history,    setHistory]    = useState([])
   const [isThinking, setIsThinking] = useState(false)
   const [startTime,  setStartTime]  = useState(null)
   const gameRef = useRef(null)
 
+  // After deploy, `api-config.json` can point at your Render URL without rebuilding env.
+  useEffect(() => {
+    if (ENV_API_URL) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const base = import.meta.env.BASE_URL || '/'
+        const res = await fetch(`${base}api-config.json`, { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        const fromFile = normalizeApiBaseUrl(data?.apiBaseUrl)
+        if (fromFile && !cancelled) setApiBaseUrl(fromFile)
+      } catch {
+        /* keep initial fallback */
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const api = useMemo(() => axios.create({
+    baseURL: apiBaseUrl,
+    timeout: 180000,
+  }), [apiBaseUrl])
+
   const pingBackendWarmup = useCallback(() => {
-    // Fire-and-forget: wake cheaply, and hit health for older caches.
     api.get('/wake').catch(() => {})
     api.get('/health').catch(() => {})
-  }, [])
+  }, [api])
 
   useEffect(() => {
     pingBackendWarmup()
   }, [pingBackendWarmup])
 
-  if (import.meta.env.PROD && !configuredApiUrl) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      '[csi-vegas] VITE_API_URL is missing for this build; using fallback:',
-      PRODUCTION_API_FALLBACK
-    )
-  }
+  useEffect(() => {
+    if (import.meta.env.PROD && !ENV_API_URL) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[csi-vegas] No VITE_API_URL at build time — using',
+        apiBaseUrl,
+        '(from api-config.json or fallback). Set repo secret VITE_API_URL to lock the API.'
+      )
+    }
+  }, [apiBaseUrl])
 
-  // ── Scroll to game ───────────────────────────────────────────────────────────
   const goToGame = () => {
     setView('game')
     setTimeout(() => gameRef.current?.scrollIntoView({ behavior: 'smooth' }), 60)
   }
 
-  // ── Generate new case ────────────────────────────────────────────────────────
   const startNewCase = useCallback(async () => {
     const startedAt = Date.now()
     const waitForMinimumLoading = async () => {
@@ -94,6 +119,7 @@ export default function App() {
     }
 
     setGameState('loading')
+    setLoadError('')
     setHistory([])
     setCase(null)
     setCaseFile('')
@@ -108,17 +134,16 @@ export default function App() {
     } catch (error) {
       await waitForMinimumLoading()
       const msg = getApiErrorMessage(error, 'Backend not reachable. Check API URL and backend logs.')
-      setCaseFile(`⚠️ ${msg}`)
-      setGameState('playing')
+      setLoadError(msg)
+      setCaseFile('')
+      setGameState('error')
     }
-  }, [])
+  }, [api])
 
-  // Auto-start case when game view appears
   useEffect(() => {
     if (view === 'game' && gameState === 'idle') startNewCase()
   }, [view, gameState, startNewCase])
 
-  // ── Send chat message ────────────────────────────────────────────────────────
   const sendMessage = useCallback(async (message) => {
     if (!message.trim() || isThinking || gameState !== 'playing' || !case_) return
 
@@ -149,9 +174,8 @@ export default function App() {
     } finally {
       setIsThinking(false)
     }
-  }, [case_, caseFile, history, isThinking, gameState])
+  }, [case_, caseFile, history, isThinking, gameState, api])
 
-  // ── Accuse ───────────────────────────────────────────────────────────────────
   const accuse = useCallback((guess) => {
     if (!case_) return
     const c = case_.culprit.toLowerCase()
@@ -159,12 +183,10 @@ export default function App() {
     setGameState(g.includes(c) || c.includes(g) ? 'solved' : 'failed')
   }, [case_])
 
-  // ── Timer up ─────────────────────────────────────────────────────────────────
   const handleTimeUp = useCallback(() => {
     if (gameState === 'playing') setGameState('gameover')
   }, [gameState])
 
-  // ── Loading screen — glitchy typewriter ─────────────────────────────────────
   const LoadingScreen = () => {
     const [displayed, setDisplayed] = useState('')
     const [glitch, setGlitch]       = useState(false)
@@ -182,7 +204,6 @@ export default function App() {
       return () => clearInterval(type)
     }, [pingBackendWarmup])
 
-    // Random glitch flicker
     useEffect(() => {
       const flicker = setInterval(() => {
         setGlitch(true)
@@ -191,7 +212,6 @@ export default function App() {
       return () => clearInterval(flicker)
     }, [])
 
-    // Scramble effect on top of typed text
     const scrambled = displayed.split('').map((ch, i) =>
       glitch && Math.random() > 0.7 ? chars[Math.floor(Math.random() * chars.length)] : ch
     ).join('')
@@ -203,13 +223,11 @@ export default function App() {
         gap: '28px', background: 'var(--black)',
         position: 'relative', overflow: 'hidden',
       }}>
-        {/* Scanlines */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 6px)',
         }} />
 
-        {/* Glitchy text */}
         <div style={{
           fontFamily: 'var(--font-mono)',
           fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
@@ -224,7 +242,6 @@ export default function App() {
           padding: '0 20px',
         }}>
           {scrambled}
-          {/* Blinking cursor */}
           <span style={{
             display: 'inline-block',
             width: '2px', height: '1.2em',
@@ -235,7 +252,6 @@ export default function App() {
           }} />
         </div>
 
-        {/* Sub label */}
         <div style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.65rem',
@@ -245,7 +261,6 @@ export default function App() {
           ACCESSING BELLAGIO SECURITY FILES...
         </div>
 
-        {/* Progress bar */}
         <div style={{
           width: '260px', height: '2px',
           background: 'var(--grey-dim)',
@@ -263,14 +278,14 @@ export default function App() {
     )
   }
 
+  const connectionError = gameState === 'error' ? loadError : ''
+
   return (
     <div>
-      {/* Page 1 — Landing */}
       <div style={{ minHeight: '100vh' }}>
         <LandingPage onStart={goToGame} />
       </div>
 
-      {/* Page 2 — Game */}
       <div ref={gameRef}>
         {view === 'game' && (
           gameState === 'loading'
@@ -286,6 +301,9 @@ export default function App() {
                 onNewCase={startNewCase}
                 onAccuse={accuse}
                 onTimeUp={handleTimeUp}
+                connectionError={connectionError}
+                apiBaseUrl={apiBaseUrl}
+                onConnectionRetry={startNewCase}
               />
         )}
       </div>

@@ -52,6 +52,9 @@ export default function GamePage({
   onNewCase,
   onAccuse,
   onTimeUp,
+  connectionError,
+  apiBaseUrl,
+  onConnectionRetry,
 }) {
   return (
     <div
@@ -109,7 +112,7 @@ export default function GamePage({
             minHeight: 0,
           }}
         >
-          <DossierPanel case_={case_} />
+          <DossierPanel case_={case_} connectionError={connectionError} />
         </motion.div>
 
         {/* Col 3: Chat */}
@@ -130,6 +133,9 @@ export default function GamePage({
             isThinking={isThinking}
             gameState={gameState}
             onSend={onSend}
+            connectionError={connectionError}
+            apiBaseUrl={apiBaseUrl}
+            onConnectionRetry={onConnectionRetry}
           />
         </motion.div>
 
@@ -152,6 +158,8 @@ export default function GamePage({
             gameState={gameState}
             onAccuse={onAccuse}
             onNewCase={onNewCase}
+            connectionError={connectionError}
+            apiBaseUrl={apiBaseUrl}
           />
         </motion.div>
       </div>
