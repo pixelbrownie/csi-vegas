@@ -92,6 +92,7 @@ The API will be available at `http://localhost:8000`.
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/health` | Health check |
+| `GET` | `/wake` | Lightweight “spin up the host” ping (no case generation) |
 | `POST` | `/new-case` | Generate a new crime scenario |
 | `POST` | `/chat` | Send a detective message, receive agent response |
 
@@ -118,6 +119,8 @@ If you omit it, the dev app uses `http://localhost:8000` (see `src/app.jsx`).
 
 For a production build, set `VITE_API_URL` to wherever the FastAPI app is hosted (and add that origin to backend `CORS_ORIGINS` if needed).
 
+**GitHub Pages note:** the frontend also includes a **safe production fallback** API URL (see `frontend/src/app.jsx`) so the game can still boot if the `VITE_API_URL` secret isn't set — but you should still set the secret to your real Render URL to avoid accidentally pointing at the wrong service.
+
 ### 3. Start the dev server
 
 ```bash
@@ -143,7 +146,7 @@ The app will be available at `http://localhost:5173`.
 
 | Variable | Default | Description |
 |---|---|---|
-| `VITE_API_URL` | `http://localhost:8000` (in code / `.env.production` template) | Backend API base URL baked in at build time |
+| `VITE_API_URL` | `https://csi-vegas.onrender.com` (template / fallback) | Backend API base URL baked in at build time |
 
 ---
 

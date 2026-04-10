@@ -3,6 +3,7 @@
 # Run with: uvicorn main:app --reload --port 8000
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -28,7 +29,8 @@ if _extra:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors,
-    allow_origin_regex=r"^https://.*\.github\.io$", 
+    # GitHub Pages + any user/organization Pages subdomain over HTTPS.
+    allow_origin_regex=r"^https://.*\.github\.io$",
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -66,24 +68,52 @@ def health():
     }
 
 
+@app.get("/wake")
+def wake():
+    """
+    Cheap request intended to spin up free-tier hosts without generating a case.
+    The frontend calls this on page load.
+    """
+    return {"status": "ok"}
+
+
+@app.head("/wake")
+def wake_head():
+    return Response(status_code=204)
+
+
+def _new_case_payload():
+    """Shared case generation used by POST (and safe wake/no-op methods)."""
+    case = generate_case()
+    return {
+        "case": case,
+        "case_file": (
+            f"A body was discovered at the Bellagio. "
+            f"Victim: {case['victim']['name']}, "
+            f"a {case['victim']['role']}. "
+            "Investigation begins."
+        ),
+    }
+
+
 @app.post("/new-case")
 def new_case():
     """Generate a fresh crime scenario."""
     try:
-        case = generate_case()
-        return {
-            "case": case,
-            "case_file": (
-                f"A body was discovered at the Bellagio. "
-                f"Victim: {case['victim']['name']}, "
-                f"a {case['victim']['role']}. "
-                "Investigation begins."
-            )
-        }
+        return _new_case_payload()
     except LLMUnavailableError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.head("/new-case")
+def new_case_head():
+    """
+    Some proxies / cached frontends probe endpoints with HEAD.
+    Avoid returning 405 so CORS middleware can still attach headers on errors.
+    """
+    return Response(status_code=204)
 
 
 @app.post("/chat", response_model=ChatResponse)

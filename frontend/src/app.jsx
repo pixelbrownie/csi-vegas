@@ -7,10 +7,42 @@ import axios from 'axios'
 import LandingPage from './components/LandingPage.jsx'
 import GamePage    from './components/GamePage.jsx'
 
-const API = 'https://csi-vegas.onrender.com'
-const MIN_LOADING_MS = 5000
+// Vite injects this at build time. Keep a production fallback so GitHub Pages still works
+// even if the `VITE_API_URL` Actions secret isn't configured.
+const PRODUCTION_API_FALLBACK = 'https://csi-vegas.onrender.com'
+const MIN_LOADING_MS = 1500
+
+function normalizeApiBaseUrl(raw) {
+  let base = String(raw || '').trim()
+  if (!base) return ''
+
+  // If someone pasted a deep link or Pages URL by mistake, keep only the origin.
+  try {
+    if (base.includes('://')) {
+      const u = new URL(base)
+      base = `${u.protocol}//${u.host}`
+    }
+  } catch {
+    // ignore — we'll still attempt to use the string as-is
+  }
+
+  return base.replace(/\/+$/, '')
+}
+
+const configuredApiUrl = normalizeApiBaseUrl(import.meta.env.VITE_API_URL)
+const apiBaseUrl = normalizeApiBaseUrl(
+  configuredApiUrl
+    || (import.meta.env.DEV ? 'http://localhost:8000' : PRODUCTION_API_FALLBACK)
+)
+
+const api = axios.create({
+  baseURL: apiBaseUrl,
+  // Render cold starts + LLM calls can exceed axios' default timeout.
+  timeout: 180000,
+})
 
 function getApiErrorMessage(error, fallback) {
+  if (error?.code === 'ECONNABORTED') return 'Request timed out. Is the backend still waking up? Try again in a few seconds.'
   const detail = error?.response?.data?.detail
   if (typeof detail === 'string' && detail.trim()) return detail.trim()
   if (Array.isArray(detail) && detail.length) return String(detail[0]?.msg || fallback)
@@ -26,6 +58,24 @@ export default function App() {
   const [isThinking, setIsThinking] = useState(false)
   const [startTime,  setStartTime]  = useState(null)
   const gameRef = useRef(null)
+
+  const pingBackendWarmup = useCallback(() => {
+    // Fire-and-forget: wake cheaply, and hit health for older caches.
+    api.get('/wake').catch(() => {})
+    api.get('/health').catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    pingBackendWarmup()
+  }, [pingBackendWarmup])
+
+  if (import.meta.env.PROD && !configuredApiUrl) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[csi-vegas] VITE_API_URL is missing for this build; using fallback:',
+      PRODUCTION_API_FALLBACK
+    )
+  }
 
   // ── Scroll to game ───────────────────────────────────────────────────────────
   const goToGame = () => {
@@ -49,7 +99,7 @@ export default function App() {
     setCaseFile('')
     setStartTime(null)
     try {
-      const res = await axios.post(`${API}/new-case`)
+      const res = await api.post('/new-case')
       await waitForMinimumLoading()
       setCase(res.data.case)
       setCaseFile(res.data.case_file)
@@ -77,7 +127,7 @@ export default function App() {
     setIsThinking(true)
 
     try {
-      const res = await axios.post(`${API}/chat`, {
+      const res = await api.post('/chat', {
         message,
         case: case_,
         case_file: caseFile,
@@ -122,7 +172,7 @@ export default function App() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&!'
 
     useEffect(() => {
-      axios.get(`${API}/health`).catch(() => {})
+      pingBackendWarmup()
       let i = 0
       const type = setInterval(() => {
         if (i >= full.length) { clearInterval(type); return }
@@ -130,7 +180,7 @@ export default function App() {
         i++
       }, 65)
       return () => clearInterval(type)
-    }, [])
+    }, [pingBackendWarmup])
 
     // Random glitch flicker
     useEffect(() => {
