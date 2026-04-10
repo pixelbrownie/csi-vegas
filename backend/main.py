@@ -15,26 +15,23 @@ from llm_client import LLMUnavailableError, llm_health_status
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
-# Browser origins allowed to call this API (your GitHub Pages site, local dev, etc.)
 _cors = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://pixelbrownie.github.io",
 ]
+
 _extra = os.getenv("CORS_ORIGINS", "")
 if _extra:
     _cors.extend(o.strip() for o in _extra.split(",") if o.strip())
 
-# Regex covers GitHub Pages (Origin is always https://<user>.github.io, no path).
-# Add more origins with CORS_ORIGINS=comma,separated if needed.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors,
-    allow_origin_regex=r"^https://[a-zA-Z0-9-]+\.github\.io$",
+    allow_origin_regex=r"^https://.*\.github\.io$", 
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # ─── Request / Response Models ─────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):

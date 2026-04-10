@@ -23,27 +23,28 @@ A new crime scenario is generated each game (victim, two suspects, culprit, weap
 ```
 csi-vegas/
 ├── backend/
-│   ├── main.py               # FastAPI server
-│   ├── llm_client.py         # Groq (OpenAI-compatible) chat client
-│   ├── orchestrator.py       # Intent classification + agent routing
-│   ├── agents.py             # Witness, Analyst, Narrator agents
-│   └── scenario_generator.py # Crime scenario generator (Groq or offline)
-└── frontend/
-    ├── src/
-    │   ├── app.jsx            # Root component, game state, API calls
-    │   ├── main.jsx           # React entry point
-    │   ├── style_fixed.css    # Global styles and CSS variables
-    │   └── components/
-    │       ├── GamePage.jsx       # 4-column game layout
-    │       ├── LandingPage.jsx    # Hero + agent explainer
-    │       ├── ChatRoom.jsx       # Chat UI with agent-styled bubbles
-    │       ├── DossierPanel.jsx   # Victim + suspect cards
-    │       ├── RightPanel.jsx     # Case file, accusation, how-to-play
-    │       ├── Sidebar.jsx        # Timer + location + new case
-    │       └── SecretReveal.jsx   # Hover-to-reveal secret clue widget
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
+│   ├── main.py
+│   ├── llm_client.py
+│   ├── orchestrator.py
+│   ├── agents.py
+│   ├── scenario_generator.py
+│   └── requirements.txt
+├── frontend/
+│   ├── src/ 
+│   │   ├── app.jsx            # Root component, game state, API calls
+│   │   ├── main.jsx           # React entry point
+│   │   ├── style_fixed.css    # Global styles and CSS variables
+│   │   └── components/
+│   │       ├── GamePage.jsx       # 4-column game layout
+│   │       ├── LandingPage.jsx    # Hero + agent explainer
+│   │       ├── ChatRoom.jsx       # Chat UI with agent-styled bubbles
+│   │       ├── DossierPanel.jsx   # Victim + suspect cards
+│   │       ├── RightPanel.jsx     # Case file, accusation, how-to-play
+│   │       ├── Sidebar.jsx        # Timer + location + new case
+│   │       └── SecretReveal.jsx   # Hover-to-reveal secret clue widget
+│   ├── index.html
+│   └── vite.config.js
+└── README.md
 ```
 
 ---
