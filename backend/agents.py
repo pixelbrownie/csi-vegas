@@ -1,42 +1,48 @@
 # agents.py
-# Phase 3 — Three specialized LangChain agents
-# Each agent wraps an LLM call with a specific persona and role
+# Phase 3 — Three specialized agents (live LLM when enabled, else in-character templates)
 
-from langchain_community.llms import Ollama
-
-llm = Ollama(model="mistral")
-LLM_AVAILABLE = True
+from llm_client import invoke_llm, is_live_llm_enabled
 
 
-def _safe_invoke(prompt: str, fallback: str) -> str:
-    """
-    Run the LLM call if available; otherwise return a deterministic fallback.
-    This keeps production usable when Ollama is not running.
-    """
-    global LLM_AVAILABLE
-    if not LLM_AVAILABLE:
-        return fallback
-    try:
-        return llm.invoke(prompt)
-    except Exception:
-        LLM_AVAILABLE = False
-        return fallback
+def _witness_scripted(question: str, case: dict) -> str:
+    suspect = case["suspect_a"]
+    victim = case["victim"]
+    other = case["suspect_b"]
+    motive = other["motive"]
+    motive_phrase = (motive[0].lower() + motive[1:]) if motive else "their own secrets"
+    return (
+        f"[{suspect['name']} avoids eye contact, voice tight] "
+        f"Look, I already told security — I was {suspect['alibi']}. "
+        f"{victim['name']}? We weren't friends, but I didn't wish that on anyone. "
+        f"You're fishing. *nervous laugh* Ask about {other['name']} — "
+        f"they had more reason than me: {motive_phrase}."
+    )
 
-# ─────────────────────────────────────────
-# WITNESS AGENT
-# Knows the full truth but is evasive.
-# Drops subtle hints without direct reveals.
-# ─────────────────────────────────────────
+
+def _analyst_scripted(clue: str, case_history: str) -> str:
+    hist = case_history if case_history else "No prior clues on record."
+    return (
+        f"Preliminary read: the submission does not obviously contradict the logged timeline. "
+        f"Case context: {hist[:120]}{'…' if len(hist) > 120 else ''} "
+        f"New item: \"{clue[:100]}{'…' if len(clue) > 100 else ''}\" suggests follow-up on chain of custody. "
+        f"Importance: MEDIUM — worth corroborating with venue security and witness statements."
+    )
+
+
+def _narrator_scripted(event: str, case_file: str) -> str:
+    return (
+        f"The Strip hums indifferent neon while the file thickens: {event[:140]}"
+        f"{'…' if len(event) > 140 else ''} "
+        "Another sin city secret waits behind mirrored glass."
+    )
+
+
 def witness_agent(question: str, case: dict) -> str:
-    """
-    Plays the role of a nervous witness / suspect.
-    Knows the truth but deflects and hints instead of confessing.
-    """
     suspect = case["suspect_a"]
     culprit = case["culprit"]
-    weapon  = case["murder_weapon"]
-    clue    = case["key_clue"]
-    victim  = case["victim"]
+    weapon = case["murder_weapon"]
+    clue = case["key_clue"]
+    victim = case["victim"]
 
     prompt = f"""You are {suspect['name']}, a witness being interrogated in a Las Vegas murder case.
 
@@ -58,25 +64,12 @@ INSTRUCTIONS:
 Detective's question: {question}
 Your response:"""
 
-    fallback = (
-        f"{suspect['name']} shifts in their seat and avoids eye contact. "
-        f'"I told you, I was at {suspect["alibi"]}... mostly. '
-        f'The only thing I remember clearly is someone arguing with {victim["name"]} '
-        f'right before everything went bad."'
-    )
-    return _safe_invoke(prompt, fallback)
+    if not is_live_llm_enabled():
+        return _witness_scripted(question, case)
+    return invoke_llm(prompt, "witness_agent")
 
 
-# ─────────────────────────────────────────
-# ANALYST AGENT
-# Forensic examiner. Clinical, precise.
-# Cross-checks clues for contradictions.
-# ─────────────────────────────────────────
 def analyst_agent(clue: str, case_history: str) -> str:
-    """
-    Forensic analyst that evaluates submitted clues.
-    Checks for contradictions and rates importance.
-    """
     prompt = f"""You are Agent Reyes, a forensic analyst at the Las Vegas Crime Lab.
 
 CASE HISTORY SO FAR:
@@ -92,38 +85,12 @@ YOUR TASK:
 
 Be brief, clinical, and analytical. 4-5 sentences max. No dramatic flair."""
 
-    clue_lower = clue.lower()
-    contradiction = "YES" if any(k in clue_lower for k in ["contradict", "doesn't match", "does not match", "inconsistent"]) else "NO"
-    if any(k in clue_lower for k in ["dna", "fingerprint", "camera", "footage", "entry log", "logs", "badge", "keycard"]):
-        importance = "HIGH"
-        reason = "it can directly verify presence, identity, or timeline."
-    elif any(k in clue_lower for k in ["maybe", "think", "heard", "possibly"]):
-        importance = "LOW"
-        reason = "it is suggestive but not strongly verifiable yet."
-    else:
-        importance = "MEDIUM"
-        reason = "it narrows hypotheses but still needs corroboration."
-
-    history_note = "No prior clues on record." if not case_history.strip() else "Cross-referenced with existing notes for timeline consistency."
-    fallback = (
-        f"Contradiction check: {contradiction}. {history_note} "
-        f"Clue assessed: '{clue[:140]}'. "
-        "Most likely implication: this clue should be used to pressure alibi verification and movement around the crime window. "
-        f"Importance: {importance}, because {reason}"
-    )
-    return _safe_invoke(prompt, fallback)
+    if not is_live_llm_enabled():
+        return _analyst_scripted(clue, case_history)
+    return invoke_llm(prompt, "analyst_agent")
 
 
-# ─────────────────────────────────────────
-# NARRATOR AGENT
-# Noir Vegas storyteller.
-# Updates the living case file after each event.
-# ─────────────────────────────────────────
 def narrator_agent(event: str, case_file: str) -> str:
-    """
-    Noir narrator that dramatically updates the case file
-    after each significant player action.
-    """
     prompt = f"""You are the noir narrator of a Vegas murder mystery.
 
 EXISTING CASE FILE:
@@ -138,22 +105,19 @@ Think Raymond Chandler meets Vegas neon lights.
 Start directly with the new addition — do NOT repeat the existing case file.
 Keep it evocative and punchy."""
 
-    fallback = (
-        "Neon bled across the evidence board as another thread snapped into place. "
-        "In Vegas, every answer buys two new questions, and the night keeps its secrets close."
-    )
-    return _safe_invoke(prompt, fallback)
+    if not is_live_llm_enabled():
+        return _narrator_scripted(event, case_file)
+    return invoke_llm(prompt, "narrator_agent")
 
 
 if __name__ == "__main__":
-    # Quick test of each agent with a dummy case
     dummy_case = {
         "victim": {"name": "Marco Delgado", "role": "poker dealer"},
         "suspect_a": {"name": "Veronica Sloane", "motive": "witnessed chip skimming", "alibi": "spa all evening"},
         "suspect_b": {"name": "Danny Ricci", "motive": "owed money", "alibi": "at craps table"},
         "culprit": "Danny Ricci",
         "murder_weapon": "a weighted poker chip sleeve",
-        "key_clue": "monogrammed loyalty card found under victim"
+        "key_clue": "monogrammed loyalty card found under victim",
     }
 
     print("=== WITNESS AGENT ===")

@@ -8,8 +8,7 @@ import LandingPage from './components/LandingPage.jsx'
 import GamePage    from './components/GamePage.jsx'
 
 const API =
-  import.meta.env.VITE_API_URL?.trim() ||
-  'https://csi-vegas.onrender.com'
+  import.meta.env.VITE_API_URL?.trim() || 'http://localhost:8000'
 const MIN_LOADING_MS = 5000
 
 function getApiErrorMessage(error, fallback) {
