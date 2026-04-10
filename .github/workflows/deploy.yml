@@ -24,7 +24,6 @@ jobs:
         working-directory: frontend
         run: chmod +x node_modules/.bin/vite
 
-      # Bakes API URL into the static build. Set repo secret VITE_API_URL to your public API (required for GitHub Pages).
       - name: Build the project
         working-directory: frontend
         run: npm run build
