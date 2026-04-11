@@ -167,6 +167,8 @@ export default function App() {
         role:    'assistant',
         content: res.data.response,
         agent:   res.data.agent,
+        reasoning: res.data.reasoning,
+        audit:   res.data.audit,
       }])
     } catch (error) {
       const msg = getApiErrorMessage(error, 'Connection lost. Try again.')

@@ -2,6 +2,139 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+function MessageBubble({ msg, isLast }) {
+  const [showReasoning, setShowReasoning] = useState(false)
+  const isAssistant = msg.role === 'assistant'
+  const hasContradiction = isAssistant && msg.audit?.contradiction
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+        width: '100%',
+        marginBottom: '24px',
+      }}
+    >
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--gold-metallic)',
+        marginBottom: '8px',
+        letterSpacing: '0.15em',
+        textTransform: 'uppercase',
+        opacity: 0.7,
+        marginLeft: msg.role === 'user' ? 0 : '16px',
+        marginRight: msg.role === 'user' ? '16px' : 0,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+      }}>
+        {msg.role === 'user' ? 'DETECTIVE' : (msg.agent || 'SYSTEM')}
+        {isAssistant && msg.audit?.contradiction && (
+          <span style={{ color: 'var(--crimson-accent)', fontWeight: 900 }}>[ ! CONTRADICTION DETECTED ]</span>
+        )}
+      </div>
+      
+      <div 
+        className={hasContradiction ? 'audit-alert' : ''}
+        style={{
+          maxWidth: '85%',
+          padding: '14px 18px',
+          background: msg.role === 'user' 
+            ? 'var(--gold-gradient)' 
+            : 'rgba(255, 255, 255, 0.05)',
+          color: msg.role === 'user' ? 'var(--black-pure)' : 'var(--white-soft)',
+          borderRadius: '24px',
+          border: hasContradiction 
+            ? '2px solid var(--crimson-accent)' 
+            : msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.1)',
+          backdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
+          fontFamily: 'var(--font-ui)',
+          fontSize: '0.82rem',
+          lineHeight: 1.5,
+          boxShadow: msg.role === 'user' 
+            ? '0 8px 25px rgba(212, 175, 55, 0.2)' 
+            : '0 4px 15px rgba(0,0,0,0.3)',
+          position: 'relative',
+        }}
+      >
+        {msg.content}
+
+        {isAssistant && msg.audit?.contradiction && (
+          <div style={{ 
+            marginTop: '12px', 
+            paddingTop: '10px', 
+            borderTop: '1px dashed rgba(139, 0, 0, 0.4)',
+            fontSize: '0.75rem',
+            color: 'var(--crimson-accent)',
+            fontStyle: 'italic',
+            fontWeight: 600
+          }}>
+            Forensic Audit: {msg.audit.explanation}
+          </div>
+        )}
+      </div>
+
+      {isAssistant && msg.reasoning && (
+        <div style={{ marginTop: '8px', paddingLeft: '16px' }}>
+          <button 
+            onClick={() => setShowReasoning(!showReasoning)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--gold-metallic)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.55rem',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              opacity: 0.5,
+              padding: '4px 0',
+            }}
+          >
+            {showReasoning ? '[-] Hide Diagnostic Trace' : '[+] Trace AI Reasoning'}
+          </button>
+          
+          <AnimatePresence>
+            {showReasoning && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  borderLeft: '1px solid var(--gold-metallic)',
+                  padding: '12px 16px',
+                  marginTop: '6px',
+                  borderRadius: '0 8px 8px 0',
+                  maxWidth: '400px',
+                  overflow: 'hidden'
+                }}
+              >
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.65rem',
+                  color: 'var(--grey-chic)',
+                  lineHeight: 1.4,
+                  whiteSpace: 'pre-wrap',
+                }}>
+                  <span style={{ color: 'var(--gold-metallic)', opacity: 0.8 }}>// SYSTEM REFLECTION //</span>
+                  <br /><br />
+                  {msg.reasoning}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
 export default function ChatRoom({
   history,
   isThinking,
@@ -48,12 +181,12 @@ export default function ChatRoom({
         overflow: 'hidden',
       }}
     >
-      {/* Header - Removed border */}
+      {/* Header */}
       <div style={{
-        padding: '24px 24px 12px', // Tighter header
+        padding: '24px 24px 12px',
         display: 'flex',
         justifyContent: 'center',
-        background: 'transparent', // No background block
+        background: 'transparent',
         zIndex: 1,
       }}>
         <div style={{
@@ -79,58 +212,17 @@ export default function ChatRoom({
           padding: '12px 24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '24px',
           position: 'relative',
           zIndex: 1,
         }}
       >
         <AnimatePresence initial={false}>
           {history.map((msg, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                width: '100%',
-              }}
-            >
-              <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.55rem',
-                color: 'var(--gold-metallic)',
-                marginBottom: '8px',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                opacity: 0.7,
-                marginLeft: msg.role === 'user' ? 0 : '16px',
-                marginRight: msg.role === 'user' ? '16px' : 0,
-              }}>
-                {msg.role === 'user' ? 'DETECTIVE' : (msg.agent || 'SYSTEM')}
-              </div>
-              
-              <div style={{
-                maxWidth: '85%',
-                padding: '14px 18px', // Slightly thinner bubbles
-                background: msg.role === 'user' 
-                  ? 'var(--gold-gradient)' 
-                  : 'rgba(255, 255, 255, 0.05)',
-                color: msg.role === 'user' ? 'var(--black-pure)' : 'var(--white-soft)',
-                borderRadius: '24px',
-                border: msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.1)',
-                backdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
-                fontFamily: 'var(--font-ui)',
-                fontSize: '0.82rem',
-                lineHeight: 1.5,
-                boxShadow: msg.role === 'user' 
-                  ? '0 8px 25px rgba(212, 175, 55, 0.2)' 
-                  : '0 4px 15px rgba(0,0,0,0.3)',
-              }}>
-                {msg.content}
-              </div>
-            </motion.div>
+            <MessageBubble 
+              key={idx} 
+              msg={msg} 
+              isLast={idx === history.length - 1} 
+            />
           ))}
 
           {isThinking && (
@@ -169,10 +261,10 @@ export default function ChatRoom({
         </AnimatePresence>
       </div>
 
-      {/* Input area - Thinner, No separators */}
+      {/* Input area */}
       <div style={{
-        padding: '12px 24px 20px', // Much thinner padding
-        background: 'transparent', // Fully seamless
+        padding: '12px 24px 20px',
+        background: 'transparent',
         zIndex: 2,
       }}>
         <div 
@@ -182,8 +274,8 @@ export default function ChatRoom({
             position: 'relative', 
             display: 'flex', 
             gap: '12px',
-            background: '#0a0a0a', // Solid Dark
-            padding: '4px 12px 4px 20px', // Increased right padding for more space around button
+            background: '#0a0a0a',
+            padding: '4px 8px 4px 20px',
             borderRadius: 'var(--radius-pill)',
             border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
             boxShadow: isInputHovered 
@@ -202,13 +294,13 @@ export default function ChatRoom({
             onKeyDown={handleKeyDown}
             style={{
               flex: 1,
-              height: '22px', // Specific height for centering
+              height: '22px',
               background: 'transparent',
               border: 'none',
               color: 'var(--white-pure)',
-              padding: '0', // No internal padding to ensure flex centering works
+              padding: '0',
               fontFamily: 'var(--font-ui)',
-              fontSize: '1.05rem', // Slightly larger as requested
+              fontSize: '1.05rem',
               resize: 'none',
               outline: 'none',
               lineHeight: '22px',
@@ -221,7 +313,7 @@ export default function ChatRoom({
             onClick={handleSend}
             disabled={isInputDisabled || !input.trim()}
             style={{
-              width: '38px', // Thinner button
+              width: '38px',
               height: '38px',
               background: '#FFD700',
               border: 'none',

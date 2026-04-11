@@ -122,14 +122,15 @@ h1, h2, h3, h4, .case-title {
   100% { transform: translateX(-50%); }
 }
 
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); }
+@keyframes auditPulse {
+  0% { box-shadow: 0 0 0 0 rgba(139, 0, 0, 0.7); border-color: var(--crimson-accent); }
+  70% { box-shadow: 0 0 0 10px rgba(139, 0, 0, 0); border-color: #ff0000; }
+  100% { box-shadow: 0 0 0 0 rgba(139, 0, 0, 0); border-color: var(--crimson-accent); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+.audit-alert {
+  animation: auditPulse 2s infinite;
+  border-width: 2px !important;
 }
 
 .shimmer {
