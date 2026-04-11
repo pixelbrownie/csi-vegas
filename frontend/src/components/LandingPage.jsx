@@ -1,342 +1,257 @@
-import React, { Suspense } from 'react'
-import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion'
+import React, { useState, useEffect } from 'react'
+import { motion, useTransform, useMotionValue, useSpring } from 'framer-motion'
+
+function FloatingAsset({ src, initialPos, duration, delay }) {
+  return (
+    <motion.img
+      src={src}
+      initial={{ ...initialPos, opacity: 0 }}
+      animate={{ 
+        y: [initialPos.y, initialPos.y - 40, initialPos.y],
+        rotate: [0, 10, -10, 0],
+        opacity: [0, 0.4, 0.4, 0]
+      }}
+      transition={{ 
+        duration: duration, 
+        repeat: Infinity, 
+        delay: delay,
+        ease: "easeInOut" 
+      }}
+      style={{
+        position: 'absolute',
+        width: '120px',
+        pointerEvents: 'none',
+        zIndex: 2,
+        filter: 'blur(1px) drop-shadow(0 10px 20px rgba(0,0,0,0.5))',
+      }}
+    />
+  )
+}
+
+function Particle({ size, top, left, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ 
+        opacity: [0, 0.5, 0], 
+        scale: [0, 1, 0],
+        y: [0, -100]
+      }}
+      transition={{ 
+        duration: 4 + Math.random() * 4, 
+        repeat: Infinity, 
+        delay: delay 
+      }}
+      style={{
+        position: 'absolute',
+        top: `${top}%`,
+        left: `${left}%`,
+        width: size,
+        height: size,
+        background: 'var(--gold-metallic)',
+        borderRadius: '50%',
+        filter: 'blur(2px)',
+        zIndex: 3,
+      }}
+    />
+  )
+}
 
 export default function LandingPage({ onStart }) {
-  // Track mouse coordinates for dynamic background glow
-  const mouseX = useMotionValue(15)
-  const mouseY = useMotionValue(20)
-  
-  // Apply a smooth spring so it follows naturally
-  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 })
-  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 })
-  
-  const glowBackground = useMotionTemplate`
-    radial-gradient(circle at ${springX}% ${springY}%, rgba(190, 242, 100, 0.32), transparent 40%),
-    radial-gradient(circle at 80% 30%, rgba(251, 146, 60, 0.18), transparent 40%), 
-    radial-gradient(circle at 50% 80%, rgba(132, 204, 22, 0.15), transparent 45%)
-  `
+  const bgPath = `${import.meta.env.BASE_URL}assets/vegas_high_roller_bg.png`
+  const chipPath = `${import.meta.env.BASE_URL}assets/poker_chip.png`
 
-  function handleMouseMove({ currentTarget, clientX, clientY }) {
-    const { left, top, width, height } = currentTarget.getBoundingClientRect()
-    mouseX.set(((clientX - left) / width) * 100)
-    mouseY.set(((clientY - top) / height) * 100)
-  }
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+
+  const springX = useSpring(mouseX, { damping: 50, stiffness: 200 })
+  const springY = useSpring(mouseY, { damping: 50, stiffness: 200 })
+
+  const moveX = useTransform(springX, [0, window.innerWidth], [-10, 10])
+  const moveY = useTransform(springY, [0, window.innerHeight], [-10, 10])
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      mouseX.set(e.clientX)
+      mouseY.set(e.clientY)
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [mouseX, mouseY])
 
   return (
-    <div className="lp-container" onMouseMove={handleMouseMove}>
+    <div className="lp-container">
       <style>{`
         .lp-container {
           min-height: 100vh;
-          background-color: var(--black);
-          color: var(--white);
+          background-color: #050505;
+          color: var(--white-soft);
           position: relative;
           overflow: hidden;
           font-family: var(--font-ui);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        
-        .lp-spectra {
+
+        .lp-bg-wrapper {
           position: absolute;
-          inset: 0;
-          opacity: 0.4;
+          inset: -10px;
           z-index: 0;
         }
 
-        .framer-spectra-override {
-          width: 100% !important;
-          height: 100% !important;
-          min-height: 100vh !important;
-        }
-
-        .lp-glow {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-        }
-
-        .lp-grid {
-          position: absolute;
-          inset: 0;
-          opacity: 0.1;
-          z-index: 1;
-          pointer-events: none;
-          background-image: 
-            linear-gradient(rgba(251, 146, 60, 0.12) 1px, transparent 1px), 
-            linear-gradient(90deg, rgba(251, 146, 60, 0.12) 1px, transparent 1px);
-          background-size: 45px 45px;
-        }
-
-        .lp-main {
-          position: absolute;
-          inset: 0;
-          z-index: 10;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 80px;
-        }
-
-        .lp-top-left {
-          position: absolute;
-          top: 40px;
-          left: 60px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .lp-title-top {
-          font-family: var(--font-mono);
-          font-size: 0.65rem;
-          letter-spacing: 0.45em;
-          color: var(--orange);
-          text-transform: uppercase;
-          font-weight: 400;
-        }
-
-        .lp-title-bottom {
-          font-family: var(--font-mono);
-          font-size: 0.65rem;
-          letter-spacing: 0.45em;
-          color: var(--yellow);
-          text-transform: uppercase;
-          font-weight: 400;
-        }
-
-        .lp-top-right {
-          position: absolute;
-          top: 40px;
-          right: 60px;
-          font-family: var(--font-ui);
-          font-style: italic;
-          font-size: 1.2rem;
-          color: var(--white-dim);
-        }
-
-        .lp-middle-row {
-          display: flex;
-          flex-direction: row;
-          gap: 100px;
-          align-items: center;
-          justify-content: center;
+        .lp-bg {
           width: 100%;
-          max-width: 1300px;
-          margin-top: 40px;
+          height: 100%;
+          background: url("${import.meta.env.BASE_URL}assets/vegas_luxury_noir_background_1775884030168.png") center/cover no-repeat;
+          filter: brightness(0.3) saturate(0.7) blur(2px);
         }
 
-        @media (max-width: 1024px) {
-          .lp-middle-row { flex-direction: column; text-align: center; gap: 60px; }
-        }
-
-        .lp-hero-left {
-          display: flex;
-          flex-direction: column;
-          max-width: 500px;
-        }
-
-        @media (max-width: 1024px) {
-          .lp-hero-left { align-items: center; }
-        }
-
-        .lp-h1 {
-          font-family: var(--font-hero);
-          font-size: 8rem;
-          font-weight: 700;
-          line-height: 0.9;
-          margin-bottom: 24px;
-          letter-spacing: 0.02em;
-          text-transform: uppercase;
-        }
-        @media (max-width: 768px) {
-          .lp-h1 { font-size: 5rem; }
-        }
-
-        .lp-gradient-text {
-          color: transparent;
-          background-clip: text;
-          -webkit-background-clip: text;
-          background-image: linear-gradient(to right, var(--yellow), var(--orange));
-          filter: drop-shadow(0 0 30px rgba(251, 146, 60, 0.35));
-        }
-
-        .lp-desc {
-          font-family: var(--font-ui);
-          font-size: 1.125rem;
-          color: var(--white-dim);
-          line-height: 1.7;
-          font-weight: 400;
-          letter-spacing: 0.01em;
-        }
-
-        .lp-cards {
-          display: grid;
-          gap: 20px;
-          flex-grow: 1;
-          max-width: 600px;
-        }
-
-        .lp-card {
-          background: rgba(0, 0, 0, 0.55);
-          backdrop-filter: blur(40px);
-          -webkit-backdrop-filter: blur(40px);
-          border: 1px solid rgba(251, 146, 60, 0.2);
-          border-radius: var(--radius-subtle);
-          padding: 24px 32px;
-          transition: all 0.3s;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        .lp-card:hover {
-          border-color: rgba(251, 146, 60, 0.6);
-          background: rgba(0, 0, 0, 0.65);
-        }
-        
-        .lp-card-header {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 8px;
-        }
-
-        .lp-card-icon {
-          font-size: 1.4rem;
-        }
-
-        .lp-card-title {
-          font-family: var(--font-stamp);
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: var(--orange);
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-        }
-
-        .lp-card-desc {
-          font-family: var(--font-ui);
-          color: var(--grey);
-          line-height: 1.7;
-          font-size: 0.9rem;
-          letter-spacing: 0.01em;
-        }
-
-        .lp-bottom-container {
-          margin-top: 80px;
-        }
-
-        .lp-btn-primary {
-          background: linear-gradient(to right, var(--yellow), var(--orange));
-          color: black;
-          padding: 18px 56px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-stamp);
-          font-weight: 700;
-          font-size: 1rem;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          box-shadow: 0 0 35px rgba(251, 146, 60, 0.35);
-          border: none;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .lp-btn-primary:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 50px rgba(251, 146, 60, 0.5);
-        }
-        .lp-noise-overlay {
+        .lp-overlay {
           position: absolute;
           inset: 0;
+          background: radial-gradient(circle at center, transparent 0%, #050505 95%);
           z-index: 1;
-          opacity: 0.15;
+        }
+
+        .lp-content {
+          position: relative;
+          z-index: 20;
+          text-align: center;
+          max-width: 1000px;
+          padding: 60px;
+        }
+
+        .lp-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          letter-spacing: 0.6em;
+          color: var(--gold-metallic);
+          text-transform: uppercase;
+          margin-bottom: 30px;
+          display: block;
+          text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .lp-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(3.5rem, 10vw, 8rem);
+          font-weight: 900;
+          line-height: 0.9;
+          margin-bottom: 40px;
+          letter-spacing: -0.01em;
+          text-shadow: 0 10px 50px rgba(0,0,0,0.8);
+          animation: slowGlow 8s ease-in-out infinite;
+        }
+
+        .lp-subtitle {
+          font-family: var(--font-mono);
+          font-size: 0.95rem;
+          color: #bdbdbd;
+          line-height: 1.8;
+          max-width: 700px;
+          margin: 0 auto 60px;
+          letter-spacing: 0.05em;
+          font-weight: 300;
+          padding: 24px;
+          border-left: 2px solid var(--gold-metallic);
+          border-right: 2px solid var(--gold-metallic);
+          background: rgba(212, 175, 55, 0.03);
+        }
+
+        .lp-btn {
+          background: linear-gradient(135deg, #d4af37 0%, #a67c00 100%);
+          color: #000;
+          padding: 22px 60px;
+          border-radius: var(--radius-pill);
+          border: 1px solid rgba(255,255,255,0.2);
+          font-family: var(--font-ui);
+          font-weight: 800;
+          font-size: 1rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .lp-btn:hover {
+          transform: translateY(-5px) scale(1.02);
+          box-shadow: 0 20px 50px rgba(212, 175, 55, 0.4);
+          letter-spacing: 0.25em;
+          background: #f9f6e5;
+        }
+
+        .lp-noise {
+          position: absolute;
+          inset: 0;
+          opacity: 0.04;
           pointer-events: none;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+          z-index: 5;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
       `}</style>
+
+      <motion.div className="lp-bg-wrapper" style={{ x: moveX, y: moveY }}>
+        <div className="lp-bg" />
+      </motion.div>
+      <div className="lp-overlay" />
+      <div className="lp-noise" />
+
+      {/* Floating Assets */}
+      <FloatingAsset src={chipPath} initialPos={{ top: '20%', left: '10%', x: 0, y: 0 }} duration={8} delay={0} />
+      <FloatingAsset src={chipPath} initialPos={{ top: '60%', right: '10%', x: 0, y: 0 }} duration={10} delay={2} />
       
-      {/* Vanilla Noise Background */}
-      <div className="lp-noise-overlay" />
+      {/* Particles */}
+      {[...Array(15)].map((_, i) => (
+        <Particle 
+          key={i} 
+          size={Math.random() * 4 + 2} 
+          top={Math.random() * 100} 
+          left={Math.random() * 100} 
+          delay={Math.random() * 5} 
+        />
+      ))}
 
-      {/* Green / Yellow Ambient Glow */}
-      <motion.div className="lp-glow" style={{ background: glowBackground }} />
+      <main className="lp-content">
+        <motion.span 
+          className="lp-eyebrow"
+          initial={{ opacity: 0, tracking: 1 }}
+          animate={{ opacity: 1, tracking: 0.6 }}
+          transition={{ duration: 1.5 }}
+        >
+          An Exclusive Sin City Suite
+        </motion.span>
 
-      {/* Tactical Grid Overlay */}
-      <div className="lp-grid" />
+        <motion.h1 
+          className="lp-title gold-text-metallic"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          CSI VEGAS
+        </motion.h1>
 
-      <main className="lp-main">
-        {/* Top left metadata */}
-        <div className="lp-top-left">
-          <div className="lp-title-top">Bellagio Case Simulation</div>
-          <div className="lp-title-bottom">Live Investigation Interface</div>
-        </div>
+        <motion.div 
+          className="lp-subtitle"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+        >
+          A new murder has shaken the foundations of the Strip. 
+          Step into the role of lead investigator in this high-stakes forensic suit. 
+          Reveal the suspects, decrypt the clues, and find the killer before they flee into the neon lights of Las Vegas.
+        </motion.div>
 
-        {/* Top right floating text */}
-        <div className="lp-top-right">
-          how to play
-        </div>
-
-        <div className="lp-middle-row">
-          {/* Left Hero */}
-          <motion.div
-            className="lp-hero-left"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="lp-h1">
-              CSI <br />
-              <span className="lp-gradient-text">Vegas</span>
-            </h2>
-
-            <p className="lp-desc">
-              Investigate dynamic AI-driven murder cases in real time. Question suspects,
-              examine evidence, and expose contradictions before the killer disappears.
-            </p>
-          </motion.div>
-
-          {/* Right Cards */}
-          <div className="lp-cards">
-            {[
-              {
-                icon: '🕵️‍♂️',
-                title: 'Witness Agent',
-                desc: 'Interrogate suspects and pressure-test every statement.'
-              },
-              {
-                icon: '🧠',
-                title: 'Analyst Agent',
-                desc: 'Cross-reference clues and identify timeline inconsistencies.'
-              },
-              {
-                icon: '🎬',
-                title: 'Narrator Agent',
-                desc: 'Explore crime scenes and advance the case narrative.'
-              }
-            ].map((card, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.03, x: 10 }}
-                className="lp-card"
-              >
-                <div className="lp-card-header">
-                  <span className="lp-card-icon">{card.icon}</span>
-                  <h3 className="lp-card-title">{card.title}</h3>
-                </div>
-                <p className="lp-card-desc">{card.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="lp-bottom-container">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            className="lp-btn-primary"
-            onClick={onStart}
-          >
-            Start Investigation
-          </motion.button>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+        >
+          <button className="lp-btn" onClick={onStart}>
+            ENLIST NOW
+          </button>
+        </motion.div>
       </main>
     </div>
   )

@@ -7,35 +7,70 @@ import ChatRoom from './ChatRoom.jsx'
 import RightPanel from './RightPanel.jsx'
 
 function TickerTape() {
-  const chunk = 'KEEP OUT  '
+  const chunk = 'CRIME SCENE DO NOT CROSS  '
   const text = chunk.repeat(25)
-  const durationSec = 30
+  const durationSec = 100
 
   return (
     <div
       style={{
-        background: 'var(--yellow)',
+        background: 'var(--gold-metallic)',
         overflow: 'hidden',
         whiteSpace: 'nowrap',
-        padding: '7px 0',
-        borderTop: '3px solid var(--gold)',
-        borderBottom: '3px solid var(--gold)',
+        padding: '5px 0',
         flexShrink: 0,
+        zIndex: 60,
       }}
     >
       <div
         style={{
           display: 'inline-block',
           animation: `scrollLeft ${durationSec}s linear infinite`,
-          fontFamily: 'var(--font-stamp)',
+          fontFamily: 'var(--font-mono)',
           fontWeight: 700,
-          fontSize: '0.95rem',
-          color: 'var(--black)',
-          letterSpacing: '0.22em',
+          fontSize: '0.65rem',
+          color: 'var(--black-pure)',
+          letterSpacing: '0.4em',
         }}
       >
         {text}
         {text}
+      </div>
+    </div>
+  )
+}
+
+function StatusBar() {
+  return (
+    <div
+      style={{
+        background: 'var(--black-pure)',
+        overflow: 'hidden',
+        padding: '8px 30px',
+        borderBottom: '1px solid var(--border-gold)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexShrink: 0,
+        zIndex: 50,
+      }}
+    >
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--gold-metallic)',
+        letterSpacing: '0.4em',
+        textTransform: 'uppercase',
+      }}>
+        Bellagio Security Network // Encrypted
+      </div>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--grey-chic)',
+        letterSpacing: '0.2em',
+      }}>
+        LV NV // 10:40 PM
       </div>
     </div>
   )
@@ -62,18 +97,20 @@ export default function GamePage({
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
-        background: 'var(--black)',
+        background: 'var(--black-pure)',
         overflow: 'hidden',
       }}
     >
       <TickerTape />
+      <StatusBar />
 
       <div
         style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '208px 320px minmax(0, 1fr) 300px',
-          columnGap: '10px',
+          gridTemplateColumns: '220px 340px minmax(0, 1fr) 320px',
+          gap: '12px',
+          padding: '12px',
           overflow: 'hidden',
           minHeight: 0,
           width: '100%',
@@ -88,6 +125,9 @@ export default function GamePage({
             overflow: 'hidden',
             minWidth: 0,
             minHeight: 0,
+            background: 'var(--black-rich)',
+            borderRadius: 'var(--radius-card)',
+            border: '1px solid var(--border-gold)',
           }}
         >
           <Sidebar
@@ -104,8 +144,9 @@ export default function GamePage({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08 }}
           style={{
-            borderRight: '1px solid var(--border)',
-            borderLeft: '1px solid var(--border)',
+            background: 'var(--black-rich)',
+            borderRadius: 'var(--radius-card)',
+            border: '1px solid var(--border-gold)',
             overflowY: 'auto',
             overflowX: 'hidden',
             minWidth: 0,
@@ -126,6 +167,9 @@ export default function GamePage({
             flexDirection: 'column',
             minWidth: 0,
             minHeight: 0,
+            background: 'var(--black-rich)',
+            borderRadius: 'var(--radius-card)',
+            border: '1px solid var(--border-gold)',
           }}
         >
           <ChatRoom
@@ -145,7 +189,9 @@ export default function GamePage({
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           style={{
-            borderLeft: '1px solid var(--border)',
+            background: 'var(--black-rich)',
+            borderRadius: 'var(--radius-card)',
+            border: '1px solid var(--border-gold)',
             overflowY: 'auto',
             overflowX: 'hidden',
             minWidth: 0,

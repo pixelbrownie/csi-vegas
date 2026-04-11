@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-
 const TOTAL = 30 * 60
 
 export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
@@ -23,68 +22,64 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
   const mins = String(Math.floor(remaining / 60)).padStart(2, '0')
   const secs = String(remaining % 60).padStart(2, '0')
   const pct  = remaining / TOTAL
-  const r    = 36
+  const r    = 34
   const circ = 2 * Math.PI * r
-  const timerColor = pct > 0.33 ? 'var(--gold)' : pct > 0.1 ? '#e07030' : '#c0392b'
+  const timerColor = pct > 0.33 ? 'var(--gold-metallic)' : 'var(--crimson-accent)'
 
   return (
     <div style={{
       height: '100%',
-      background: '#08090b',
-      borderRight: '1px solid var(--border)',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      padding: '22px 14px 16px',
+      padding: '32px 16px 24px',
     }}>
       <div style={{
         width: '100%',
-        marginBottom: '22px',
+        marginBottom: '40px',
+        textAlign: 'center',
       }}>
         <div style={{
           fontFamily: 'var(--font-hero)',
           fontWeight: 700,
-          fontStyle: 'normal',
           fontSize: '1.2rem',
-          letterSpacing: '0.06em',
-          color: 'var(--white)',
+          letterSpacing: '0.05em',
+          color: 'var(--white-pure)',
           lineHeight: 1,
         }}>
           CSI VEGAS
         </div>
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontWeight: 400,
-          fontSize: '0.46rem',
-          color: 'var(--grey)',
-          letterSpacing: '0.2em',
-          marginTop: '4px',
+          fontSize: '0.45rem',
+          color: 'var(--gold-metallic)',
+          letterSpacing: '0.3em',
+          marginTop: '6px',
           textTransform: 'uppercase',
+          fontWeight: 400,
         }}>
-          Murder Mystery
+          Sin City Division
         </div>
       </div>
 
       {/* Timer label */}
       <div style={{
-        fontFamily: 'var(--font-stamp)',
-        fontWeight: 700,
-        fontStyle: 'normal',
-        fontSize: '0.52rem',
-        color: 'var(--grey)',
-        letterSpacing: '0.14em',
-        marginBottom: '10px',
-        alignSelf: 'flex-start',
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--grey-chic)',
+        letterSpacing: '0.15em',
+        marginBottom: '16px',
         textTransform: 'uppercase',
-      }}>TIME REMAINING</div>
+      }}>CASE DURATION</div>
 
       {/* SVG Ring timer */}
-      <div style={{ position: 'relative', width: '84px', height: '84px', marginBottom: '18px' }}>
-        <svg width="84" height="84" style={{ transform: 'rotate(-90deg)' }}>
-          <circle cx="42" cy="42" r={r} fill="none" stroke="var(--grey-dim)" strokeWidth="2.2" />
+      <div style={{ position: 'relative', width: '90px', height: '90px', marginBottom: '32px' }}>
+        <svg width="90" height="90" style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx="45" cy="45" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
           <motion.circle
-            cx="42" cy="42" r={r} fill="none"
-            stroke={timerColor} strokeWidth="2.2" strokeLinecap="round"
+            cx="45" cy="45" r={r} fill="none"
+            stroke={timerColor} strokeWidth="3" strokeLinecap="round"
             strokeDasharray={circ}
             animate={{ strokeDashoffset: circ * (1 - pct) }}
             transition={{ duration: 0.9, ease: 'linear' }}
@@ -94,90 +89,83 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
           <AnimatePresence mode="wait">
             <motion.span
               key={secs}
-              initial={{ scale: 0.9, opacity: 0.7 }}
-              animate={{ scale: 1, opacity: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               style={{
-                fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 400, fontStyle: 'normal',
-                color: timerColor, filter: `drop-shadow(0 0 6px ${timerColor})`,
+                fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 600,
+                color: timerColor,
               }}
             >{mins}:{secs}</motion.span>
           </AnimatePresence>
         </div>
       </div>
 
-      <div style={{ width: '100%', height: '1px', background: 'var(--border)', marginBottom: '18px' }} />
+      <div style={{ width: '100%', borderTop: '1px solid var(--border-gold)', margin: '0 0 32px' }} />
 
-      {/* Location — bigger label */}
+      {/* Location */}
       <div style={{
-        fontFamily: 'var(--font-stamp)',
-        fontSize: '0.52rem',
-        fontWeight: 700,
-        fontStyle: 'normal',
-        color: 'var(--grey)',
-        letterSpacing: '0.14em',
-        marginBottom: '8px',
-        alignSelf: 'flex-start',
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--grey-chic)',
+        letterSpacing: '0.15em',
+        marginBottom: '12px',
         textTransform: 'uppercase',
-      }}>LOCATION</div>
+        width: '100%',
+        textAlign: 'left',
+      }}>CURRENT LOCATION</div>
       <div style={{
         width: '100%',
-        background: '#0d0f12',
-        border: '1px solid var(--border)',
+        background: 'rgba(255,255,255,0.02)',
+        border: '1px solid var(--border-gold)',
         borderRadius: 'var(--radius-sharp)',
-        padding: '10px',
-        fontFamily: 'var(--font-mono)',
+        padding: '14px',
+        fontFamily: 'var(--font-ui)',
         fontWeight: 400,
-        fontSize: '0.6rem',
-        color: 'var(--orange)',
+        fontSize: '0.75rem',
+        color: 'var(--white-soft)',
         textAlign: 'center',
         lineHeight: 1.5,
-        marginBottom: '24px',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-      }}>The Bellagio<br />Las Vegas Strip</div>
+        marginBottom: '40px',
+      }}>
+        <div style={{ fontWeight: 600, color: 'var(--gold-metallic)', marginBottom: '4px' }}>THE BELLAGIO</div>
+        LAS VEGAS STRIP, NV
+      </div>
 
-      {/* New Case — yellow pill, black text — right below location */}
+      {/* New Case Button */}
       <motion.button
-        whileHover={{ scale: 1.03, backgroundColor: 'var(--yellow)' }}
-        whileTap={{ scale: 0.96 }}
+        whileHover={{ scale: 1.02, backgroundColor: 'var(--gold-pale)' }}
+        whileTap={{ scale: 0.98 }}
         onClick={onNewCase}
         style={{
           width: '100%',
-          padding: '11px 12px',
-          background: 'var(--orange)',
+          padding: '16px',
+          background: 'var(--gold-metallic)',
           border: 'none',
-          color: 'var(--black)',
-          fontFamily: 'var(--font-stamp)',
+          color: 'var(--black-pure)',
+          fontFamily: 'var(--font-ui)',
           fontWeight: 700,
-          fontStyle: 'normal',
-          fontSize: '0.7rem',
-          letterSpacing: '0.14em',
+          fontSize: '0.75rem',
+          letterSpacing: '0.15em',
           cursor: 'pointer',
           borderRadius: 'var(--radius-pill)',
-          transition: 'all 0.2s',
-          marginBottom: '16px',
+          transition: 'all 0.3s ease',
+          marginBottom: '20px',
+          textTransform: 'uppercase',
         }}
       >
-        NEW CASE
+        NEW INVESTIGATION
       </motion.button>
 
-      {/* Tip */}
+      {/* Hint */}
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontWeight: 400,
-        fontSize: '0.48rem',
-        color: 'var(--grey-dim)',
-        lineHeight: 1.5,
-        textAlign: 'left',
-        marginBottom: 'auto',
-        width: '100%',
+        fontSize: '0.55rem',
+        color: 'var(--grey-muted)',
+        lineHeight: 1.8,
+        textAlign: 'center',
+        marginTop: 'auto',
       }}>
-        Hint keys: "ask"
-        <br />
-        "found" "analyze"
-      </div>
-
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingTop: '20px' }}>
+        SYSTEMS SECURED // ACCESS LEVEL 5
       </div>
     </div>
   )

@@ -58,6 +58,7 @@ export default function App() {
   const [history,    setHistory]    = useState([])
   const [isThinking, setIsThinking] = useState(false)
   const [startTime,  setStartTime]  = useState(null)
+  const [caseInstanceId, setCaseInstanceId] = useState(0)
   const gameRef = useRef(null)
 
   // After deploy, `api-config.json` can point at your Render URL without rebuilding env.
@@ -127,6 +128,9 @@ export default function App() {
     try {
       const res = await api.post('/new-case')
       await waitForMinimumLoading()
+      
+      // Force a full state refresh by incrementing instance ID
+      setCaseInstanceId(prev => prev + 1)
       setCase(res.data.case)
       setCaseFile(res.data.case_file)
       setStartTime(Date.now())
@@ -190,8 +194,8 @@ export default function App() {
   const LoadingScreen = () => {
     const [displayed, setDisplayed] = useState('')
     const [glitch, setGlitch]       = useState(false)
-    const full = 'CONNECTING TO BELLAGIO SERVERS...'
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&!'
+    const full = 'INITIALIZING ENCRYPTED CASE FILE...'
+    const chars = '0123456789X$/%&'
 
     useEffect(() => {
       pingBackendWarmup()
@@ -200,79 +204,68 @@ export default function App() {
         if (i >= full.length) { clearInterval(type); return }
         setDisplayed(full.slice(0, i + 1))
         i++
-      }, 65)
+      }, 50)
       return () => clearInterval(type)
-    }, [pingBackendWarmup])
+    }, [])
 
     useEffect(() => {
       const flicker = setInterval(() => {
         setGlitch(true)
         setTimeout(() => setGlitch(false), 80)
-      }, 1800)
+      }, 2000)
       return () => clearInterval(flicker)
     }, [])
 
     const scrambled = displayed.split('').map((ch, i) =>
-      glitch && Math.random() > 0.7 ? chars[Math.floor(Math.random() * chars.length)] : ch
+      glitch && Math.random() > 0.8 ? chars[Math.floor(Math.random() * chars.length)] : ch
     ).join('')
 
     return (
       <div style={{
         height: '100vh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        gap: '28px', background: 'var(--black)',
+        gap: '32px', background: 'var(--black-pure)',
         position: 'relative', overflow: 'hidden',
       }}>
+        {/* Subtle noise background */}
         <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 6px)',
+          position: 'absolute', inset: 0, opacity: 0.1, pointerEvents: 'none',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }} />
 
         <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-          color: glitch ? 'var(--gold)' : 'var(--orange)',
-          letterSpacing: '0.18em',
-          textShadow: glitch
-            ? '2px 0 var(--orange), -2px 0 var(--yellow), 0 0 20px var(--yellow)'
-            : '0 0 14px rgba(251,146,60,0.6)',
-          transition: 'color 0.05s, text-shadow 0.05s',
-          minHeight: '2rem',
+          fontFamily: 'var(--font-title)',
+          fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
+          color: 'var(--gold-metallic)',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
           textAlign: 'center',
-          padding: '0 20px',
+          padding: '0 40px',
+          textShadow: glitch ? '0 0 15px var(--gold-glow)' : 'none',
         }}>
           {scrambled}
-          <span style={{
-            display: 'inline-block',
-            width: '2px', height: '1.2em',
-            background: 'var(--orange)',
-            marginLeft: '4px',
-            verticalAlign: 'middle',
-            animation: 'bounce 0.8s step-end infinite',
-          }} />
         </div>
 
         <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.65rem',
-          color: 'var(--grey-dim)',
-          letterSpacing: '0.25em',
-        }}>
-          ACCESSING BELLAGIO SECURITY FILES...
-        </div>
-
-        <div style={{
-          width: '260px', height: '2px',
+          width: '300px', height: '1px',
           background: 'var(--grey-dim)',
-          borderRadius: 'var(--radius-sharp)',
-          overflow: 'hidden',
+          position: 'relative',
         }}>
           <div style={{
             height: '100%',
-            background: 'var(--orange)',
-            boxShadow: '0 0 8px var(--orange)',
-            animation: 'progressBar 2.5s ease-in-out infinite',
+            background: 'var(--gold-metallic)',
+            boxShadow: '0 0 10px var(--gold-metallic)',
+            animation: 'progressBar 2s ease-in-out infinite',
           }} />
+        </div>
+        
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.65rem',
+          color: 'var(--grey-chic)',
+          letterSpacing: '0.3em',
+        }}>
+          BY APPOINTMENT ONLY
         </div>
       </div>
     )
@@ -291,6 +284,7 @@ export default function App() {
           gameState === 'loading'
             ? <LoadingScreen />
             : <GamePage
+                key={caseInstanceId}
                 case_={case_}
                 caseFile={caseFile}
                 history={history}

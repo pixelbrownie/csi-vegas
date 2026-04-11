@@ -41,15 +41,16 @@ export default function SecretReveal({ secretText }) {
   const showPulse = hovering && (pos.x > 0 || touchReveal)
 
   return (
-    <div style={{ marginBottom: '14px' }}>
+    <div style={{ marginBottom: '20px' }}>
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.58rem',
-        color: 'var(--gold)',
-        letterSpacing: '0.14em',
-        marginBottom: '5px',
+        fontSize: '0.6rem',
+        color: 'var(--gold-low)',
+        letterSpacing: '0.2em',
+        marginBottom: '10px',
+        textTransform: 'uppercase',
       }}>
-        SECRET CLUE - hover to reveal
+        ULTraviolet Evidence
       </div>
 
       <div
@@ -63,10 +64,9 @@ export default function SecretReveal({ secretText }) {
         style={{
           position: 'relative',
           width: '100%',
-          height: '70px',
-          background: '#040303',
-          border: '1px solid var(--border)',
-          borderLeft: '3px solid var(--orange)',
+          height: '80px',
+          background: 'rgba(0,0,0,0.4)',
+          border: '1px solid var(--border-gold)',
           borderRadius: 'var(--radius-subtle)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'crosshair',
@@ -74,56 +74,37 @@ export default function SecretReveal({ secretText }) {
           userSelect: 'none',
         }}
       >
-        {/* Hidden background text */}
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.72rem',
-          color: '#1c1c1c',
-          textTransform: 'uppercase',
-          letterSpacing: '0.14em',
-          textAlign: 'center',
-          padding: '0 12px',
-        }}>
-        </span>
-
-        {/* Revealed neon layer */}
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
-          color: 'var(--yellow)',
+          fontSize: '0.8rem',
+          color: 'var(--gold-metallic)',
           textTransform: 'uppercase',
-          letterSpacing: '0.14em',
+          letterSpacing: '0.25em',
           textAlign: 'center',
-          padding: '0 12px',
+          padding: '0 16px',
+          fontWeight: 600,
           pointerEvents: 'none',
-          textShadow: '0 0 10px var(--orange), 0 0 20px rgba(251,146,60,0.4)',
-          WebkitMaskImage: `radial-gradient(circle 78px at ${pos.x}px ${pos.y}px, black 20%, transparent 100%)`,
-          maskImage:       `radial-gradient(circle 78px at ${pos.x}px ${pos.y}px, black 20%, transparent 100%)`,
+          textShadow: '0 0 15px rgba(212, 175, 55, 0.6)',
+          WebkitMaskImage: `radial-gradient(circle 60px at ${pos.x}px ${pos.y}px, black 30%, transparent 100%)`,
+          maskImage:       `radial-gradient(circle 60px at ${pos.x}px ${pos.y}px, black 30%, transparent 100%)`,
         }}>
           {secretText}
         </div>
 
-        {/* Scanline overlay */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px)',
-          pointerEvents: 'none',
-        }} />
-
         {/* Pulse ring on hover */}
         {showPulse && (
           <motion.div
-            animate={{ scale: [1, 1.5], opacity: [0.4, 0] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
+            animate={{ scale: [1, 1.4], opacity: [0.3, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
             style={{
               position: 'absolute',
-              width: '56px', height: '56px',
+              width: '120px', height: '120px',
               borderRadius: '50%',
-              border: '1px solid rgba(251,146,60,0.35)',
-              left: pos.x - 28,
-              top: pos.y - 28,
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              left: pos.x - 60,
+              top: pos.y - 60,
               pointerEvents: 'none',
             }}
           />

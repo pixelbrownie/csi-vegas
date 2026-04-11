@@ -3,456 +3,256 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SecretReveal from './SecretReveal.jsx'
 
-// ── Parchment Case File ────────────────────────────────────────────────────────
 function CaseFile({ text }) {
   return (
     <motion.div
-      initial={{ opacity: 0, rotate: 0.8 }}
-      animate={{ opacity: 1, rotate: 0.3 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       style={{
-        background: 'linear-gradient(140deg, #d2bc82 0%, #b89050 100%)',
-        border: '1px solid #8a6c3a',
-        borderRadius: 'var(--radius-sharp)',
-        padding: '16px',
         position: 'relative',
-        boxShadow: '3px 4px 14px rgba(0,0,0,0.6)',
-        transform: 'rotate(0.3deg)',
-        marginBottom: '14px',
-        marginTop: '8px',
-        minWidth: 0,
+        marginTop: '20px',
+        marginBottom: '30px',
       }}
     >
-      {/* Gold paperclip */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-7px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '34px',
-          height: '11px',
-          background: 'var(--gold)',
-          borderRadius: '2px',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
-        }}
-      />
-
-      <div
-        style={{
-          fontFamily: 'var(--font-stamp)',
-          fontWeight: 700,
-          fontStyle: 'normal',
-          fontSize: '0.9rem',
-          color: '#2a1808',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          marginBottom: '10px',
-          borderBottom: '1px solid rgba(42,24,8,0.25)',
-          paddingBottom: '7px',
-        }}
-      >
-        Live Case File
+      {/* Folder Tab */}
+      <div style={{
+        position: 'absolute',
+        top: '-18px',
+        right: '15px',
+        background: '#f1e1ad',
+        padding: '4px 18px',
+        borderRadius: '12px 12px 0 0',
+        boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
+        zIndex: 2,
+        border: '1px solid #d4af37',
+        borderBottom: 'none',
+      }}>
+        <div style={{
+          fontFamily: 'Impact, sans-serif',
+          fontSize: '0.8rem',
+          color: '#8e5033',
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          fontWeight: 900,
+        }}>
+          CASE FILE
+        </div>
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={text}
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.35 }}
-          style={{
-            fontFamily: 'var(--font-ui)',
-            fontWeight: 400,
+      {/* Main Folder Body */}
+      <div style={{
+        background: 'linear-gradient(145deg, #e6ce7b 0%, #d4af37 100%)',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        border: '1px solid #c59f2a',
+        minHeight: '220px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Scuff marks / texture overlays */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.2,
+          pointerEvents: 'none',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }} />
+        
+        <div style={{
+          padding: '12px 4px',
+          minHeight: '140px',
+        }}>
+          <div style={{
+            fontFamily: 'serif',
+            fontSize: '1rem',
+            color: '#3d251a',
+            lineHeight: 1.7,
             fontStyle: 'italic',
-            fontSize: '0.76rem',
-            color: '#2a1808',
-            lineHeight: 1.75,
-            maxHeight: '160px',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-            minWidth: 0,
             whiteSpace: 'pre-wrap',
-          }}
-        >
-          {text}
-        </motion.div>
-      </AnimatePresence>
+            fontWeight: 500,
+          }}>
+            {text}
+          </div>
+        </div>
+      </div>
     </motion.div>
   )
 }
 
-// ── Accusation Panel ───────────────────────────────────────────────────────────
 function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
   const [selected, setSelected] = useState('')
   const [shown, setShown] = useState(false)
 
-  if (gameState === 'solved')
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        style={{
-          background: '#1a1808',
-          border: '2px solid var(--gold)',
-          borderRadius: 'var(--radius-subtle)',
-          padding: '16px',
-          marginBottom: '10px',
-          minWidth: 0,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontStyle: 'normal',
-            fontSize: '1rem',
-            color: 'var(--gold)',
-            marginBottom: '8px',
-          }}
-        >
-          ✅ CASE CLOSED!
-        </div>
+  if (gameState === 'solved') return (
+    <div style={{
+      padding: '24px',
+      background: 'rgba(212, 175, 55, 0.1)',
+      border: '2px solid var(--gold-metallic)',
+      borderRadius: 'var(--radius-subtle)',
+      textAlign: 'center',
+    }}>
+      <h3 style={{ fontFamily: 'var(--font-hero)', color: 'var(--gold-metallic)', marginBottom: '16px' }}>CASE RESOLVED</h3>
+      <p style={{ fontFamily: 'var(--font-ui)', fontSize: '0.9rem', color: 'var(--white-pure)', marginBottom: '24px' }}>
+        The culprit was indeed {case_.culprit}.
+      </p>
+      <button className="lp-btn" style={{ width: '100%' }} onClick={onNewCase}>NEW CASE</button>
+    </div>
+  )
 
-        {[
-          ['Culprit', case_.culprit],
-          ['Weapon', case_.murder_weapon],
-          ['Key Clue', case_.key_clue],
-        ].map(([k, v]) => (
-          <div
-            key={k}
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.7rem',
-              color: 'var(--yellow)',
-              lineHeight: 1.8,
-              wordBreak: 'break-word',
-              overflowWrap: 'anywhere',
-            }}
-          >
-            <strong style={{ color: 'var(--gold)' }}>{k}:</strong> {v}
-          </div>
-        ))}
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          onClick={onNewCase}
-          style={{
-            marginTop: '12px',
-            width: '100%',
-            padding: '9px',
-            background: 'transparent',
-            border: '1px solid var(--gold)',
-            color: 'var(--gold)',
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontStyle: 'normal',
-            fontSize: '0.72rem',
-            letterSpacing: '0.12em',
-            cursor: 'pointer',
-            borderRadius: 'var(--radius-pill)',
-          }}
-        >
-          PLAY AGAIN
-        </motion.button>
-      </motion.div>
-    )
-
-  if (gameState === 'failed')
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        style={{
-          background: '#1a0808',
-          border: '2px solid var(--orange)',
-          borderRadius: 'var(--radius-subtle)',
-          padding: '16px',
-          marginBottom: '10px',
-          minWidth: 0,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontStyle: 'normal',
-            fontSize: '1rem',
-            color: 'var(--orange)',
-            marginBottom: '8px',
-          }}
-        >
-          ❌ WRONG ACCUSATION
-        </div>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.7rem',
-            color: '#c06050',
-            lineHeight: 1.8,
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          The culprit was{' '}
-          <strong style={{ color: 'var(--white-dim)' }}>{case_.culprit}</strong>
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          onClick={onNewCase}
-          style={{
-            marginTop: '12px',
-            width: '100%',
-            padding: '9px',
-            background: 'transparent',
-            border: '1px solid var(--orange)',
-            color: 'var(--orange)',
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontStyle: 'normal',
-            fontSize: '0.72rem',
-            letterSpacing: '0.12em',
-            cursor: 'pointer',
-            borderRadius: 'var(--radius-pill)',
-          }}
-        >
-          PLAY AGAIN
-        </motion.button>
-      </motion.div>
-    )
+  if (gameState === 'failed') return (
+    <div style={{
+      padding: '24px',
+      background: 'rgba(139, 0, 0, 0.1)',
+      border: '2px solid var(--crimson-accent)',
+      borderRadius: 'var(--radius-subtle)',
+      textAlign: 'center',
+    }}>
+      <h3 style={{ fontFamily: 'var(--font-hero)', color: 'var(--crimson-accent)', marginBottom: '16px' }}>CASE COMPROMISED</h3>
+      <p style={{ fontFamily: 'var(--font-ui)', fontSize: '0.9rem', color: 'var(--white-pure)', marginBottom: '24px' }}>
+        A false accusation was made. The killer escaped.
+      </p>
+      <button className="lp-btn" style={{ width: '100%', background: 'var(--crimson-accent)', color: 'white' }} onClick={onNewCase}>TRY AGAIN</button>
+    </div>
+  )
 
   return (
-    <div
-      style={{
-        background: 'var(--black-2)',
-        border: '1px solid var(--border-2)',
-        borderRadius: 'var(--radius-subtle)',
-        padding: '14px',
-        marginBottom: '10px',
-        minWidth: 0,
-      }}
-    >
-      <div
-        style={{
-          fontFamily: 'var(--font-stamp)',
-          fontWeight: 700,
-          fontStyle: 'normal',
-          fontSize: '0.9rem',
-          color: 'var(--white)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '7px',
-          marginBottom: '12px',
-          textTransform: 'uppercase',
-        }}
-      >
-        Make Your Accusation
+    <div style={{
+      padding: '24px',
+      background: 'rgba(0,0,0,0.3)',
+      border: '1px solid var(--border-gold)',
+      borderRadius: 'var(--radius-subtle)',
+      marginBottom: '20px',
+    }}>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.6rem',
+        color: 'var(--gold-metallic)',
+        letterSpacing: '0.2em',
+        marginBottom: '20px',
+        textTransform: 'uppercase',
+      }}>
+        Formal Accusation
       </div>
 
       {!shown ? (
-        <motion.button
-          whileHover={{ borderColor: 'var(--white-dim)', color: 'var(--white)' }}
-          whileTap={{ scale: 0.97 }}
+        <button 
           onClick={() => setShown(true)}
           style={{
             width: '100%',
-            padding: '11px',
+            padding: '16px',
             background: 'transparent',
-            border: '1px solid var(--grey-dim)',
-            color: 'var(--grey)',
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontStyle: 'normal',
-            fontSize: '0.75rem',
-            letterSpacing: '0.12em',
-            cursor: 'pointer',
+            border: '1px solid var(--gold-metallic)',
+            color: 'var(--gold-metallic)',
             borderRadius: 'var(--radius-pill)',
-            transition: 'all 0.2s',
+            fontFamily: 'var(--font-ui)',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            cursor: 'pointer',
           }}
         >
-          I KNOW THE CULPRIT
-        </motion.button>
+          I AM READY TO ACCUSE
+        </button>
       ) : (
-        <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: 'var(--black-pure)',
+              border: '1px solid var(--border-gold)',
+              borderRadius: 'var(--radius-sharp)',
+              color: 'var(--white-pure)',
+              fontFamily: 'var(--font-ui)',
+              outline: 'none',
+            }}
           >
-            <select
-              value={selected}
-              onChange={(e) => setSelected(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                background: 'var(--black)',
-                border: '1px solid var(--border-2)',
-                color: selected ? 'var(--white)' : 'var(--grey)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.8rem',
-                borderRadius: 'var(--radius-subtle)',
-                marginBottom: '10px',
-                cursor: 'pointer',
-                outline: 'none',
-              }}
-            >
-              <option value="">— select suspect —</option>
-              <option value={case_.suspect_a.name}>{case_.suspect_a.name}</option>
-              <option value={case_.suspect_b.name}>{case_.suspect_b.name}</option>
-            </select>
-
-            <motion.button
-              whileHover={selected ? { scale: 1.02, backgroundColor: 'var(--orange-dark)' } : {}}
-              whileTap={selected ? { scale: 0.97 } : {}}
-              onClick={() => selected && onAccuse(selected)}
-              disabled={!selected}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: selected ? 'var(--orange)' : 'var(--grey-dim)',
-                border: 'none',
-                color: selected ? 'var(--black)' : 'var(--grey)',
-                fontFamily: 'var(--font-stamp)',
-                fontWeight: 700,
-                fontStyle: 'normal',
-                fontSize: '0.82rem',
-                letterSpacing: '0.14em',
-                cursor: selected ? 'pointer' : 'default',
-                borderRadius: 'var(--radius-pill)',
-                transition: 'background 0.2s',
-              }}
-            >
-              ACCUSE
-            </motion.button>
-          </motion.div>
-        </AnimatePresence>
+            <option value="">Select the Culprit</option>
+            <option value={case_.suspect_a.name}>{case_.suspect_a.name}</option>
+            <option value={case_.suspect_b.name}>{case_.suspect_b.name}</option>
+          </select>
+          <button
+            onClick={() => selected && onAccuse(selected)}
+            disabled={!selected}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: selected ? 'var(--gold-metallic)' : 'var(--grey-muted)',
+              color: 'var(--black-pure)',
+              borderRadius: 'var(--radius-pill)',
+              fontFamily: 'var(--font-ui)',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: '0.1em',
+              border: 'none',
+              cursor: selected ? 'pointer' : 'default',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            DELIVER VERDICT
+          </button>
+        </div>
       )}
     </div>
   )
 }
 
-// ── How to Play ────────────────────────────────────────────────────────────────
-function HowToPlay({ victimName }) {
-  const items = [
-    { icon: '🔍', agent: 'Witness Agent', desc: '– Question suspects', eg: `"Where were you when ${victimName} died?"` },
-    { icon: '🧬', agent: 'Analyst Agent', desc: '– Submit clues', eg: '"I found a loyalty card. Analyze it."' },
-    { icon: '🎙', agent: 'Narrator Agent', desc: '– Advance the story', eg: 'Anything else you type' },
-  ]
-
+function Instructions() {
   return (
-    <div
-      style={{
-        background: 'var(--black)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-subtle)',
-        padding: '14px',
-        minWidth: 0,
-      }}
-    >
-      <div
-        style={{
-          fontFamily: 'var(--font-stamp)',
-          fontWeight: 700,
-          fontStyle: 'normal',
-          fontSize: '0.84rem',
-          color: 'var(--gold)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          marginBottom: '12px',
-          textTransform: 'uppercase',
-        }}
-      >
-        How to Play
+    <div style={{ padding: '24px', opacity: 0.7 }}>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--grey-chic)',
+        letterSpacing: '0.2em',
+        marginBottom: '16px',
+        textTransform: 'uppercase',
+      }}>
+        Operational Guidance
       </div>
-
-      {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '12px', minWidth: 0 }}>
-          <span style={{ fontSize: '0.9rem', flexShrink: 0, marginTop: '1px' }}>{item.icon}</span>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--orange)', letterSpacing: '0.1em' }}>
-              {item.agent.toUpperCase()}
-            </div>
-            <div
-              style={{
-                fontFamily: 'var(--font-ui)',
-                fontSize: '0.75rem',
-                color: 'var(--white-dim)',
-                lineHeight: 1.4,
-                wordBreak: 'break-word',
-                overflowWrap: 'anywhere',
-                marginBottom: '2px',
-              }}
-            >
-              {item.desc}
-            </div>
-            <div
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.65rem',
-                color: 'var(--grey)',
-                fontStyle: 'italic',
-                wordBreak: 'break-word',
-                overflowWrap: 'anywhere',
-              }}
-            >
-              {item.eg}
-            </div>
-          </div>
-        </div>
-      ))}
+      <div style={{
+        fontFamily: 'var(--font-ui)',
+        fontSize: '0.7rem',
+        color: 'var(--grey-chic)',
+        lineHeight: 1.6,
+      }}>
+        - Question suspects about motive.<br />
+        - Analyze evidence via the sensor.<br />
+        - Accuse only when certain.
+      </div>
     </div>
   )
 }
 
-// ── Main export ────────────────────────────────────────────────────────────────
-export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNewCase, connectionError, apiBaseUrl }) {
-  if (!case_ && connectionError) {
-    return (
-      <div
-        style={{
-          padding: '12px 10px',
-          height: '100%',
-          background: '#090a0d',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          minWidth: 0,
-        }}
-      >
-        <CaseFile
-          text={`⚠️ ${connectionError}\n\nAPI base URL:\n${apiBaseUrl || '(not set)'}\n\nTip: set repo secret VITE_API_URL or edit frontend/public/api-config.json, then redeploy Pages.`}
-        />
-      </div>
-    )
-  }
-
+export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNewCase, connectionError }) {
   if (!case_) return null
-
   return (
-    <div
-      style={{
-        padding: '12px 10px',
-        height: '100%',
-        background: '#090a0d',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        minWidth: 0,
-      }}
-    >
+    <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
       <CaseFile text={caseFile} />
+      
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.6rem',
+        color: 'var(--gold-metallic)',
+        letterSpacing: '0.2em',
+        marginBottom: '10px',
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        opacity: 0.8,
+      }}>
+        Hover To Reveal
+      </div>
       <SecretReveal secretText={case_.key_clue.toUpperCase()} />
-      <AccusationPanel
-        case_={case_}
-        gameState={gameState}
-        onAccuse={onAccuse}
-        onNewCase={onNewCase}
+      <AccusationPanel 
+        case_={case_} 
+        gameState={gameState} 
+        onAccuse={onAccuse} 
+        onNewCase={onNewCase} 
       />
-      <HowToPlay victimName={case_.victim.name} />
+      <Instructions />
     </div>
   )
 }

@@ -1,299 +1,185 @@
-// DossierPanel.jsx
+// DossierPanel.jsx — Victim + Suspect info
 import { motion } from 'framer-motion'
 
-function VictimCard({ victim }) {
+function ProfileCard({ title, name, role, image, fileId }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(0,0,0,0.5)' }}
       style={{
-        background: 'var(--black-2)',
-        border: '1px solid var(--border-2)',
+        background: 'var(--gold-gradient)',
+        border: '1px solid #7d6b35',
         borderRadius: 'var(--radius-subtle)',
-        padding: '12px',
+        padding: '14px',
+        marginBottom: '12px',
+        position: 'relative',
         display: 'flex',
-        gap: '12px',
-        alignItems: 'flex-start',
-        marginBottom: '16px',
-        minWidth: 0,
+        gap: '16px',
+        alignItems: 'center',
+        boxShadow: '0 3px 15px rgba(0,0,0,0.4)',
       }}
     >
-      <div
-        style={{
-          width: '44px',
-          height: '48px',
-          flexShrink: 0,
-          background: 'var(--black-3)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-subtle)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.2rem',
-        }}
-      >
-        🕵️
+      {/* Character Image Frame */}
+      <div style={{
+        width: '95px',
+        height: '95px',
+        flexShrink: 0,
+        border: '2px solid #7d6b35',
+        borderRadius: '4px',
+        overflow: 'hidden',
+        background: '#000',
+      }}>
+        {image && <img src={image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
       </div>
 
-      <div style={{ minWidth: 0 }}>
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.55rem',
-            color: 'var(--orange)',
-            letterSpacing: '0.12em',
-            marginBottom: '4px',
-          }}
-        >
-          VICTIM
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontFamily: 'Impact, sans-serif',
+          fontSize: '1.2rem',
+          color: 'var(--rust-text)',
+          letterSpacing: '0.01em',
+          textTransform: 'uppercase',
+          lineHeight: 1,
+          marginBottom: '8px',
+          opacity: 0.9,
+        }}>
+          {title}
+        </div>
+        
+        <div style={{
+          fontFamily: 'Impact, sans-serif',
+          fontSize: '1.15rem',
+          color: 'var(--rust-text)',
+          marginBottom: '4px',
+          lineHeight: 1,
+          textTransform: 'uppercase',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {name}
         </div>
 
         <div style={{
-          fontFamily: 'var(--font-stamp)',
-          fontWeight: 700,
-          fontSize: '0.95rem',
-          color: 'var(--white)',
+          fontFamily: 'serif',
+          fontSize: '0.7rem',
+          color: 'var(--rust-text)',
+          marginBottom: '10px',
+          fontStyle: 'italic',
           lineHeight: 1.2,
-          marginBottom: '4px',
-          wordBreak: 'break-word',
-          overflowWrap: 'anywhere',
+          opacity: 0.8,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
         }}>
-          {victim.name}
+          {role}
         </div>
 
-        <div
-          style={{
-            fontFamily: 'var(--font-ui)',
-            fontSize: '0.7rem',
-            color: 'var(--yellow)',
-            fontStyle: 'italic',
-            marginBottom: '8px',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          {victim.role}
-        </div>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.58rem',
-            color: 'var(--grey)',
-            marginBottom: '3px',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          <span style={{ color: 'var(--white-dim)' }}>FILE</span>: {victim.name}.DR
-        </div>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.58rem',
-            color: 'var(--grey)',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          <span style={{ color: 'var(--white-dim)' }}>STATUS</span>: CLOSED_V
+        <div style={{
+          fontFamily: 'Impact, sans-serif',
+          fontSize: '0.7rem',
+          color: 'var(--rust-text)',
+          lineHeight: 1.3,
+          textTransform: 'uppercase',
+        }}>
+          FILE: {fileId}<br />
+          STATUS: <span style={{ textDecoration: 'underline' }}>{title === 'THE DECEASED' ? 'CLOSED_V' : 'UNDER SURVEILLANCE'}</span>
         </div>
       </div>
     </motion.div>
   )
 }
 
-function SuspectCard({ suspect, icon, index }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.1 + index * 0.1 }}
-      whileHover={{ borderColor: 'var(--grey)', transition: { duration: 0.15 } }}
-      style={{
-        background: 'var(--black)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-subtle)',
-        padding: '10px',
-        display: 'flex',
-        gap: '10px',
-        alignItems: 'flex-start',
-        marginBottom: '10px',
-        minWidth: 0,
-      }}
-    >
-      <div
-        style={{
-          width: '32px',
-          height: '42px',
-          flexShrink: 0,
-          background: 'var(--black-3)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-subtle)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1rem',
-        }}
-      >
-        {icon}
-      </div>
-
-      <div style={{ minWidth: 0 }}>
-        <div
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontWeight: 700,
-          fontSize: '0.75rem',
-          color: 'var(--orange)',
-          marginBottom: '6px',
-          letterSpacing: '0.04em',
-          lineHeight: 1.2,
-          wordBreak: 'break-word',
-          overflowWrap: 'anywhere',
-        }}
-      >
-          {suspect.name}
-        </div>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.58rem',
-            color: 'var(--grey)',
-            lineHeight: 1.6,
-            marginBottom: '4px',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          <span style={{ color: 'var(--orange)', fontSize: '0.5rem' }}>MOTIVE</span> {suspect.motive.slice(0, 52)}
-          {suspect.motive.length > 52 ? '…' : ''}
-        </div>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.58rem',
-            color: 'var(--grey)',
-            lineHeight: 1.6,
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          <span style={{ color: 'var(--orange)', fontSize: '0.5rem' }}>ALIBI</span> {suspect.alibi.slice(0, 52)}
-          {suspect.alibi.length > 52 ? '…' : ''}
-        </div>
-      </div>
-    </motion.div>
+function isFemale(name) {
+  if (!name) return false
+  const femaleNames = [
+    'priya', 'lena', 'lola', 'sarah', 'elena', 'maria', 'sophia', 'isabella', 
+    'mia', 'amelia', 'evelyn', 'abigail', 'elizabeth', 'anna', 'laura', 'rose', 
+    'ananya', 'maya', 'zara', 'lily', 'grace', 'clara', 'julia', 'emily', 'lucy',
+    'nina', 'tanya', 'sheila', 'rachel', 'monica', 'phoebe', 'claire', 'beverly',
+    'veronica', 'diana', 'sandra', 'cynthia', 'natalie', 'stacy', 'victoria'
+  ]
+  const n = name.toLowerCase()
+  const parts = n.split(/\s+/)
+  
+  // Check if any part of the name is in the list or ends with 'a'
+  const isMatch = parts.some(p => 
+    femaleNames.includes(p) || 
+    (p.length > 2 && p.endsWith('a') && !['joshua', 'luca', 'noah'].includes(p))
   )
+  
+  if (isMatch) return true
+  return false
 }
 
 export default function DossierPanel({ case_, connectionError }) {
-  if (!case_ && connectionError) {
-    return (
-      <div
-        style={{
-          padding: '24px 16px',
-          height: '100%',
-          background: '#0b0c0e',
-          overflowX: 'hidden',
-          minWidth: 0,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'var(--font-hero)',
-            fontSize: '1.1rem',
-            color: 'var(--orange)',
-            letterSpacing: '0.06em',
-            marginBottom: '12px',
-            textTransform: 'uppercase',
-          }}
-        >
-          Case file unavailable
-        </div>
-        <p
-          style={{
-            fontFamily: 'var(--font-ui)',
-            fontSize: '0.82rem',
-            color: 'var(--white-dim)',
-            lineHeight: 1.65,
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          The dossier loads after the backend returns a new case. Use <strong style={{ color: 'var(--white)' }}>NEW CASE</strong> or{' '}
-          <strong style={{ color: 'var(--white)' }}>RETRY</strong> in the chat column once the API is reachable.
-        </p>
-        <p
-          style={{
-            marginTop: '14px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.62rem',
-            color: 'var(--grey)',
-            lineHeight: 1.6,
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          {connectionError}
-        </p>
-      </div>
-    )
-  }
+  if (connectionError) return (
+    <div style={{ padding: '24px', color: 'var(--crimson-accent)', fontFamily: 'var(--font-mono)', fontSize: '0.6rem' }}>
+      ERROR: CONNECTION SEVERED
+    </div>
+  )
+  
+  if (!case_) return (
+    <div style={{ padding: '24px', color: 'var(--grey-muted)', fontFamily: 'var(--font-mono)', fontSize: '0.6rem' }}>
+      // AWAITING DATA...
+    </div>
+  )
 
-  if (!case_) return null
+  const victimImg = isFemale(case_.victim.name) ? 'victim_f.png' : 'victim_m.png'
+  const suspectAImg = isFemale(case_.suspect_a.name) ? 'suspect_f.png' : 'suspect_m.png'
+  const suspectBImg = isFemale(case_.suspect_b.name) ? 'suspect_f.png' : 'suspect_m.png'
 
   return (
-    <div
-      style={{
-        padding: '18px 14px',
-        height: '100%',
-        background: '#0b0c0e',
-        overflowX: 'hidden',
-        minWidth: 0,
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        style={{
-          fontFamily: 'var(--font-hero)',
-          fontSize: '1.45rem',
-          color: 'var(--white)',
-          letterSpacing: '0.04em',
-          marginBottom: '10px',
-          textTransform: 'uppercase',
-        }}
-      >
-        VICTIM
-      </motion.div>
+    <div style={{ padding: '24px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{
+        fontFamily: 'Playfair Display, serif',
+        fontSize: '1rem',
+        color: 'var(--white-pure)',
+        marginBottom: '20px',
+        paddingBottom: '10px',
+        borderBottom: '1px solid var(--border-gold)',
+        letterSpacing: '0.05em',
+      }}>
+        CASE DOSSIER
+      </div>
 
-      <VictimCard victim={case_.victim} />
+      <ProfileCard
+        title="THE DECEASED"
+        name={case_.victim.name}
+        role={case_.victim.role}
+        fileId={`${case_.victim.name.replace(/\s+/g, '')}.DR`}
+        image={`${import.meta.env.BASE_URL}assets/${victimImg}`}
+      />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        style={{
-          fontFamily: 'var(--font-hero)',
-          fontSize: '1.25rem',
-          color: 'var(--white)',
-          letterSpacing: '0.04em',
-          marginBottom: '8px',
-          textTransform: 'uppercase',
-        }}
-      >
-        SUSPECTS
-      </motion.div>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.55rem',
+        color: 'var(--grey-muted)',
+        letterSpacing: '0.2em',
+        margin: '16px 0 12px',
+        textTransform: 'uppercase',
+      }}>
+        PRIMARY SUSPECTS
+      </div>
 
-      {[case_.suspect_a, case_.suspect_b].map((s, i) => (
-        <SuspectCard key={i} suspect={s} icon={['🧑‍💼', '🕴️'][i]} index={i} />
-      ))}
+      <ProfileCard
+        title="SUSPECT ALPHA"
+        name={case_.suspect_a.name}
+        role={case_.suspect_a.motive}
+        fileId={`${case_.suspect_a.name.replace(/\s+/g, '')}.POI`}
+        image={`${import.meta.env.BASE_URL}assets/${suspectAImg}`}
+      />
+
+      <ProfileCard
+        title="SUSPECT BETA"
+        name={case_.suspect_b.name}
+        role={case_.suspect_b.motive}
+        fileId={`${case_.suspect_b.name.replace(/\s+/g, '')}.POI`}
+        image={`${import.meta.env.BASE_URL}assets/${suspectBImg}`}
+      />
     </div>
   )
 }
