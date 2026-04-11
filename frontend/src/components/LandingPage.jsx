@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react'
 import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion'
-import ErrorBoundary from './ErrorBoundary.jsx'
 
 export default function LandingPage({ onStart }) {
   // Track mouse coordinates for dynamic background glow
