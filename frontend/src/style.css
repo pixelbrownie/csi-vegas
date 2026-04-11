@@ -1,50 +1,70 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   /* Colors */
-  --black:        #050805;
-  --black-2:      #111111;
-  --black-3:      #181818;
-  --card:         #141414;
-  --card-2:       #1c1c1c;
-  --border:       #2a2a2a;
-  --border-2:     #383838;
-  --white:        #ffffff;
-  --white-dim:    #cccccc;
-  --grey:         #888888;
-  --grey-dim:     #3a3a3a;
-  
+  --black: #050805;
+  --black-2: #111111;
+  --black-3: #181818;
+  --card: #141414;
+  --card-2: #1c1c1c;
+  --border: #2a2a2a;
+  --border-2: #383838;
+  --white: #ffffff;
+  --white-dim: #cccccc;
+  --grey: #888888;
+  --grey-dim: #3a3a3a;
+
   /* Primary Accents - Shifted from Green to Orange/Yellow */
-  --orange:       #fb923c;
-  --orange-neon:  #fb923c;
-  --yellow:       #fcd34d;
-  --gold:         #e6c000;
-  --cyan:         #fb923c; /* proxy for consistency if used elsewhere */
+  --orange: #fb923c;
+  --orange-neon: #fb923c;
+  --yellow: #fcd34d;
+  --gold: #e6c000;
+  --cyan: #fb923c;
+  /* proxy for consistency if used elsewhere */
 
   /* Retained overrides for existing components mapping to new theme */
-  --purple:       #fb923c; 
+  --purple: #fb923c;
   --purple-light: #fcd34d;
-  --green:        #fcd34d; /* green now mapped to yellow */
-  --green-neon:   #fb923c; /* green neon now mapped to orange */
-  --pink:         #fb923c;
+  --green: #fcd34d;
+  /* green now mapped to yellow */
+  --green-neon: #fb923c;
+  /* green neon now mapped to orange */
+  --pink: #fb923c;
 
   /* Typography unified to Space Mono */
-  --font-hero:    'Space Mono', monospace;     /* 700 for heavy titles */
-  --font-ui:      'Space Mono', monospace;     /* 400 for body, chat */
-  --font-mono:    'Space Mono', monospace;     /* consistent mono throughout */
-  --font-stamp:   'Space Mono', monospace;     /* 700 for buttons, section headers */
+  --font-hero: 'Bebas Neue', sans-serif;
+  /* 700 for heavy titles */
+  --font-ui: 'Space Mono', monospace;
+  /* 400 for body, chat */
+  --font-mono: 'Space Mono', monospace;
+  /* consistent mono throughout */
+  --font-stamp: 'Bebas Neue', sans-serif;
+  /* 700 for buttons, section headers */
 
   /* Radiuses mapping exactly as requested */
-  --radius-sharp: 0px;    /* 0-2px (sharp) physical document/stamped form */
-  --radius-subtle: 4px;   /* 4px (subtle) chat bubbles, dossier cards */
-  --radius-pill: 999px;   /* 999px (full pill) action buttons */
+  --radius-sharp: 0px;
+  /* 0-2px (sharp) physical document/stamped form */
+  --radius-subtle: 4px;
+  /* 4px (subtle) chat bubbles, dossier cards */
+  --radius-pill: 999px;
+  /* 999px (full pill) action buttons */
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   background: var(--black);
   color: var(--white);
@@ -53,39 +73,94 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--black); }
-::-webkit-scrollbar-thumb { background: var(--grey-dim); border-radius: 2px; }
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grey-dim);
+  border-radius: 2px;
+}
 
 /* ── Animations ── */
 @keyframes scrollLeft {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(232,86,10,0.5), 0 0 40px rgba(232,86,10,0.2); }
-  50%       { box-shadow: 0 0 50px rgba(232,86,10,0.9), 0 0 80px rgba(232,86,10,0.4); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(232, 86, 10, 0.5), 0 0 40px rgba(232, 86, 10, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 50px rgba(232, 86, 10, 0.9), 0 0 80px rgba(232, 86, 10, 0.4);
+  }
 }
 
 @keyframes bounce {
-  0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
-  40%           { transform: translateY(-7px); opacity: 1; }
+
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+
+  40% {
+    transform: translateY(-7px);
+    opacity: 1;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
 }
 
 @keyframes progressBar {
-  0%   { width: 0%; }
-  60%  { width: 85%; }
-  80%  { width: 90%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+
+  60% {
+    width: 85%;
+  }
+
+  80% {
+    width: 90%;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
