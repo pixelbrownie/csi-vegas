@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SecretReveal from './SecretReveal.jsx'
 
@@ -60,17 +60,34 @@ function CaseResult({ gameState, case_, onNewCase }) {
 
 function CaseFile({ text }) {
   const [displayedText, setDisplayedText] = useState('')
+  const prevFullTextRef = useRef('')
   
   useEffect(() => {
-    setDisplayedText('')
-    if (!text) return
+    if (!text) {
+      setDisplayedText('')
+      prevFullTextRef.current = ''
+      return
+    }
+
+    // Check if new text is an extension of the previously typed text
+    const isExtension = text.startsWith(prevFullTextRef.current) && prevFullTextRef.current !== ''
+    const startFrom = isExtension ? prevFullTextRef.current.length : 0
     
-    let i = 0
+    if (!isExtension) {
+      setDisplayedText('')
+    }
+    
+    let i = startFrom
     const interval = setInterval(() => {
-      setDisplayedText(text.slice(0, i + 1))
-      i++
-      if (i >= text.length) clearInterval(interval)
-    }, 30)
+      // Don't type more than the current text length
+      if (i < text.length) {
+        setDisplayedText(text.slice(0, i + 1))
+        i++
+      } else {
+        clearInterval(interval)
+        prevFullTextRef.current = text
+      }
+    }, 25) // Slightly faster typewriter
     
     return () => clearInterval(interval)
   }, [text])
@@ -98,8 +115,8 @@ function CaseFile({ text }) {
         borderBottom: 'none',
       }}>
         <div style={{
-          fontFamily: 'Impact, sans-serif',
-          fontSize: '0.8rem',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.7rem',
           color: '#8e5033',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
@@ -112,32 +129,32 @@ function CaseFile({ text }) {
       <div style={{
         background: 'linear-gradient(145deg, #e6ce7b 0%, #d4af37 100%)',
         borderRadius: '12px',
-        padding: '24px',
+        padding: '20px',
         boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         border: '1px solid #c59f2a',
-        minHeight: '220px',
+        minHeight: '200px',
         position: 'relative',
         overflow: 'hidden',
       }}>
         <div style={{
           position: 'absolute',
           inset: 0,
-          opacity: 0.2,
+          opacity: 0.15,
           pointerEvents: 'none',
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }} />
         
         <div style={{
-          padding: '12px 4px',
+          padding: '8px 4px',
           minHeight: '140px',
         }}>
           <div style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.85rem',
+            fontSize: '0.72rem', // Decreased font size as requested
             color: '#3d251a',
-            lineHeight: 1.6,
+            lineHeight: 1.5,
             whiteSpace: 'pre-wrap',
-            fontWeight: 500,
+            fontWeight: 600,
           }}>
             {displayedText}
             <motion.span

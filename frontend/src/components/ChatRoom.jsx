@@ -44,17 +44,16 @@ export default function ChatRoom({
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        background: 'linear-gradient(180deg, #050a15 0%, #020202 100%)', // Smooth Blue-Black Gradient
+        background: 'linear-gradient(180deg, #050a15 0%, #020202 100%)',
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
+      {/* Header - Removed border */}
       <div style={{
-        padding: '20px 24px',
-        borderBottom: '1px solid var(--border-gold)',
+        padding: '24px 24px 12px', // Tighter header
         display: 'flex',
         justifyContent: 'center',
-        background: 'rgba(0,0,0,0.5)',
+        background: 'transparent', // No background block
         zIndex: 1,
       }}>
         <div style={{
@@ -77,7 +76,7 @@ export default function ChatRoom({
         style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '24px',
+          padding: '12px 24px',
           display: 'flex',
           flexDirection: 'column',
           gap: '24px',
@@ -114,13 +113,13 @@ export default function ChatRoom({
               
               <div style={{
                 maxWidth: '85%',
-                padding: '16px 20px',
+                padding: '14px 18px', // Slightly thinner bubbles
                 background: msg.role === 'user' 
                   ? 'var(--gold-gradient)' 
                   : 'rgba(255, 255, 255, 0.05)',
                 color: msg.role === 'user' ? 'var(--black-pure)' : 'var(--white-soft)',
                 borderRadius: '24px',
-                border: msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.15)',
+                border: msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.1)',
                 backdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
                 fontFamily: 'var(--font-ui)',
                 fontSize: '0.82rem',
@@ -170,11 +169,10 @@ export default function ChatRoom({
         </AnimatePresence>
       </div>
 
-      {/* Input area - Opaque and Smooth */}
+      {/* Input area - Thinner, No separators */}
       <div style={{
-        padding: '24px 32px 32px',
-        background: 'rgba(5, 10, 21, 0.95)', // Mostly Opaque Dark Blue match
-        borderTop: '1px solid rgba(212, 175, 55, 0.1)',
+        padding: '12px 24px 20px', // Much thinner padding
+        background: 'transparent', // Fully seamless
         zIndex: 2,
       }}>
         <div 
@@ -184,14 +182,14 @@ export default function ChatRoom({
             position: 'relative', 
             display: 'flex', 
             gap: '12px',
-            background: 'var(--black-soft)', // Solid Opaque
-            padding: '8px 12px 8px 24px',
+            background: '#0a0a0a', // Solid Dark
+            padding: '4px 12px 4px 20px', // Increased right padding for more space around button
             borderRadius: 'var(--radius-pill)',
-            border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.2)'}`,
+            border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
             boxShadow: isInputHovered 
-              ? '0 0 25px rgba(212, 175, 55, 0.15), 0 10px 30px rgba(0,0,0,0.5)' 
-              : '0 10px 20px rgba(0,0,0,0.3)',
-            transition: 'all 0.4s ease',
+              ? '0 0 20px rgba(212, 175, 55, 0.1)' 
+              : '0 4px 15px rgba(0,0,0,0.2)',
+            transition: 'all 0.3s ease',
             alignItems: 'center',
           }}
         >
@@ -204,27 +202,27 @@ export default function ChatRoom({
             onKeyDown={handleKeyDown}
             style={{
               flex: 1,
-              minHeight: '44px',
-              maxHeight: '120px',
+              height: '22px', // Specific height for centering
               background: 'transparent',
               border: 'none',
               color: 'var(--white-pure)',
-              padding: '12px 0',
+              padding: '0', // No internal padding to ensure flex centering works
               fontFamily: 'var(--font-ui)',
-              fontSize: '0.85rem',
+              fontSize: '1.05rem', // Slightly larger as requested
               resize: 'none',
               outline: 'none',
-              lineHeight: 1.4,
+              lineHeight: '22px',
+              display: 'block',
             }}
           />
           <motion.button
-            whileHover={{ scale: 1.1, backgroundColor: '#FFD700' }}
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleSend}
             disabled={isInputDisabled || !input.trim()}
             style={{
-              width: '48px',
-              height: '48px',
+              width: '38px', // Thinner button
+              height: '38px',
               background: '#FFD700',
               border: 'none',
               borderRadius: '50%',
@@ -234,11 +232,10 @@ export default function ChatRoom({
               justifyContent: 'center',
               cursor: (isInputDisabled || !input.trim()) ? 'default' : 'pointer',
               opacity: (isInputDisabled || !input.trim()) ? 0.3 : 1,
-              boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: '1rem', marginLeft: '2px' }}>➤</span>
+            <span style={{ fontSize: '0.9rem', marginLeft: '2px' }}>➤</span>
           </motion.button>
         </div>
       </div>
