@@ -39,13 +39,12 @@ export default function ChatRoom({
 
   return (
     <div 
-      className="grainy-bg"
       style={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        background: 'linear-gradient(180deg, var(--black-rich) 0%, #151515 100%)',
+        background: 'linear-gradient(180deg, #050a15 0%, #020202 100%)', // Smooth Blue-Black Gradient
         overflow: 'hidden',
       }}
     >
@@ -55,7 +54,7 @@ export default function ChatRoom({
         borderBottom: '1px solid var(--border-gold)',
         display: 'flex',
         justifyContent: 'center',
-        background: 'rgba(0,0,0,0.3)',
+        background: 'rgba(0,0,0,0.5)',
         zIndex: 1,
       }}>
         <div style={{
@@ -118,9 +117,9 @@ export default function ChatRoom({
                 padding: '16px 20px',
                 background: msg.role === 'user' 
                   ? 'var(--gold-gradient)' 
-                  : 'rgba(255, 255, 255, 0.03)',
+                  : 'rgba(255, 255, 255, 0.05)',
                 color: msg.role === 'user' ? 'var(--black-pure)' : 'var(--white-soft)',
-                borderRadius: '24px', // More rounded as requested
+                borderRadius: '24px',
                 border: msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.15)',
                 backdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
                 fontFamily: 'var(--font-ui)',
@@ -128,7 +127,7 @@ export default function ChatRoom({
                 lineHeight: 1.5,
                 boxShadow: msg.role === 'user' 
                   ? '0 8px 25px rgba(212, 175, 55, 0.2)' 
-                  : '0 4px 15px rgba(0,0,0,0.2)',
+                  : '0 4px 15px rgba(0,0,0,0.3)',
               }}>
                 {msg.content}
               </div>
@@ -171,10 +170,11 @@ export default function ChatRoom({
         </AnimatePresence>
       </div>
 
-      {/* Input area - No top line, pill shaped */}
+      {/* Input area - Opaque and Smooth */}
       <div style={{
         padding: '24px 32px 32px',
-        background: 'transparent',
+        background: 'rgba(5, 10, 21, 0.95)', // Mostly Opaque Dark Blue match
+        borderTop: '1px solid rgba(212, 175, 55, 0.1)',
         zIndex: 2,
       }}>
         <div 
@@ -184,14 +184,14 @@ export default function ChatRoom({
             position: 'relative', 
             display: 'flex', 
             gap: '12px',
-            background: 'rgba(255,255,255,0.03)',
+            background: 'var(--black-soft)', // Solid Opaque
             padding: '8px 12px 8px 24px',
-            borderRadius: 'var(--radius-pill)', // Pill shaped
-            border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
+            borderRadius: 'var(--radius-pill)',
+            border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.2)'}`,
             boxShadow: isInputHovered 
-              ? '0 0 20px rgba(212, 175, 55, 0.2), inset 0 2px 10px rgba(0,0,0,0.5)' 
-              : 'inset 0 2px 10px rgba(0,0,0,0.5)',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              ? '0 0 25px rgba(212, 175, 55, 0.15), 0 10px 30px rgba(0,0,0,0.5)' 
+              : '0 10px 20px rgba(0,0,0,0.3)',
+            transition: 'all 0.4s ease',
             alignItems: 'center',
           }}
         >
@@ -218,16 +218,16 @@ export default function ChatRoom({
             }}
           />
           <motion.button
-            whileHover={{ scale: 1.1, backgroundColor: 'var(--gold-metallic)' }}
+            whileHover={{ scale: 1.1, backgroundColor: '#FFD700' }}
             whileTap={{ scale: 0.9 }}
             onClick={handleSend}
             disabled={isInputDisabled || !input.trim()}
             style={{
               width: '48px',
               height: '48px',
-              background: '#FFD700', // Vibrant Yellow
-              border: '1px solid rgba(255, 215, 0, 0.3)',
-              borderRadius: '50%', // Circular button
+              background: '#FFD700',
+              border: 'none',
+              borderRadius: '50%',
               color: 'var(--black-pure)',
               display: 'flex',
               alignItems: 'center',
@@ -238,7 +238,7 @@ export default function ChatRoom({
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: '1.2rem', marginLeft: '2px' }}>➤</span>
+            <span style={{ fontSize: '1rem', marginLeft: '2px' }}>➤</span>
           </motion.button>
         </div>
       </div>
