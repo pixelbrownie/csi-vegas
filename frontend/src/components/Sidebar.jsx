@@ -1,7 +1,7 @@
 // Sidebar.jsx — timer + location + new case only
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import FramerEyes from './framer/FramerEyes.jsx'
+
 
 const TOTAL = 30 * 60
 
@@ -178,7 +178,6 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       </div>
 
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingTop: '20px' }}>
-        <FramerEyes />
       </div>
     </div>
   )

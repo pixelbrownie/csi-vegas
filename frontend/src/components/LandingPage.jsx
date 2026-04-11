@@ -1,8 +1,6 @@
 import React, { Suspense } from 'react'
 import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion'
 import ErrorBoundary from './ErrorBoundary.jsx'
-import '../framer/styles.css'
-import SpectraNoise from '../framer/SpectraNoise.js'
 
 export default function LandingPage({ onStart }) {
   // Track mouse coordinates for dynamic background glow
@@ -243,14 +241,18 @@ export default function LandingPage({ onStart }) {
           transform: scale(1.05);
           box-shadow: 0 0 50px rgba(251, 146, 60, 0.5);
         }
+        .lp-noise-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          opacity: 0.15;
+          pointer-events: none;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
       `}</style>
       
-      {/* Spectra Noise Background */}
-      <div className="lp-spectra">
-        <ErrorBoundary fallback={null}>
-          <SpectraNoise.Responsive className="framer-spectra-override" />
-        </ErrorBoundary>
-      </div>
+      {/* Vanilla Noise Background */}
+      <div className="lp-noise-overlay" />
 
       {/* Green / Yellow Ambient Glow */}
       <motion.div className="lp-glow" style={{ background: glowBackground }} />

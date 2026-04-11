@@ -1,8 +1,0 @@
-{
-  "components": {
-    "eyes": "https://framer.com/m/eyes-ZYGv.js@FfIIKDynKRXjqznTXtaR",
-    "FluidFlowBackground": "https://framer.com/m/FluidFlowBackground-MHZymA.js@fDmF21fbHJGL1qyHn3oQ",
-    "SpectraNoise": "https://framer.com/m/SpectraNoise-l2Js.js@PswA93ZW5ISUVLr5J1Ed"
-  },
-  "outDir": "./src/framer"
-}
