@@ -141,11 +141,11 @@ export default function LandingPage({ onStart }) {
 
         .lp-h1 {
           font-family: var(--font-hero);
-          font-size: 9rem;
-          font-weight: 900;
-          line-height: 0.85;
+          font-size: 8rem;
+          font-weight: 700;
+          line-height: 0.9;
           margin-bottom: 24px;
-          letter-spacing: -0.025em;
+          letter-spacing: 0.02em;
           text-transform: uppercase;
         }
         @media (max-width: 768px) {
@@ -164,8 +164,9 @@ export default function LandingPage({ onStart }) {
           font-family: var(--font-ui);
           font-size: 1.125rem;
           color: var(--white-dim);
-          line-height: 1.625;
+          line-height: 1.7;
           font-weight: 400;
+          letter-spacing: 0.01em;
         }
 
         .lp-cards {
@@ -213,8 +214,9 @@ export default function LandingPage({ onStart }) {
         .lp-card-desc {
           font-family: var(--font-ui);
           color: var(--grey);
-          line-height: 1.625;
+          line-height: 1.7;
           font-size: 0.9rem;
+          letter-spacing: 0.01em;
         }
 
         .lp-bottom-container {

@@ -43,7 +43,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       }}>
         <div style={{
           fontFamily: 'var(--font-hero)',
-          fontWeight: 900,
+          fontWeight: 700,
           fontStyle: 'normal',
           fontSize: '1.2rem',
           letterSpacing: '0.06em',

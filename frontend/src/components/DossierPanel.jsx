@@ -49,18 +49,16 @@ function VictimCard({ victim }) {
           VICTIM
         </div>
 
-        <div
-          style={{
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontSize: '0.95rem',
-            color: 'var(--white)',
-            lineHeight: 1.2,
-            marginBottom: '4px',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
+        <div style={{
+          fontFamily: 'var(--font-stamp)',
+          fontWeight: 700,
+          fontSize: '0.95rem',
+          color: 'var(--white)',
+          lineHeight: 1.2,
+          marginBottom: '4px',
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
+        }}>
           {victim.name}
         </div>
 
@@ -145,17 +143,18 @@ function SuspectCard({ suspect, icon, index }) {
 
       <div style={{ minWidth: 0 }}>
         <div
-          style={{
-            fontFamily: 'var(--font-stamp)',
-            fontWeight: 700,
-            fontSize: '0.82rem',
-            color: 'var(--white)',
-            marginBottom: '6px',
-            lineHeight: 1.2,
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 700,
+          fontSize: '0.75rem',
+          color: 'var(--orange)',
+          marginBottom: '6px',
+          letterSpacing: '0.04em',
+          lineHeight: 1.2,
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
+        }}
+      >
           {suspect.name}
         </div>
 

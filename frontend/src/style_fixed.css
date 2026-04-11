@@ -1,45 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Oswald:wght@600;700;900&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Colors */
-  --black:        #050805;
+  --black:        #0a0a0a;
   --black-2:      #111111;
   --black-3:      #181818;
   --card:         #141414;
   --card-2:       #1c1c1c;
   --border:       #2a2a2a;
   --border-2:     #383838;
+  --purple:       #7c3f7c;
+  --purple-dim:   #4a2a4a;
+  --purple-light: #c070c0;
+  --orange:       #e8560a;
+  --orange-dark:  #b03d00;
+  --yellow:       #f5c800;
   --white:        #ffffff;
   --white-dim:    #cccccc;
   --grey:         #888888;
   --grey-dim:     #3a3a3a;
-  
-  /* Primary Accents - Shifted from Green to Orange/Yellow */
-  --orange:       #fb923c;
-  --orange-neon:  #fb923c;
-  --yellow:       #fcd34d;
-  --gold:         #e6c000;
-  --cyan:         #fb923c; /* proxy for consistency if used elsewhere */
+  --pink:         #a0405a;
+  --cyan:         #00F2FF;
+  --green:        #22c55e;
+  --gold:         #D4AF37;
 
-  /* Retained overrides for existing components mapping to new theme */
-  --purple:       #fb923c; 
-  --purple-light: #fcd34d;
-  --green:        #fcd34d; /* green now mapped to yellow */
-  --green-neon:   #fb923c; /* green neon now mapped to orange */
-  --pink:         #fb923c;
-
-  /* Typography unified to Space Mono */
-  --font-hero:    'Space Mono', monospace;     /* 700 for heavy titles */
-  --font-ui:      'Space Mono', monospace;     /* 400 for body, chat */
-  --font-mono:    'Space Mono', monospace;     /* consistent mono throughout */
-  --font-stamp:   'Space Mono', monospace;     /* 700 for buttons, section headers */
-
-  /* Radiuses mapping exactly as requested */
-  --radius-sharp: 0px;    /* 0-2px (sharp) physical document/stamped form */
-  --radius-subtle: 4px;   /* 4px (subtle) chat bubbles, dossier cards */
-  --radius-pill: 999px;   /* 999px (full pill) action buttons */
+  --font-hero:    'Bebas Neue', sans-serif;
+  --font-ui:      'Inter', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+  --font-stamp:   'Oswald', sans-serif;
 }
 
 html { scroll-behavior: smooth; }
@@ -49,7 +38,6 @@ html, body, #root {
   background: var(--black);
   color: var(--white);
   font-family: var(--font-ui);
-  line-height: 1.6;
   overflow-x: hidden;
 }
 
