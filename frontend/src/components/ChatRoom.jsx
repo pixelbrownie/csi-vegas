@@ -3,9 +3,9 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const AGENT_STYLES = {
-  witness: { bg: '#1c1808', border: '#3a3010', accent: '#D4AF37', label: 'WITNESS AGENT' },
-  analyst: { bg: '#0c1618', border: '#143848', accent: '#3a8aaa', label: 'ANALYST AGENT' },
-  narrator: { bg: '#160c1c', border: '#2a1440', accent: '#8040b0', label: 'NARRATOR AGENT' },
+  witness: { bg: '#1c1808', border: '#3a3010', accent: 'var(--yellow)', label: 'WITNESS AGENT' },
+  analyst: { bg: '#1c1208', border: '#3a2410', accent: 'var(--orange)', label: 'ANALYST AGENT' },
+  narrator: { bg: '#181208', border: '#302210', accent: 'var(--gold)', label: 'NARRATOR AGENT' },
   system: { bg: '#1a0808', border: '#3a1414', accent: '#c03030', label: 'SYSTEM' },
 }
 

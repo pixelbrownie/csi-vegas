@@ -8,12 +8,12 @@ function VictimCard({ victim }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
       style={{
-        background: 'var(--card)',
+        background: 'var(--black-2)',
         border: '1px solid var(--border-2)',
-        borderRadius: '18px',
-        padding: '10px',
+        borderRadius: 'var(--radius-subtle)',
+        padding: '12px',
         display: 'flex',
-        gap: '9px',
+        gap: '12px',
         alignItems: 'flex-start',
         marginBottom: '16px',
         minWidth: 0,
@@ -21,12 +21,12 @@ function VictimCard({ victim }) {
     >
       <div
         style={{
-          width: '40px',
-          height: '46px',
+          width: '44px',
+          height: '48px',
           flexShrink: 0,
           background: 'var(--black-3)',
           border: '1px solid var(--border)',
-          borderRadius: '10px',
+          borderRadius: 'var(--radius-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -40,10 +40,10 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.5rem',
+            fontSize: '0.55rem',
             color: 'var(--orange)',
             letterSpacing: '0.12em',
-            marginBottom: '3px',
+            marginBottom: '4px',
           }}
         >
           VICTIM
@@ -53,10 +53,10 @@ function VictimCard({ victim }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
-            fontSize: '0.88rem',
+            fontSize: '0.95rem',
             color: 'var(--white)',
             lineHeight: 1.2,
-            marginBottom: '3px',
+            marginBottom: '4px',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
@@ -67,10 +67,10 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-ui)',
-            fontSize: '0.66rem',
-            color: 'var(--orange)',
+            fontSize: '0.7rem',
+            color: 'var(--yellow)',
             fontStyle: 'italic',
-            marginBottom: '7px',
+            marginBottom: '8px',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
@@ -81,26 +81,26 @@ function VictimCard({ victim }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.56rem',
+            fontSize: '0.58rem',
             color: 'var(--grey)',
-            marginBottom: '2px',
+            marginBottom: '3px',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
         >
-          <span style={{ color: 'var(--white-dim)' }}>DETAILS</span> {victim.name}
+          <span style={{ color: 'var(--white-dim)' }}>FILE</span>: {victim.name}.DR
         </div>
 
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.56rem',
+            fontSize: '0.58rem',
             color: 'var(--grey)',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
         >
-          <span style={{ color: 'var(--white-dim)' }}>EVIDENCE</span> 🔍 Fingerprint on file
+          <span style={{ color: 'var(--white-dim)' }}>STATUS</span>: CLOSED_V
         </div>
       </div>
     </motion.div>
@@ -117,27 +117,27 @@ function SuspectCard({ suspect, icon, index }) {
       style={{
         background: 'var(--black)',
         border: '1px solid var(--border)',
-        borderRadius: '16px',
-        padding: '9px',
+        borderRadius: 'var(--radius-subtle)',
+        padding: '10px',
         display: 'flex',
-        gap: '8px',
+        gap: '10px',
         alignItems: 'flex-start',
-        marginBottom: '8px',
+        marginBottom: '10px',
         minWidth: 0,
       }}
     >
       <div
         style={{
-          width: '30px',
-          height: '40px',
+          width: '32px',
+          height: '42px',
           flexShrink: 0,
           background: 'var(--black-3)',
           border: '1px solid var(--border)',
-          borderRadius: '9px',
+          borderRadius: 'var(--radius-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '0.95rem',
+          fontSize: '1rem',
         }}
       >
         {icon}
@@ -148,9 +148,9 @@ function SuspectCard({ suspect, icon, index }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
-            fontSize: '0.76rem',
+            fontSize: '0.82rem',
             color: 'var(--white)',
-            marginBottom: '4px',
+            marginBottom: '6px',
             lineHeight: 1.2,
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
@@ -162,46 +162,30 @@ function SuspectCard({ suspect, icon, index }) {
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.56rem',
+            fontSize: '0.58rem',
             color: 'var(--grey)',
-            lineHeight: 1.5,
-            marginBottom: '2px',
+            lineHeight: 1.6,
+            marginBottom: '4px',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
         >
-          Motive: {suspect.motive.slice(0, 48)}
-          {suspect.motive.length > 48 ? '…' : ''}
+          <span style={{ color: 'var(--orange)', fontSize: '0.5rem' }}>MOTIVE</span> {suspect.motive.slice(0, 52)}
+          {suspect.motive.length > 52 ? '…' : ''}
         </div>
 
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.56rem',
+            fontSize: '0.58rem',
             color: 'var(--grey)',
-            lineHeight: 1.5,
+            lineHeight: 1.6,
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
           }}
         >
-          Alibi: {suspect.alibi.slice(0, 48)}
-          {suspect.alibi.length > 48 ? '…' : ''}
-        </div>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.52rem',
-            color: 'var(--orange)',
-            fontStyle: 'italic',
-            marginTop: '5px',
-            paddingTop: '5px',
-            borderTop: '1px dashed var(--border)',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          Start msgs with "ask", "found" or "analyze"
+          <span style={{ color: 'var(--orange)', fontSize: '0.5rem' }}>ALIBI</span> {suspect.alibi.slice(0, 52)}
+          {suspect.alibi.length > 52 ? '…' : ''}
         </div>
       </div>
     </motion.div>

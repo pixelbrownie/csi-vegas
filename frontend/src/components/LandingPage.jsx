@@ -30,11 +30,11 @@ export default function LandingPage({ onStart }) {
       <style>{`
         .lp-container {
           min-height: 100vh;
-          background-color: #050805;
-          color: white;
+          background-color: var(--black);
+          color: var(--white);
           position: relative;
           overflow: hidden;
-          font-family: sans-serif;
+          font-family: var(--font-ui);
         }
         
         .lp-spectra {
@@ -64,8 +64,8 @@ export default function LandingPage({ onStart }) {
           z-index: 1;
           pointer-events: none;
           background-image: 
-            linear-gradient(rgba(190, 242, 100, 0.08) 1px, transparent 1px), 
-            linear-gradient(90deg, rgba(190, 242, 100, 0.08) 1px, transparent 1px);
+            linear-gradient(rgba(251, 146, 60, 0.12) 1px, transparent 1px), 
+            linear-gradient(90deg, rgba(251, 146, 60, 0.12) 1px, transparent 1px);
           background-size: 45px 45px;
         }
 
@@ -90,29 +90,31 @@ export default function LandingPage({ onStart }) {
         }
 
         .lp-title-top {
-          font-size: 0.8rem;
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
           letter-spacing: 0.45em;
-          color: #bef264;
+          color: var(--orange);
           text-transform: uppercase;
-          font-weight: 600;
+          font-weight: 400;
         }
 
         .lp-title-bottom {
-          font-size: 0.8rem;
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
           letter-spacing: 0.45em;
-          color: #fb923c;
+          color: var(--yellow);
           text-transform: uppercase;
-          font-weight: 600;
+          font-weight: 400;
         }
 
         .lp-top-right {
           position: absolute;
           top: 40px;
           right: 60px;
-          font-family: serif;
+          font-family: var(--font-ui);
           font-style: italic;
-          font-size: 1.5rem;
-          color: #f4f4f5;
+          font-size: 1.2rem;
+          color: var(--white-dim);
         }
 
         .lp-middle-row {
@@ -141,6 +143,7 @@ export default function LandingPage({ onStart }) {
         }
 
         .lp-h1 {
+          font-family: var(--font-hero);
           font-size: 9rem;
           font-weight: 900;
           line-height: 0.85;
@@ -156,15 +159,16 @@ export default function LandingPage({ onStart }) {
           color: transparent;
           background-clip: text;
           -webkit-background-clip: text;
-          background-image: linear-gradient(to right, #bef264, #fb923c);
-          filter: drop-shadow(0 0 30px rgba(190, 242, 100, 0.35));
+          background-image: linear-gradient(to right, var(--yellow), var(--orange));
+          filter: drop-shadow(0 0 30px rgba(251, 146, 60, 0.35));
         }
 
         .lp-desc {
+          font-family: var(--font-ui);
           font-size: 1.125rem;
-          color: #d4d4d8;
+          color: var(--white-dim);
           line-height: 1.625;
-          font-weight: 300;
+          font-weight: 400;
         }
 
         .lp-cards {
@@ -178,14 +182,15 @@ export default function LandingPage({ onStart }) {
           background: rgba(0, 0, 0, 0.55);
           backdrop-filter: blur(40px);
           -webkit-backdrop-filter: blur(40px);
-          border: 1px solid rgba(190, 242, 100, 0.2);
-          border-radius: 1.25rem;
+          border: 1px solid rgba(251, 146, 60, 0.2);
+          border-radius: var(--radius-subtle);
           padding: 24px 32px;
           transition: all 0.3s;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
         .lp-card:hover {
-          border-color: rgba(190, 242, 100, 0.6);
+          border-color: rgba(251, 146, 60, 0.6);
+          background: rgba(0, 0, 0, 0.65);
         }
         
         .lp-card-header {
@@ -200,15 +205,19 @@ export default function LandingPage({ onStart }) {
         }
 
         .lp-card-title {
-          font-size: 1.3rem;
+          font-family: var(--font-stamp);
+          font-size: 1.1rem;
           font-weight: 700;
-          color: #bef264;
+          color: var(--orange);
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
         }
 
         .lp-card-desc {
-          color: #a1a1aa;
+          font-family: var(--font-ui);
+          color: var(--grey);
           line-height: 1.625;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
         }
 
         .lp-bottom-container {
@@ -216,15 +225,23 @@ export default function LandingPage({ onStart }) {
         }
 
         .lp-btn-primary {
-          background: linear-gradient(to right, #bef264, #fb923c);
+          background: linear-gradient(to right, var(--yellow), var(--orange));
           color: black;
-          padding: 16px 48px;
-          border-radius: 1.25rem;
-          font-weight: 800;
-          font-size: 1.1rem;
-          box-shadow: 0 0 35px rgba(190, 242, 100, 0.35);
+          padding: 18px 56px;
+          border-radius: var(--radius-pill);
+          font-family: var(--font-stamp);
+          font-weight: 700;
+          font-size: 1rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          box-shadow: 0 0 35px rgba(251, 146, 60, 0.35);
           border: none;
           cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .lp-btn-primary:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 50px rgba(251, 146, 60, 0.5);
         }
       `}</style>
       

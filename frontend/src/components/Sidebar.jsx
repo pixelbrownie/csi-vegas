@@ -70,15 +70,16 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         fontFamily: 'var(--font-stamp)',
         fontWeight: 700,
         fontStyle: 'normal',
-        fontSize: '0.5rem',
+        fontSize: '0.52rem',
         color: 'var(--grey)',
         letterSpacing: '0.14em',
-        marginBottom: '8px',
+        marginBottom: '10px',
         alignSelf: 'flex-start',
+        textTransform: 'uppercase',
       }}>TIME REMAINING</div>
 
       {/* SVG Ring timer */}
-      <div style={{ position: 'relative', width: '84px', height: '84px', marginBottom: '16px' }}>
+      <div style={{ position: 'relative', width: '84px', height: '84px', marginBottom: '18px' }}>
         <svg width="84" height="84" style={{ transform: 'rotate(-90deg)' }}>
           <circle cx="42" cy="42" r={r} fill="none" stroke="var(--grey-dim)" strokeWidth="2.2" />
           <motion.circle
@@ -96,7 +97,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
               initial={{ scale: 0.9, opacity: 0.7 }}
               animate={{ scale: 1, opacity: 1 }}
               style={{
-                fontFamily: 'var(--font-stamp)', fontSize: '1rem', fontWeight: 700, fontStyle: 'normal',
+                fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 400, fontStyle: 'normal',
                 color: timerColor, filter: `drop-shadow(0 0 6px ${timerColor})`,
               }}
             >{mins}:{secs}</motion.span>
@@ -104,7 +105,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         </div>
       </div>
 
-      <div style={{ width: '100%', height: '1px', background: 'var(--border)', marginBottom: '16px' }} />
+      <div style={{ width: '100%', height: '1px', background: 'var(--border)', marginBottom: '18px' }} />
 
       {/* Location — bigger label */}
       <div style={{
@@ -114,44 +115,47 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         fontStyle: 'normal',
         color: 'var(--grey)',
         letterSpacing: '0.14em',
-        marginBottom: '6px',
+        marginBottom: '8px',
         alignSelf: 'flex-start',
+        textTransform: 'uppercase',
       }}>LOCATION</div>
       <div style={{
         width: '100%',
         background: '#0d0f12',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-sharp)',
-        padding: '8px',
+        padding: '10px',
         fontFamily: 'var(--font-mono)',
         fontWeight: 400,
-        fontSize: '0.58rem',
-        color: 'var(--white-dim)',
+        fontSize: '0.6rem',
+        color: 'var(--orange)',
         textAlign: 'center',
-        lineHeight: 1.45,
-        marginBottom: '20px',
+        lineHeight: 1.5,
+        marginBottom: '24px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
       }}>The Bellagio<br />Las Vegas Strip</div>
 
       {/* New Case — yellow pill, black text — right below location */}
       <motion.button
-        whileHover={{ scale: 1.03, backgroundColor: '#e6c000' }}
+        whileHover={{ scale: 1.03, backgroundColor: 'var(--yellow)' }}
         whileTap={{ scale: 0.96 }}
         onClick={onNewCase}
         style={{
           width: '100%',
-          padding: '9px 10px',
-          background: 'var(--yellow)',
-          border: '1px solid #c8a000',
+          padding: '11px 12px',
+          background: 'var(--orange)',
+          border: 'none',
           color: 'var(--black)',
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
           fontStyle: 'normal',
-          fontSize: '0.65rem',
+          fontSize: '0.7rem',
           letterSpacing: '0.14em',
           cursor: 'pointer',
           borderRadius: 'var(--radius-pill)',
-          transition: 'background 0.2s',
-          marginBottom: '14px',
+          transition: 'all 0.2s',
+          marginBottom: '16px',
         }}
       >
         NEW CASE

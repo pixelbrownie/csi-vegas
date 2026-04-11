@@ -231,11 +231,11 @@ export default function App() {
         <div style={{
           fontFamily: 'var(--font-mono)',
           fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-          color: glitch ? 'var(--cyan)' : 'var(--purple-light)',
+          color: glitch ? 'var(--gold)' : 'var(--orange)',
           letterSpacing: '0.18em',
           textShadow: glitch
-            ? '2px 0 var(--orange), -2px 0 var(--cyan), 0 0 20px var(--cyan)'
-            : '0 0 14px rgba(192,112,192,0.6)',
+            ? '2px 0 var(--orange), -2px 0 var(--yellow), 0 0 20px var(--yellow)'
+            : '0 0 14px rgba(251,146,60,0.6)',
           transition: 'color 0.05s, text-shadow 0.05s',
           minHeight: '2rem',
           textAlign: 'center',
@@ -245,7 +245,7 @@ export default function App() {
           <span style={{
             display: 'inline-block',
             width: '2px', height: '1.2em',
-            background: 'var(--purple-light)',
+            background: 'var(--orange)',
             marginLeft: '4px',
             verticalAlign: 'middle',
             animation: 'bounce 0.8s step-end infinite',
@@ -264,13 +264,13 @@ export default function App() {
         <div style={{
           width: '260px', height: '2px',
           background: 'var(--grey-dim)',
-          borderRadius: '2px',
+          borderRadius: 'var(--radius-sharp)',
           overflow: 'hidden',
         }}>
           <div style={{
             height: '100%',
-            background: 'var(--purple-light)',
-            boxShadow: '0 0 8px var(--purple-light)',
+            background: 'var(--orange)',
+            boxShadow: '0 0 8px var(--orange)',
             animation: 'progressBar 2.5s ease-in-out infinite',
           }} />
         </div>

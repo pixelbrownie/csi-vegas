@@ -18,8 +18,8 @@ function TickerTape() {
         overflow: 'hidden',
         whiteSpace: 'nowrap',
         padding: '7px 0',
-        borderTop: '3px solid #c8a000',
-        borderBottom: '3px solid #c8a000',
+        borderTop: '3px solid var(--gold)',
+        borderBottom: '3px solid var(--gold)',
         flexShrink: 0,
       }}
     >

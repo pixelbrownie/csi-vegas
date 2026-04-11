@@ -96,8 +96,8 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         style={{
-          background: '#081a08',
-          border: '2px solid var(--green)',
+          background: '#1a1808',
+          border: '2px solid var(--gold)',
           borderRadius: 'var(--radius-subtle)',
           padding: '16px',
           marginBottom: '10px',
@@ -110,7 +110,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             fontWeight: 700,
             fontStyle: 'normal',
             fontSize: '1rem',
-            color: 'var(--green)',
+            color: 'var(--gold)',
             marginBottom: '8px',
           }}
         >
@@ -127,13 +127,13 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.7rem',
-              color: '#4a9850',
+              color: 'var(--yellow)',
               lineHeight: 1.8,
               wordBreak: 'break-word',
               overflowWrap: 'anywhere',
             }}
           >
-            <strong style={{ color: 'var(--green)' }}>{k}:</strong> {v}
+            <strong style={{ color: 'var(--gold)' }}>{k}:</strong> {v}
           </div>
         ))}
 
@@ -145,8 +145,8 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             width: '100%',
             padding: '9px',
             background: 'transparent',
-            border: '1px solid var(--green)',
-            color: 'var(--green)',
+            border: '1px solid var(--gold)',
+            color: 'var(--gold)',
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
             fontStyle: 'normal',
@@ -229,7 +229,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
   return (
     <div
       style={{
-        background: 'var(--card)',
+        background: 'var(--black-2)',
         border: '1px solid var(--border-2)',
         borderRadius: 'var(--radius-subtle)',
         padding: '14px',
@@ -248,6 +248,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
           alignItems: 'center',
           gap: '7px',
           marginBottom: '12px',
+          textTransform: 'uppercase',
         }}
       >
         Make Your Accusation
@@ -260,15 +261,15 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
           onClick={() => setShown(true)}
           style={{
             width: '100%',
-            padding: '9px',
+            padding: '11px',
             background: 'transparent',
             border: '1px solid var(--grey-dim)',
             color: 'var(--grey)',
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
             fontStyle: 'normal',
-            fontSize: '0.72rem',
-            letterSpacing: '0.1em',
+            fontSize: '0.75rem',
+            letterSpacing: '0.12em',
             cursor: 'pointer',
             borderRadius: 'var(--radius-pill)',
             transition: 'all 0.2s',
@@ -288,14 +289,14 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
               onChange={(e) => setSelected(e.target.value)}
               style={{
                 width: '100%',
-                padding: '9px 12px',
+                padding: '10px 12px',
                 background: 'var(--black)',
                 border: '1px solid var(--border-2)',
                 color: selected ? 'var(--white)' : 'var(--grey)',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 borderRadius: 'var(--radius-subtle)',
-                marginBottom: '8px',
+                marginBottom: '10px',
                 cursor: 'pointer',
                 outline: 'none',
               }}
@@ -312,7 +313,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
               disabled={!selected}
               style={{
                 width: '100%',
-                padding: '10px',
+                padding: '12px',
                 background: selected ? 'var(--orange)' : 'var(--grey-dim)',
                 border: 'none',
                 color: selected ? 'var(--black)' : 'var(--grey)',
@@ -349,7 +350,7 @@ function HowToPlay({ victimName }) {
         background: 'var(--black)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-subtle)',
-        padding: '12px',
+        padding: '14px',
         minWidth: 0,
       }}
     >
@@ -363,35 +364,38 @@ function HowToPlay({ victimName }) {
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          marginBottom: '10px',
+          marginBottom: '12px',
+          textTransform: 'uppercase',
         }}
       >
         How to Play
       </div>
 
       {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', gap: '9px', marginBottom: '9px', minWidth: 0 }}>
+        <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '12px', minWidth: 0 }}>
           <span style={{ fontSize: '0.9rem', flexShrink: 0, marginTop: '1px' }}>{item.icon}</span>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--orange)' }}>
-              {item.agent}
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--orange)', letterSpacing: '0.1em' }}>
+              {item.agent.toUpperCase()}
             </div>
             <div
               style={{
                 fontFamily: 'var(--font-ui)',
-                fontSize: '0.7rem',
-                color: 'var(--grey)',
+                fontSize: '0.75rem',
+                color: 'var(--white-dim)',
+                lineHeight: 1.4,
                 wordBreak: 'break-word',
                 overflowWrap: 'anywhere',
+                marginBottom: '2px',
               }}
             >
               {item.desc}
             </div>
             <div
               style={{
-                fontFamily: 'var(--font-ui)',
-                fontSize: '0.68rem',
-                color: 'var(--grey-dim)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.65rem',
+                color: 'var(--grey)',
                 fontStyle: 'italic',
                 wordBreak: 'break-word',
                 overflowWrap: 'anywhere',

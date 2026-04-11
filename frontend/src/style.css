@@ -15,23 +15,26 @@
   --white-dim:    #cccccc;
   --grey:         #888888;
   --grey-dim:     #3a3a3a;
-  --green-neon:   #bef264;
-  --orange-neon:  #fb923c;
   
-  /* Retained overrides for existing components so they map to sleek colors */
-  --purple:       #fb923c; /* fallback proxy to orange */
-  --purple-light: #fb923c;
-  --yellow:       #fb923c; /* fallback proxy to orange */
-  --green:        #bef264;
+  /* Primary Accents - Shifted from Green to Orange/Yellow */
   --orange:       #fb923c;
-  --gold:         #fb923c;
+  --orange-neon:  #fb923c;
+  --yellow:       #fcd34d;
+  --gold:         #e6c000;
+  --cyan:         #fb923c; /* proxy for consistency if used elsewhere */
+
+  /* Retained overrides for existing components mapping to new theme */
+  --purple:       #fb923c; 
+  --purple-light: #fcd34d;
+  --green:        #fcd34d; /* green now mapped to yellow */
+  --green-neon:   #fb923c; /* green neon now mapped to orange */
   --pink:         #fb923c;
 
   /* Typography mapping exactly as requested */
-  --font-hero:    'Playfair Display', serif;   /* was Bebas Neue — for CSI VEGAS title, big headings */
-  --font-ui:      'Playfair Display', serif;   /* was Inter — for body text, chat messages, descriptions */
-  --font-mono:    'Space Mono', monospace;     /* unchanged — keep for all data labels, agent tags, clue metadata */
-  --font-stamp:   'Playfair Display', serif;   /* was Oswald — for buttons, section headers, UI labels */
+  --font-hero:    'Playfair Display', serif;   /* 900 for CSI VEGAS title */
+  --font-ui:      'Playfair Display', serif;   /* 400 for body, chat */
+  --font-mono:    'Space Mono', monospace;     /* for all data labels, agent tags */
+  --font-stamp:   'Playfair Display', serif;   /* 700 for buttons, section headers */
 
   /* Radiuses mapping exactly as requested */
   --radius-sharp: 0px;    /* 0-2px (sharp) physical document/stamped form */
