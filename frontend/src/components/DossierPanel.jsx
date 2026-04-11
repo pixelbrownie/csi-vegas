@@ -16,13 +16,13 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
         background: 'var(--gold-gradient)',
         border: '1px solid #7d6b35',
         borderRadius: 'var(--radius-subtle)',
-        padding: '14px',
+        padding: '16px',
         marginBottom: '12px',
         position: 'relative',
         display: 'flex',
-        gap: '16px',
+        gap: '20px',
         alignItems: 'center',
-        boxShadow: '0 3px 15px rgba(0,0,0,0.4)',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
         cursor: canAccuse ? 'pointer' : 'default',
         overflow: 'hidden',
       }}
@@ -37,8 +37,8 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
               position: 'absolute',
               inset: 0,
               zIndex: 10,
-              background: 'rgba(0,0,0,0.6)',
-              backdropFilter: 'blur(4px)',
+              background: 'rgba(0,0,0,0.7)',
+              backdropFilter: 'blur(6px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -46,7 +46,7 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
             }}
           >
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 25px var(--gold-glow)' }}
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
                 e.stopPropagation()
@@ -56,14 +56,13 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
                 background: 'var(--gold-metallic)',
                 color: 'var(--black-pure)',
                 border: 'none',
-                padding: '12px 24px',
+                padding: '12px 28px',
                 borderRadius: 'var(--radius-pill)',
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '0.75rem',
-                fontWeight: 900,
-                letterSpacing: '0.1em',
+                fontWeight: 800,
+                letterSpacing: '0.05em',
                 cursor: 'pointer',
-                boxShadow: '0 0 20px var(--gold-glow)',
               }}
             >
               DELIVER VERDICT
@@ -74,38 +73,40 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
 
       {/* Character Image Frame */}
       <div style={{
-        width: '95px',
-        height: '95px',
+        width: '100px',
+        height: '100px',
         flexShrink: 0,
         border: '2px solid #7d6b35',
-        borderRadius: '4px',
+        borderRadius: '16px', // Rounded corners for image
         overflow: 'hidden',
         background: '#000',
+        boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
       }}>
         {image && <img src={image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontFamily: 'Impact, sans-serif',
-          fontSize: '1.2rem',
+          fontFamily: 'var(--font-title)',
+          fontSize: '0.9rem',
           color: 'var(--rust-text)',
-          letterSpacing: '0.01em',
+          letterSpacing: '0.05em',
           textTransform: 'uppercase',
+          fontWeight: 800,
           lineHeight: 1,
-          marginBottom: '8px',
-          opacity: 0.9,
+          marginBottom: '6px',
+          opacity: 0.8,
         }}>
           {title}
         </div>
         
         <div style={{
-          fontFamily: 'Impact, sans-serif',
-          fontSize: '1.15rem',
+          fontFamily: 'var(--font-title)',
+          fontSize: '1.25rem',
           color: 'var(--rust-text)',
+          fontWeight: 700,
           marginBottom: '4px',
-          lineHeight: 1,
-          textTransform: 'uppercase',
+          lineHeight: 1.1,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -114,13 +115,13 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
         </div>
 
         <div style={{
-          fontFamily: 'serif',
-          fontSize: '0.7rem',
+          fontFamily: 'var(--font-ui)',
+          fontSize: '0.75rem',
           color: 'var(--rust-text)',
           marginBottom: '10px',
-          fontStyle: 'italic',
-          lineHeight: 1.2,
-          opacity: 0.8,
+          fontWeight: 500,
+          lineHeight: 1.3,
+          opacity: 0.85,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           display: '-webkit-box',
@@ -131,11 +132,12 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
         </div>
 
         <div style={{
-          fontFamily: 'Impact, sans-serif',
-          fontSize: '0.7rem',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.65rem',
           color: 'var(--rust-text)',
-          lineHeight: 1.3,
-          textTransform: 'uppercase',
+          lineHeight: 1.4,
+          opacity: 0.9,
+          fontWeight: 600,
         }}>
           FILE: {fileId}<br />
           STATUS: <span style={{ textDecoration: 'underline' }}>{title === 'THE DECEASED' ? 'CLOSED_V' : 'UNDER SURVEILLANCE'}</span>
@@ -186,15 +188,18 @@ export default function DossierPanel({ case_, connectionError, onAccuse, gameSta
   return (
     <div style={{ padding: '24px', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{
-        fontFamily: 'Playfair Display, serif',
-        fontSize: '1rem',
+        fontFamily: 'var(--font-title)',
+        fontSize: '1.1rem',
         color: 'var(--white-pure)',
-        marginBottom: '20px',
-        paddingBottom: '10px',
+        fontWeight: 700,
+        marginBottom: '24px',
+        paddingBottom: '12px',
         borderBottom: '1px solid var(--border-gold)',
-        letterSpacing: '0.05em',
+        letterSpacing: '0.1em',
+        textAlign: 'center',
+        textTransform: 'uppercase',
       }}>
-        CASE DOSSIER
+        Case Dossier
       </div>
 
       <ProfileCard
@@ -211,42 +216,46 @@ export default function DossierPanel({ case_, connectionError, onAccuse, gameSta
         fontFamily: 'var(--font-mono)',
         fontSize: '0.55rem',
         color: 'var(--grey-muted)',
-        letterSpacing: '0.2em',
-        margin: '16px 0 12px',
+        letterSpacing: '0.25em',
+        margin: '20px 0 12px',
         textTransform: 'uppercase',
+        fontWeight: 700,
       }}>
         PRIMARY SUSPECTS
       </div>
 
-      <ProfileCard
-        title="SUSPECT ALPHA"
-        name={case_.suspect_a.name}
-        role={case_.suspect_a.motive}
-        fileId={`${case_.suspect_a.name.replace(/\s+/g, '')}.POI`}
-        image={`${import.meta.env.BASE_URL}assets/${suspectAImg}`}
-        onAccuse={onAccuse}
-        gameState={gameState}
-      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <ProfileCard
+          title="SUSPECT ALPHA"
+          name={case_.suspect_a.name}
+          role={case_.suspect_a.motive}
+          fileId={`${case_.suspect_a.name.replace(/\s+/g, '')}.POI`}
+          image={`${import.meta.env.BASE_URL}assets/${suspectAImg}`}
+          onAccuse={onAccuse}
+          gameState={gameState}
+        />
 
-      <ProfileCard
-        title="SUSPECT BETA"
-        name={case_.suspect_b.name}
-        role={case_.suspect_b.motive}
-        fileId={`${case_.suspect_b.name.replace(/\s+/g, '')}.POI`}
-        image={`${import.meta.env.BASE_URL}assets/${suspectBImg}`}
-        onAccuse={onAccuse}
-        gameState={gameState}
-      />
+        <ProfileCard
+          title="SUSPECT BETA"
+          name={case_.suspect_b.name}
+          role={case_.suspect_b.motive}
+          fileId={`${case_.suspect_b.name.replace(/\s+/g, '')}.POI`}
+          image={`${import.meta.env.BASE_URL}assets/${suspectBImg}`}
+          onAccuse={onAccuse}
+          gameState={gameState}
+        />
+      </div>
 
       <div style={{
         fontFamily: 'var(--font-mono)',
         fontSize: '0.6rem',
         color: 'var(--gold-metallic)',
-        letterSpacing: '0.15em',
-        marginTop: '20px',
+        letterSpacing: '0.1em',
+        marginTop: 'auto',
+        paddingTop: '32px',
         textAlign: 'center',
         textTransform: 'uppercase',
-        opacity: 0.8,
+        opacity: 0.6,
       }}>
         Hover To Vote or Accuse Your Suspect
       </div>

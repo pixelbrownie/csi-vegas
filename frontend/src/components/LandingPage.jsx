@@ -134,9 +134,9 @@ export default function LandingPage({ onStart }) {
         }
 
         .lp-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-title);
           font-size: clamp(3.5rem, 10vw, 8rem);
-          font-weight: 900;
+          font-weight: 800;
           line-height: 0.9;
           margin-bottom: 40px;
           letter-spacing: -0.01em;

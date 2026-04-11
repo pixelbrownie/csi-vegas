@@ -10,6 +10,7 @@ export default function ChatRoom({
   connectionError,
 }) {
   const [input, setInput] = useState('')
+  const [isInputHovered, setIsInputHovered] = useState(false)
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -37,28 +38,34 @@ export default function ChatRoom({
   const isInputDisabled = gameState !== 'playing' || !!connectionError
 
   return (
-    <div style={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      background: 'var(--black-rich)',
-    }}>
+    <div 
+      className="grainy-bg"
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        background: 'linear-gradient(180deg, var(--black-rich) 0%, #151515 100%)',
+        overflow: 'hidden',
+      }}
+    >
       {/* Header */}
       <div style={{
-        padding: '16px 24px',
+        padding: '20px 24px',
         borderBottom: '1px solid var(--border-gold)',
         display: 'flex',
         justifyContent: 'center',
-        background: 'rgba(0,0,0,0.2)',
+        background: 'rgba(0,0,0,0.3)',
+        zIndex: 1,
       }}>
         <div style={{
           fontFamily: 'var(--font-hero)',
-          fontSize: '1rem',
+          fontSize: '0.9rem',
           color: 'var(--gold-metallic)',
-          letterSpacing: '0.2em',
+          letterSpacing: '0.25em',
           textTransform: 'uppercase',
-          textShadow: '0 0 10px rgba(212, 175, 55, 0.3)',
+          fontWeight: 700,
+          textShadow: '0 0 15px rgba(212, 175, 55, 0.4)',
         }}>
           Investigation Log
         </div>
@@ -76,32 +83,20 @@ export default function ChatRoom({
           flexDirection: 'column',
           gap: '24px',
           position: 'relative',
+          zIndex: 1,
         }}
       >
-        {/* Connection Line */}
-        <div style={{
-          position: 'absolute',
-          left: '34px',
-          top: 0,
-          bottom: 0,
-          width: '1px',
-          background: 'linear-gradient(to bottom, transparent, var(--border-gold), transparent)',
-          opacity: 0.1,
-          pointerEvents: 'none',
-        }} />
-
         <AnimatePresence initial={false}>
           {history.map((msg, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 width: '100%',
-                zIndex: 1,
               }}
             >
               <div style={{
@@ -109,32 +104,31 @@ export default function ChatRoom({
                 fontSize: '0.55rem',
                 color: 'var(--gold-metallic)',
                 marginBottom: '8px',
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                opacity: 0.8,
+                opacity: 0.7,
+                marginLeft: msg.role === 'user' ? 0 : '16px',
+                marginRight: msg.role === 'user' ? '16px' : 0,
               }}>
                 {msg.role === 'user' ? 'DETECTIVE' : (msg.agent || 'SYSTEM')}
               </div>
               
               <div style={{
                 maxWidth: '85%',
-                padding: '16px',
+                padding: '16px 20px',
                 background: msg.role === 'user' 
                   ? 'var(--gold-gradient)' 
-                  : 'rgba(255, 255, 255, 0.02)',
+                  : 'rgba(255, 255, 255, 0.03)',
                 color: msg.role === 'user' ? 'var(--black-pure)' : 'var(--white-soft)',
-                borderRadius: msg.role === 'user' 
-                  ? '12px 12px 0 12px' 
-                  : '12px 12px 12px 0',
-                border: msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.2)',
-                backdropFilter: msg.role === 'user' ? 'none' : 'blur(10px)',
+                borderRadius: '24px', // More rounded as requested
+                border: msg.role === 'user' ? 'none' : '1px solid rgba(212, 175, 55, 0.15)',
+                backdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
                 fontFamily: 'var(--font-ui)',
-                fontSize: '0.8rem',
-                lineHeight: 1.6,
+                fontSize: '0.82rem',
+                lineHeight: 1.5,
                 boxShadow: msg.role === 'user' 
-                  ? '0 6px 20px rgba(212, 175, 55, 0.2)' 
-                  : 'none',
-                position: 'relative',
+                  ? '0 8px 25px rgba(212, 175, 55, 0.2)' 
+                  : '0 4px 15px rgba(0,0,0,0.2)',
               }}>
                 {msg.content}
               </div>
@@ -148,28 +142,28 @@ export default function ChatRoom({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                padding: '0 4px',
+                gap: '12px',
+                padding: '0 12px',
               }}
             >
               <div className="shimmer" style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.6rem',
+                fontFamily: 'var(--font-ui)',
+                fontSize: '0.7rem',
                 color: 'var(--gold-metallic)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
+                fontWeight: 600,
+                letterSpacing: '0.05em',
               }}>
-                Analyzing Evidence...
+                Analyzing Evidence
               </div>
               <motion.div
-                animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.7, 0.3] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
+                animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.8, 0.3] }}
+                transition={{ repeat: Infinity, duration: 2 }}
                 style={{
                   width: '6px',
                   height: '6px',
                   background: 'var(--gold-metallic)',
                   borderRadius: '50%',
-                  boxShadow: '0 0 10px var(--gold-metallic)',
+                  boxShadow: '0 0 12px var(--gold-metallic)',
                 }}
               />
             </motion.div>
@@ -177,27 +171,35 @@ export default function ChatRoom({
         </AnimatePresence>
       </div>
 
-      {/* Input area */}
+      {/* Input area - No top line, pill shaped */}
       <div style={{
-        padding: '24px',
-        borderTop: '1px solid var(--border-gold)',
-        background: 'rgba(0,0,0,0.4)',
+        padding: '24px 32px 32px',
+        background: 'transparent',
+        zIndex: 2,
       }}>
-        <div style={{ 
-          position: 'relative', 
-          display: 'flex', 
-          gap: '12px',
-          background: 'rgba(255,255,255,0.02)',
-          padding: '8px',
-          borderRadius: '16px',
-          border: '1px solid rgba(212, 175, 55, 0.1)',
-          boxShadow: 'inset 0 4px 15px rgba(0,0,0,0.5)',
-        }}>
+        <div 
+          onMouseEnter={() => setIsInputHovered(true)}
+          onMouseLeave={() => setIsInputHovered(false)}
+          style={{ 
+            position: 'relative', 
+            display: 'flex', 
+            gap: '12px',
+            background: 'rgba(255,255,255,0.03)',
+            padding: '8px 12px 8px 24px',
+            borderRadius: 'var(--radius-pill)', // Pill shaped
+            border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
+            boxShadow: isInputHovered 
+              ? '0 0 20px rgba(212, 175, 55, 0.2), inset 0 2px 10px rgba(0,0,0,0.5)' 
+              : 'inset 0 2px 10px rgba(0,0,0,0.5)',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            alignItems: 'center',
+          }}
+        >
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={isInputDisabled ? 'INVESTIGATION SUSPENDED' : 'INTERROGATE SUSPECTS...'}
+            placeholder={isInputDisabled ? 'INVESTIGATION SUSPENDED' : 'SEND MESSAGE'}
             disabled={isInputDisabled}
             onKeyDown={handleKeyDown}
             style={{
@@ -207,7 +209,7 @@ export default function ChatRoom({
               background: 'transparent',
               border: 'none',
               color: 'var(--white-pure)',
-              padding: '10px 12px',
+              padding: '12px 0',
               fontFamily: 'var(--font-ui)',
               fontSize: '0.85rem',
               resize: 'none',
@@ -216,27 +218,27 @@ export default function ChatRoom({
             }}
           />
           <motion.button
-            whileHover={{ scale: 1.05, boxShadow: '0 0 15px var(--gold-glow)' }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.1, backgroundColor: 'var(--gold-metallic)' }}
+            whileTap={{ scale: 0.9 }}
             onClick={handleSend}
             disabled={isInputDisabled || !input.trim()}
             style={{
-              width: '44px',
-              height: '44px',
-              background: 'var(--gold-metallic)',
-              border: 'none',
-              borderRadius: '12px',
+              width: '48px',
+              height: '48px',
+              background: '#FFD700', // Vibrant Yellow
+              border: '1px solid rgba(255, 215, 0, 0.3)',
+              borderRadius: '50%', // Circular button
               color: 'var(--black-pure)',
-              fontSize: '1rem',
-              cursor: (isInputDisabled || !input.trim()) ? 'default' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              opacity: (isInputDisabled || !input.trim()) ? 0.4 : 1,
-              transition: 'opacity 0.3s ease',
+              cursor: (isInputDisabled || !input.trim()) ? 'default' : 'pointer',
+              opacity: (isInputDisabled || !input.trim()) ? 0.3 : 1,
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+              flexShrink: 0,
             }}
           >
-            <span style={{ transform: 'rotate(-45deg)', marginLeft: '4px', marginTop: '-2px' }}>➤</span>
+            <span style={{ fontSize: '1.2rem', marginLeft: '2px' }}>➤</span>
           </motion.button>
         </div>
       </div>

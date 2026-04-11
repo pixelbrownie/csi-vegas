@@ -182,15 +182,18 @@ Run FastAPI with uvicorn (`--host 0.0.0.0` and the port your host expects).
 
 ---
 
-## Tech Stack
+## 🛠️ Technical Implementation Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18, Vite, Framer Motion |
-| Backend | FastAPI, Python 3.9+ |
-| AI / LLM | Groq (OpenAI-compatible chat) when `GROQ_API_KEY` is set; offline templates otherwise |
-| Styling | CSS custom properties, Google Fonts |
-| Deployment | GitHub Pages workflow + any FastAPI host |
+| Category | Implemented Technology | Implementation Location | Description |
+| :--- | :--- | :--- | :--- |
+| **LLMs (Free Tier)** | **Groq (Llama 3.3)** | [`backend/llm_client.py`](./backend/llm_client.py) | High-speed inference for Noir dialogue and reasoning. |
+| **Frameworks** | **LangChain** | [`backend/agents.py`](./backend/agents.py) | Structured messaging for multi-turn investigations. |
+| **Embeddings** | **Sentence-Transformers** | [`backend/memory.py`](./backend/memory.py) | Semantic mapping of evidence and alibis. |
+| **Vector Databases** | **ChromaDB** | [`backend/memory.py`](./backend/memory.py) | Efficient lookup of long-term "digital forensic" records. |
+| **RAG Systems** | **Vector Store Retrievers** | [`backend/agents.py`](./backend/agents.py) | Cross-referencing current questions with past turns. |
+| **Agent Frameworks** | **Multi-Agent Orchestrator** | [`backend/orchestrator.py`](./backend/orchestrator.py) | Intelligent classification and routing of player intent. |
+| **Backend** | **Python (FastAPI)** | [`backend/main.py`](./backend/main.py) | REST API endpoints for secure frontend-to-AI communication. |
+| **Frontend** | **React + CSS Tokens** | [`frontend/src/`](./frontend/src/) | Custom "Sin City" design system with rounded manila folders. |
 
 ---
 
