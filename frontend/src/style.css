@@ -26,6 +26,7 @@
   --gold-metallic: #D4AF37;
   --gold-pale: #F9F6EE;
   --crimson-accent: #8B0000;
+  --success-green: #00A36C;
   
   /* Fallback / Compatibility */
   --black: var(--black-pure);

@@ -11,6 +11,7 @@ import os
 from scenario_generator import generate_case
 from orchestrator import orchestrate
 from llm_client import LLMUnavailableError, llm_health_status
+from memory import clear_memory, store_memory
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
@@ -73,14 +74,25 @@ def wake_head():
 def _new_case_payload():
     """Shared case generation used by POST (and safe wake/no-op methods)."""
     case = generate_case()
+    
+    # RAG: Clear memory for a new investigation
+    clear_memory()
+    
+    case_file = (
+        f"A body was discovered at the Bellagio. "
+        f"Victim: {case['victim']['name']}, "
+        f"a {case['victim']['role']}. "
+        f"Location: {case.get('location', 'High-stakes Room')}. "
+        "Investigation begins."
+    )
+    
+    # RAG: Store initial case facts
+    store_memory(case_file, "narrator")
+    store_memory(f"Victim: {case['victim']['name']}, Role: {case['victim']['role']}", "evidence")
+    
     return {
         "case": case,
-        "case_file": (
-            f"A body was discovered at the Bellagio. "
-            f"Victim: {case['victim']['name']}, "
-            f"a {case['victim']['role']}. "
-            "Investigation begins."
-        ),
+        "case_file": case_file,
     }
 
 

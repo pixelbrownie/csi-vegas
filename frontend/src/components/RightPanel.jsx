@@ -14,16 +14,16 @@ function CaseResult({ gameState, case_, onNewCase }) {
       style={{
         padding: '24px',
         marginBottom: '20px',
-        background: isSolved ? 'rgba(212,175,55,0.1)' : 'rgba(139,0,0,0.1)',
-        border: `2px solid ${isSolved ? 'var(--gold-metallic)' : 'var(--crimson-accent)'}`,
+        background: isSolved ? 'rgba(0,163,108,0.1)' : 'rgba(139,0,0,0.1)',
+        border: `2px solid ${isSolved ? 'var(--success-green)' : 'var(--crimson-accent)'}`,
         borderRadius: 'var(--radius-subtle)',
         textAlign: 'center',
-        boxShadow: `0 0 30px ${isSolved ? 'rgba(212,175,55,0.2)' : 'rgba(139,0,0,0.2)'}`,
+        boxShadow: `0 0 30px ${isSolved ? 'rgba(0,163,108,0.2)' : 'rgba(139,0,0,0.2)'}`,
       }}
     >
       <h3 style={{ 
         fontFamily: 'var(--font-hero)', 
-        color: isSolved ? 'var(--gold-metallic)' : 'var(--crimson-accent)', 
+        color: isSolved ? 'var(--success-green)' : 'var(--crimson-accent)', 
         marginBottom: '10px',
         letterSpacing: '0.1em'
       }}>
@@ -47,7 +47,7 @@ function CaseResult({ gameState, case_, onNewCase }) {
           width: '100%', 
           padding: '12px', 
           fontSize: '0.75rem',
-          background: isSolved ? 'var(--gold-metallic)' : 'var(--crimson-accent)',
+          background: isSolved ? 'var(--success-green)' : 'var(--crimson-accent)',
           color: isSolved ? 'var(--black-pure)' : 'white'
         }} 
         onClick={onNewCase}
