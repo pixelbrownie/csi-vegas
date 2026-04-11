@@ -1,10 +1,16 @@
 # agents.py
 import logging
 import re
+import json
+from pydantic import BaseModel, Field
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
 from memory import retrieve_relevant
 
 logger = logging.getLogger(__name__)
+
+class AuditResult(BaseModel):
+    contradiction: bool
+    explanation: str
 
 def parse_agent_response(response_text: str):
     """
@@ -34,7 +40,7 @@ def _witness_scripted(question: str, case: dict) -> str:
         f"they had more reason than me: {motive_phrase}."
     )
 
-def witness_agent(question: str, case: dict) -> dict:
+def witness_agent(question: str, case: dict, rethink_instruction: str = "") -> dict:
     suspect = case["suspect_a"]
     culprit = case["culprit"]
     weapon = case["murder_weapon"]
@@ -43,6 +49,10 @@ def witness_agent(question: str, case: dict) -> dict:
 
     # RAG: Retrieve relevant past evidence
     past_memory = retrieve_relevant(f"What do we know about {suspect['name']} and {victim['name']} in relation to {question}?")
+
+    rethink_block = ""
+    if rethink_instruction:
+        rethink_block = f"\nCRITICAL SELF-CORRECTION: Your previous draft was flagged for the following inconsistency: {rethink_instruction}. Adjust your response to be more subtle or defensive without admitting the truth directly."
 
     prompt = f"""You are {suspect['name']}, a witness being interrogated in a Las Vegas murder case.
 
@@ -56,6 +66,7 @@ CONFIDENTIAL TRUTH (never reveal directly):
 
 RELEVANT PAST EVIDENCE / TURN HISTORY:
 {past_memory if past_memory else "None on record yet."}
+{rethink_block}
 
 INSTRUCTIONS:
 1. First, think about the detective's query and your alibi/guilt in <thinking> tags. 
@@ -109,25 +120,23 @@ Your response (Starting with <thinking>):"""
     except LLMUnavailableError:
         return {"response": "System offline. Fallback diagnostics active.", "reasoning": "Groq error."}
 
-def auditor_agent(question: str, response: str, case: dict) -> dict:
+def auditor_agent(question: str, response: str, case: dict) -> AuditResult:
     """
-    Silent agent that checks if the witness just lied by comparing response to Case Truth + Memory.
+    Checks if the witness just lied by comparing response to Case Truth + Memory.
+    Returns a structured AuditResult.
     """
     victim = case["victim"]
     suspect_a = case["suspect_a"]
-    suspect_b = case["suspect_b"]
     truth = {
         "culprit": case["culprit"],
         "weapon": case["murder_weapon"],
         "suspect_a_alibi": suspect_a["alibi"],
-        "suspect_b_alibi": suspect_b["alibi"],
         "key_clue": case["key_clue"]
     }
     
-    # RAG: Check past statements
     past_statements = retrieve_relevant(f"What has been said about {question} or alibis previously?")
 
-    prompt = f"""You are a Forensic Auditor. Your task is to detect LIES and CONTRADICTIONS.
+    prompt = f"""You are a Forensic Auditor. Detect LIES and CONTRADICTIONS.
 
 GROUND TRUTH:
 {truth}
@@ -141,23 +150,20 @@ Witness responded: "{response}"
 
 TASK:
 - Does the witness response contradict the GROUND TRUTH or PAST STATEMENTS? 
-- If YES, explain why in 1 sharp sentence.
-- Format: Reply with EXACTLY a JSON-style object: {{"contradiction": true/false, "explanation": "..."}}"""
+- If YES, explain exactly why in 1 sharp sentence.
+- Reply with ONLY a JSON object: {{"contradiction": true/false, "explanation": "..."}}"""
 
     if not is_live_llm_enabled():
-        return {"contradiction": False, "explanation": ""}
+        return AuditResult(contradiction=False, explanation="")
     
     try:
-        res = invoke_llm(prompt, "auditor_agent")
-        # Crude sanitization for JSON
-        is_cont = "true" in res.lower()
-        expl = re.search(r'"explanation":\s*"(.*?)"', res)
-        return {
-            "contradiction": is_cont,
-            "explanation": expl.group(1) if expl else "Discrepancy detected in timeline." if is_cont else ""
-        }
-    except Exception:
-        return {"contradiction": False, "explanation": ""}
+        raw = invoke_llm(prompt, "auditor_agent")
+        match = re.search(r"(\{.*\})", raw, re.DOTALL)
+        json_str = match.group(1) if match else raw
+        return AuditResult(**json.loads(json_str))
+    except Exception as e:
+        logger.warning(f"Auditor failed: {e}")
+        return AuditResult(contradiction=False, explanation="")
 
 def narrator_agent(event: str, case_file: str) -> str:
     prompt = f"""You are the noir narrator of a Vegas murder mystery.

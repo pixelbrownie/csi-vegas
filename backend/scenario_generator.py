@@ -5,10 +5,39 @@ import json
 import random
 import re
 import logging
+from typing import List, Optional
+from pydantic import BaseModel, Field, field_validator
 
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
 
 logger = logging.getLogger(__name__)
+
+class Suspect(BaseModel):
+    name: str
+    motive: str
+    alibi: str
+
+class Victim(BaseModel):
+    name: str
+    role: str
+
+class Case(BaseModel):
+    victim: Victim
+    suspect_a: Suspect
+    suspect_b: Suspect
+    culprit: str
+    murder_weapon: str
+    key_clue: str
+
+    @field_validator("culprit")
+    @classmethod
+    def culprit_must_match_suspects(cls, v: str, info):
+        data = info.data
+        if 'suspect_a' in data and 'suspect_b' in data:
+            names = [data['suspect_a'].name, data['suspect_b'].name]
+            if v not in names:
+                raise ValueError(f"culprit '{v}' must match either suspect_a.name or suspect_b.name: {names}")
+        return v
 
 FALLBACK_CASES = [
     {
@@ -79,42 +108,38 @@ FALLBACK_CASES = [
 
 
 def _generate_case_llm() -> dict:
-    prompt = """Generate a NEW Las Vegas murder mystery scenario as a single JSON object with exactly these keys:
-- victim: object with keys "name" (string) and "role" (string, e.g. "casino dealer")
-- suspect_a: object with keys "name", "motive", "alibi"
-- suspect_b: object with keys "name", "motive", "alibi"
-- culprit: string, MUST exactly equal suspect_a.name OR suspect_b.name (same spelling)
-- murder_weapon: string, something Vegas-themed
-- key_clue: string, one specific hidden evidence item the detective could find
+    prompt = """Generate a NEW Las Vegas murder mystery scenario as a single JSON object.
+Required keys:
+- victim: { name: str, role: str }
+- suspect_a: { name: str, motive: str, alibi: str }
+- suspect_b: { name: str, motive: str, alibi: str }
+- culprit: string (MUST exactly match name of suspect_a or suspect_b)
+- murder_weapon: string (Vegas themed)
+- key_clue: string (specific evidence item)
 
-Rules: Invent fresh names and motives every time — do not reuse famous examples. Keep alibis concrete.
-Return ONLY raw JSON. No markdown fences, no commentary before or after the JSON."""
+Rules:
+1. Invent fresh, noir-style names.
+2. The alibis should be plausible but one should have a subtle hole.
+3. Return ONLY raw JSON. No markdown fences.
+"""
 
-    required_keys = ["victim", "suspect_a", "suspect_b", "culprit", "murder_weapon", "key_clue"]
     last_error = None
-
     for attempt in range(3):
         try:
             raw = invoke_llm(prompt, f"generate_case attempt={attempt + 1}")
-            match = re.search(r"\{.*\}", raw, re.DOTALL)
-            if not match:
-                raise ValueError("No JSON object found in LLM response")
-
-            case = json.loads(match.group())
-            for key in required_keys:
-                if key not in case:
-                    raise ValueError(f"Missing key in generated case: {key}")
-            culprit = case["culprit"]
-            names = [case["suspect_a"]["name"], case["suspect_b"]["name"]]
-            if culprit not in names:
-                raise ValueError(f"culprit {culprit!r} must match suspect_a.name or suspect_b.name: {names}")
-            return case
-        except LLMUnavailableError:
-            raise
+            # Try to find JSON block
+            match = re.search(r"(\{.*\})", raw, re.DOTALL)
+            json_str = match.group(1) if match else raw
+            
+            case_data = json.loads(json_str)
+            # Pydantic validation
+            validated_case = Case(**case_data)
+            return validated_case.model_dump()
         except Exception as exc:
+            logger.warning(f"Attempt {attempt + 1} failed: {exc}")
             last_error = exc
 
-    raise LLMUnavailableError(f"generate_case failed after retries: {last_error}")
+    raise LLMUnavailableError(f"generate_case failed after 3 attempts: {last_error}")
 
 
 def generate_case():
@@ -125,13 +150,14 @@ def generate_case():
     if is_live_llm_enabled():
         try:
             return _generate_case_llm()
-        except LLMUnavailableError as e:
+        except Exception as e:
             logger.warning("Groq case generation failed, using scripted case: %s", e)
             return random.choice(FALLBACK_CASES)
     return random.choice(FALLBACK_CASES)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     print("Generating case...\n")
     case = generate_case()
     print(json.dumps(case, indent=2))

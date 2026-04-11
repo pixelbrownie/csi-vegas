@@ -1,5 +1,5 @@
 # orchestrator.py
-from agents import witness_agent, analyst_agent, narrator_agent, auditor_agent
+from agents import witness_agent, analyst_agent, narrator_agent, auditor_agent, AuditResult
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
 from memory import store_memory
 
@@ -26,12 +26,13 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) 
     intent = classify_intent(user_input)
     updated_case_file = case_file
     reasoning = ""
-    audit_results = {"contradiction": False, "explanation": ""}
+    audit_results: AuditResult = AuditResult(contradiction=False, explanation="")
 
     # RAG: Store query
     store_memory(f"Detective: {user_input}", "detective")
 
     if intent == "witness":
+        # PASS 1: Generate initial response
         agent_res = witness_agent(user_input, case)
         response = agent_res["response"]
         reasoning = agent_res["reasoning"]
@@ -39,6 +40,13 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) 
         
         # AUDIT: Run the forensic auditor
         audit_results = auditor_agent(user_input, response, case)
+        
+        # PASS 2: Agentic Confrontation Loop
+        if audit_results.contradiction:
+            # Witness is lying or caught in a contradiction; give them a chance to "re-think"
+            rethink_res = witness_agent(user_input, case, rethink_instruction=audit_results.explanation)
+            response = rethink_res["response"]
+            reasoning = f"[CONTRADICTION DETECTED] {audit_results.explanation}\n\n[RETHINKING] {rethink_res['reasoning']}"
         
         store_memory(f"Witness Response: {response}", "witness")
         narrator_update = narrator_agent(f"Interrogated witness. Response: '{response[:80]}...'", case_file)
@@ -65,6 +73,6 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) 
         "agent": agent_used,
         "response": response,
         "reasoning": reasoning,
-        "audit": audit_results,
+        "audit": audit_results.model_dump(),
         "updated_case_file": updated_case_file,
     }
