@@ -1,9 +1,24 @@
-// RightPanel.jsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SecretReveal from './SecretReveal.jsx'
 
 function CaseFile({ text }) {
+  const [displayedText, setDisplayedText] = useState('')
+  
+  useEffect(() => {
+    setDisplayedText('')
+    if (!text) return
+    
+    let i = 0
+    const interval = setInterval(() => {
+      setDisplayedText(text.slice(0, i + 1))
+      i++
+      if (i >= text.length) clearInterval(interval)
+    }, 30) // 30ms per character
+    
+    return () => clearInterval(interval)
+  }, [text])
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -64,15 +79,19 @@ function CaseFile({ text }) {
           minHeight: '140px',
         }}>
           <div style={{
-            fontFamily: 'serif',
-            fontSize: '1rem',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.85rem',
             color: '#3d251a',
-            lineHeight: 1.7,
-            fontStyle: 'italic',
+            lineHeight: 1.6,
             whiteSpace: 'pre-wrap',
             fontWeight: 500,
           }}>
-            {text}
+            {displayedText}
+            <motion.span
+              animate={{ opacity: [1, 0] }}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+              style={{ borderRight: '2px solid #3d251a', marginLeft: '2px' }}
+            />
           </div>
         </div>
       </div>
