@@ -13,7 +13,7 @@ function CaseFile({ text }) {
       style={{
         background: 'linear-gradient(140deg, #d2bc82 0%, #b89050 100%)',
         border: '1px solid #8a6c3a',
-        borderRadius: '3px',
+        borderRadius: 'var(--radius-sharp)',
         padding: '16px',
         position: 'relative',
         boxShadow: '3px 4px 14px rgba(0,0,0,0.6)',
@@ -42,6 +42,7 @@ function CaseFile({ text }) {
         style={{
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
+          fontStyle: 'normal',
           fontSize: '0.9rem',
           color: '#2a1808',
           display: 'flex',
@@ -63,6 +64,8 @@ function CaseFile({ text }) {
           transition={{ duration: 0.35 }}
           style={{
             fontFamily: 'var(--font-ui)',
+            fontWeight: 400,
+            fontStyle: 'italic',
             fontSize: '0.76rem',
             color: '#2a1808',
             lineHeight: 1.75,
@@ -95,7 +98,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
         style={{
           background: '#081a08',
           border: '2px solid var(--green)',
-          borderRadius: '24px',
+          borderRadius: 'var(--radius-subtle)',
           padding: '16px',
           marginBottom: '10px',
           minWidth: 0,
@@ -105,6 +108,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
+            fontStyle: 'normal',
             fontSize: '1rem',
             color: 'var(--green)',
             marginBottom: '8px',
@@ -145,10 +149,11 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             color: 'var(--green)',
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
+            fontStyle: 'normal',
             fontSize: '0.72rem',
             letterSpacing: '0.12em',
             cursor: 'pointer',
-            borderRadius: '3px',
+            borderRadius: 'var(--radius-pill)',
           }}
         >
           PLAY AGAIN
@@ -164,7 +169,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
         style={{
           background: '#1a0808',
           border: '2px solid var(--orange)',
-          borderRadius: '24px',
+          borderRadius: 'var(--radius-subtle)',
           padding: '16px',
           marginBottom: '10px',
           minWidth: 0,
@@ -174,6 +179,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
           style={{
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
+            fontStyle: 'normal',
             fontSize: '1rem',
             color: 'var(--orange)',
             marginBottom: '8px',
@@ -208,10 +214,11 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             color: 'var(--orange)',
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
+            fontStyle: 'normal',
             fontSize: '0.72rem',
             letterSpacing: '0.12em',
             cursor: 'pointer',
-            borderRadius: '3px',
+            borderRadius: 'var(--radius-pill)',
           }}
         >
           PLAY AGAIN
@@ -224,7 +231,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
       style={{
         background: 'var(--card)',
         border: '1px solid var(--border-2)',
-        borderRadius: '16px',
+        borderRadius: 'var(--radius-subtle)',
         padding: '14px',
         marginBottom: '10px',
         minWidth: 0,
@@ -234,6 +241,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
         style={{
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
+          fontStyle: 'normal',
           fontSize: '0.9rem',
           color: 'var(--white)',
           display: 'flex',
@@ -258,10 +266,11 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
             color: 'var(--grey)',
             fontFamily: 'var(--font-stamp)',
             fontWeight: 700,
+            fontStyle: 'normal',
             fontSize: '0.72rem',
             letterSpacing: '0.1em',
             cursor: 'pointer',
-                borderRadius: '10px',
+            borderRadius: 'var(--radius-pill)',
             transition: 'all 0.2s',
           }}
         >
@@ -285,7 +294,7 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
                 color: selected ? 'var(--white)' : 'var(--grey)',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.78rem',
-                borderRadius: '3px',
+                borderRadius: 'var(--radius-subtle)',
                 marginBottom: '8px',
                 cursor: 'pointer',
                 outline: 'none',
@@ -309,10 +318,11 @@ function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
                 color: selected ? 'var(--black)' : 'var(--grey)',
                 fontFamily: 'var(--font-stamp)',
                 fontWeight: 700,
+                fontStyle: 'normal',
                 fontSize: '0.82rem',
                 letterSpacing: '0.14em',
                 cursor: selected ? 'pointer' : 'default',
-                borderRadius: '10px',
+                borderRadius: 'var(--radius-pill)',
                 transition: 'background 0.2s',
               }}
             >
@@ -338,7 +348,7 @@ function HowToPlay({ victimName }) {
       style={{
         background: 'var(--black)',
         border: '1px solid var(--border)',
-        borderRadius: '16px',
+        borderRadius: 'var(--radius-subtle)',
         padding: '12px',
         minWidth: 0,
       }}
@@ -347,6 +357,7 @@ function HowToPlay({ victimName }) {
         style={{
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
+          fontStyle: 'normal',
           fontSize: '0.84rem',
           color: 'var(--gold)',
           display: 'flex',

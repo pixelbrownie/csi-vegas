@@ -1,34 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Oswald:wght@600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --black:        #0a0a0a;
+  /* Colors */
+  --black:        #050805;
   --black-2:      #111111;
   --black-3:      #181818;
   --card:         #141414;
   --card-2:       #1c1c1c;
   --border:       #2a2a2a;
   --border-2:     #383838;
-  --purple:       #7c3f7c;
-  --purple-dim:   #4a2a4a;
-  --purple-light: #c070c0;
-  --orange:       #e8560a;
-  --orange-dark:  #b03d00;
-  --yellow:       #f5c800;
   --white:        #ffffff;
   --white-dim:    #cccccc;
   --grey:         #888888;
   --grey-dim:     #3a3a3a;
-  --pink:         #a0405a;
-  --cyan:         #00F2FF;
-  --green:        #22c55e;
-  --gold:         #D4AF37;
+  --green-neon:   #bef264;
+  --orange-neon:  #fb923c;
+  
+  /* Retained overrides for existing components so they map to sleek colors */
+  --purple:       #fb923c; /* fallback proxy to orange */
+  --purple-light: #fb923c;
+  --yellow:       #fb923c; /* fallback proxy to orange */
+  --green:        #bef264;
+  --orange:       #fb923c;
+  --gold:         #fb923c;
+  --pink:         #fb923c;
 
-  --font-hero:    'Bebas Neue', sans-serif;
-  --font-ui:      'Inter', sans-serif;
-  --font-mono:    'Space Mono', monospace;
-  --font-stamp:   'Oswald', sans-serif;
+  /* Typography mapping exactly as requested */
+  --font-hero:    'Playfair Display', serif;   /* was Bebas Neue — for CSI VEGAS title, big headings */
+  --font-ui:      'Playfair Display', serif;   /* was Inter — for body text, chat messages, descriptions */
+  --font-mono:    'Space Mono', monospace;     /* unchanged — keep for all data labels, agent tags, clue metadata */
+  --font-stamp:   'Playfair Display', serif;   /* was Oswald — for buttons, section headers, UI labels */
+
+  /* Radiuses mapping exactly as requested */
+  --radius-sharp: 0px;    /* 0-2px (sharp) physical document/stamped form */
+  --radius-subtle: 4px;   /* 4px (subtle) chat bubbles, dossier cards */
+  --radius-pill: 999px;   /* 999px (full pill) action buttons */
 }
 
 html { scroll-behavior: smooth; }

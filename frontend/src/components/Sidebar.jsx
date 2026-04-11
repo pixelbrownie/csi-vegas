@@ -1,6 +1,7 @@
 // Sidebar.jsx — timer + location + new case only
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import FramerEyes from './framer/FramerEyes.jsx'
 
 const TOTAL = 30 * 60
 
@@ -42,6 +43,8 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       }}>
         <div style={{
           fontFamily: 'var(--font-hero)',
+          fontWeight: 900,
+          fontStyle: 'normal',
           fontSize: '1.2rem',
           letterSpacing: '0.06em',
           color: 'var(--white)',
@@ -51,6 +54,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         </div>
         <div style={{
           fontFamily: 'var(--font-mono)',
+          fontWeight: 400,
           fontSize: '0.46rem',
           color: 'var(--grey)',
           letterSpacing: '0.2em',
@@ -64,6 +68,8 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       {/* Timer label */}
       <div style={{
         fontFamily: 'var(--font-stamp)',
+        fontWeight: 700,
+        fontStyle: 'normal',
         fontSize: '0.5rem',
         color: 'var(--grey)',
         letterSpacing: '0.14em',
@@ -90,7 +96,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
               initial={{ scale: 0.9, opacity: 0.7 }}
               animate={{ scale: 1, opacity: 1 }}
               style={{
-                fontFamily: 'var(--font-stamp)', fontSize: '1rem', fontWeight: 700,
+                fontFamily: 'var(--font-stamp)', fontSize: '1rem', fontWeight: 700, fontStyle: 'normal',
                 color: timerColor, filter: `drop-shadow(0 0 6px ${timerColor})`,
               }}
             >{mins}:{secs}</motion.span>
@@ -105,6 +111,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         fontFamily: 'var(--font-stamp)',
         fontSize: '0.52rem',
         fontWeight: 700,
+        fontStyle: 'normal',
         color: 'var(--grey)',
         letterSpacing: '0.14em',
         marginBottom: '6px',
@@ -114,9 +121,10 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         width: '100%',
         background: '#0d0f12',
         border: '1px solid var(--border)',
-        borderRadius: '3px',
+        borderRadius: 'var(--radius-sharp)',
         padding: '8px',
         fontFamily: 'var(--font-mono)',
+        fontWeight: 400,
         fontSize: '0.58rem',
         color: 'var(--white-dim)',
         textAlign: 'center',
@@ -137,10 +145,11 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
           color: 'var(--black)',
           fontFamily: 'var(--font-stamp)',
           fontWeight: 700,
+          fontStyle: 'normal',
           fontSize: '0.65rem',
           letterSpacing: '0.14em',
           cursor: 'pointer',
-          borderRadius: '999px',
+          borderRadius: 'var(--radius-pill)',
           transition: 'background 0.2s',
           marginBottom: '14px',
         }}
@@ -151,6 +160,7 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       {/* Tip */}
       <div style={{
         fontFamily: 'var(--font-mono)',
+        fontWeight: 400,
         fontSize: '0.48rem',
         color: 'var(--grey-dim)',
         lineHeight: 1.5,
@@ -161,6 +171,10 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
         Hint keys: "ask"
         <br />
         "found" "analyze"
+      </div>
+
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingTop: '20px' }}>
+        <FramerEyes />
       </div>
     </div>
   )
