@@ -153,7 +153,12 @@ export default function GamePage({
             minHeight: 0,
           }}
         >
-          <DossierPanel case_={case_} connectionError={connectionError} />
+          <DossierPanel 
+            case_={case_} 
+            connectionError={connectionError} 
+            onAccuse={onAccuse}
+            gameState={gameState}
+          />
         </motion.div>
 
         {/* Col 3: Chat */}

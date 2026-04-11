@@ -2,6 +2,62 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SecretReveal from './SecretReveal.jsx'
 
+function CaseResult({ gameState, case_, onNewCase }) {
+  const isSolved = gameState === 'solved'
+  const isFailed = gameState === 'failed'
+  if (!isSolved && !isFailed) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      style={{
+        padding: '24px',
+        marginBottom: '20px',
+        background: isSolved ? 'rgba(212,175,55,0.1)' : 'rgba(139,0,0,0.1)',
+        border: `2px solid ${isSolved ? 'var(--gold-metallic)' : 'var(--crimson-accent)'}`,
+        borderRadius: 'var(--radius-subtle)',
+        textAlign: 'center',
+        boxShadow: `0 0 30px ${isSolved ? 'rgba(212,175,55,0.2)' : 'rgba(139,0,0,0.2)'}`,
+      }}
+    >
+      <h3 style={{ 
+        fontFamily: 'var(--font-hero)', 
+        color: isSolved ? 'var(--gold-metallic)' : 'var(--crimson-accent)', 
+        marginBottom: '10px',
+        letterSpacing: '0.1em'
+      }}>
+        {isSolved ? 'CASE RESOLVED' : 'CASE COMPROMISED'}
+      </h3>
+      <p style={{ 
+        fontFamily: 'var(--font-ui)', 
+        fontSize: '0.85rem', 
+        color: 'var(--white-pure)', 
+        marginBottom: '20px',
+        opacity: 0.9
+      }}>
+        {isSolved 
+          ? `Exceptional work. The culprit was indeed ${case_.culprit}.`
+          : `A false accusation was made. The suspect escaped into the night.`
+        }
+      </p>
+      <button 
+        className="lp-btn" 
+        style={{ 
+          width: '100%', 
+          padding: '12px', 
+          fontSize: '0.75rem',
+          background: isSolved ? 'var(--gold-metallic)' : 'var(--crimson-accent)',
+          color: isSolved ? 'var(--black-pure)' : 'white'
+        }} 
+        onClick={onNewCase}
+      >
+        {isSolved ? 'NEXT CASE' : 'TRY AGAIN'}
+      </button>
+    </motion.div>
+  )
+}
+
 function CaseFile({ text }) {
   const [displayedText, setDisplayedText] = useState('')
   
@@ -14,7 +70,7 @@ function CaseFile({ text }) {
       setDisplayedText(text.slice(0, i + 1))
       i++
       if (i >= text.length) clearInterval(interval)
-    }, 30) // 30ms per character
+    }, 30)
     
     return () => clearInterval(interval)
   }, [text])
@@ -29,7 +85,6 @@ function CaseFile({ text }) {
         marginBottom: '30px',
       }}
     >
-      {/* Folder Tab */}
       <div style={{
         position: 'absolute',
         top: '-18px',
@@ -54,7 +109,6 @@ function CaseFile({ text }) {
         </div>
       </div>
 
-      {/* Main Folder Body */}
       <div style={{
         background: 'linear-gradient(145deg, #e6ce7b 0%, #d4af37 100%)',
         borderRadius: '12px',
@@ -65,7 +119,6 @@ function CaseFile({ text }) {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Scuff marks / texture overlays */}
         <div style={{
           position: 'absolute',
           inset: 0,
@@ -99,126 +152,6 @@ function CaseFile({ text }) {
   )
 }
 
-function AccusationPanel({ case_, gameState, onAccuse, onNewCase }) {
-  const [selected, setSelected] = useState('')
-  const [shown, setShown] = useState(false)
-
-  if (gameState === 'solved') return (
-    <div style={{
-      padding: '24px',
-      background: 'rgba(212, 175, 55, 0.1)',
-      border: '2px solid var(--gold-metallic)',
-      borderRadius: 'var(--radius-subtle)',
-      textAlign: 'center',
-    }}>
-      <h3 style={{ fontFamily: 'var(--font-hero)', color: 'var(--gold-metallic)', marginBottom: '16px' }}>CASE RESOLVED</h3>
-      <p style={{ fontFamily: 'var(--font-ui)', fontSize: '0.9rem', color: 'var(--white-pure)', marginBottom: '24px' }}>
-        The culprit was indeed {case_.culprit}.
-      </p>
-      <button className="lp-btn" style={{ width: '100%' }} onClick={onNewCase}>NEW CASE</button>
-    </div>
-  )
-
-  if (gameState === 'failed') return (
-    <div style={{
-      padding: '24px',
-      background: 'rgba(139, 0, 0, 0.1)',
-      border: '2px solid var(--crimson-accent)',
-      borderRadius: 'var(--radius-subtle)',
-      textAlign: 'center',
-    }}>
-      <h3 style={{ fontFamily: 'var(--font-hero)', color: 'var(--crimson-accent)', marginBottom: '16px' }}>CASE COMPROMISED</h3>
-      <p style={{ fontFamily: 'var(--font-ui)', fontSize: '0.9rem', color: 'var(--white-pure)', marginBottom: '24px' }}>
-        A false accusation was made. The killer escaped.
-      </p>
-      <button className="lp-btn" style={{ width: '100%', background: 'var(--crimson-accent)', color: 'white' }} onClick={onNewCase}>TRY AGAIN</button>
-    </div>
-  )
-
-  return (
-    <div style={{
-      padding: '24px',
-      background: 'rgba(0,0,0,0.3)',
-      border: '1px solid var(--border-gold)',
-      borderRadius: 'var(--radius-subtle)',
-      marginBottom: '20px',
-    }}>
-      <div style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.6rem',
-        color: 'var(--gold-metallic)',
-        letterSpacing: '0.2em',
-        marginBottom: '20px',
-        textTransform: 'uppercase',
-      }}>
-        Formal Accusation
-      </div>
-
-      {!shown ? (
-        <button 
-          onClick={() => setShown(true)}
-          style={{
-            width: '100%',
-            padding: '16px',
-            background: 'transparent',
-            border: '1px solid var(--gold-metallic)',
-            color: 'var(--gold-metallic)',
-            borderRadius: 'var(--radius-pill)',
-            fontFamily: 'var(--font-ui)',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            letterSpacing: '0.1em',
-            cursor: 'pointer',
-          }}
-        >
-          I AM READY TO ACCUSE
-        </button>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              background: 'var(--black-pure)',
-              border: '1px solid var(--border-gold)',
-              borderRadius: 'var(--radius-sharp)',
-              color: 'var(--white-pure)',
-              fontFamily: 'var(--font-ui)',
-              outline: 'none',
-            }}
-          >
-            <option value="">Select the Culprit</option>
-            <option value={case_.suspect_a.name}>{case_.suspect_a.name}</option>
-            <option value={case_.suspect_b.name}>{case_.suspect_b.name}</option>
-          </select>
-          <button
-            onClick={() => selected && onAccuse(selected)}
-            disabled={!selected}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: selected ? 'var(--gold-metallic)' : 'var(--grey-muted)',
-              color: 'var(--black-pure)',
-              borderRadius: 'var(--radius-pill)',
-              fontFamily: 'var(--font-ui)',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              letterSpacing: '0.1em',
-              border: 'none',
-              cursor: selected ? 'pointer' : 'default',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            DELIVER VERDICT
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
 function Instructions() {
   return (
     <div style={{ padding: '24px', opacity: 0.7 }}>
@@ -246,10 +179,11 @@ function Instructions() {
   )
 }
 
-export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNewCase, connectionError }) {
+export default function RightPanel({ case_, caseFile, gameState, onNewCase }) {
   if (!case_) return null
   return (
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
+      <CaseResult gameState={gameState} case_={case_} onNewCase={onNewCase} />
       <CaseFile text={caseFile} />
       
       <div style={{
@@ -265,12 +199,6 @@ export default function RightPanel({ case_, caseFile, gameState, onAccuse, onNew
         Hover To Reveal
       </div>
       <SecretReveal secretText={case_.key_clue.toUpperCase()} />
-      <AccusationPanel 
-        case_={case_} 
-        gameState={gameState} 
-        onAccuse={onAccuse} 
-        onNewCase={onNewCase} 
-      />
       <Instructions />
     </div>
   )

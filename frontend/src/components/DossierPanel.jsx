@@ -1,12 +1,17 @@
-// DossierPanel.jsx — Victim + Suspect info
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
-function ProfileCard({ title, name, role, image, fileId }) {
+function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) {
+  const [isHovered, setIsHovered] = useState(false)
+  const isSuspect = title !== 'THE DECEASED'
+  const canAccuse = isSuspect && gameState === 'playing'
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(0,0,0,0.5)' }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       style={{
         background: 'var(--gold-gradient)',
         border: '1px solid #7d6b35',
@@ -18,8 +23,55 @@ function ProfileCard({ title, name, role, image, fileId }) {
         gap: '16px',
         alignItems: 'center',
         boxShadow: '0 3px 15px rgba(0,0,0,0.4)',
+        cursor: canAccuse ? 'pointer' : 'default',
+        overflow: 'hidden',
       }}
     >
+      <AnimatePresence>
+        {isHovered && canAccuse && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 10,
+              background: 'rgba(0,0,0,0.6)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+            }}
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onAccuse(name)
+              }}
+              style={{
+                background: 'var(--gold-metallic)',
+                color: 'var(--black-pure)',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: 'var(--radius-pill)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                letterSpacing: '0.1em',
+                cursor: 'pointer',
+                boxShadow: '0 0 20px var(--gold-glow)',
+              }}
+            >
+              DELIVER VERDICT
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Character Image Frame */}
       <div style={{
         width: '95px',
@@ -105,7 +157,6 @@ function isFemale(name) {
   const n = name.toLowerCase()
   const parts = n.split(/\s+/)
   
-  // Check if any part of the name is in the list or ends with 'a'
   const isMatch = parts.some(p => 
     femaleNames.includes(p) || 
     (p.length > 2 && p.endsWith('a') && !['joshua', 'luca', 'noah'].includes(p))
@@ -115,7 +166,7 @@ function isFemale(name) {
   return false
 }
 
-export default function DossierPanel({ case_, connectionError }) {
+export default function DossierPanel({ case_, connectionError, onAccuse, gameState }) {
   if (connectionError) return (
     <div style={{ padding: '24px', color: 'var(--crimson-accent)', fontFamily: 'var(--font-mono)', fontSize: '0.6rem' }}>
       ERROR: CONNECTION SEVERED
@@ -152,6 +203,8 @@ export default function DossierPanel({ case_, connectionError }) {
         role={case_.victim.role}
         fileId={`${case_.victim.name.replace(/\s+/g, '')}.DR`}
         image={`${import.meta.env.BASE_URL}assets/${victimImg}`}
+        onAccuse={onAccuse}
+        gameState={gameState}
       />
 
       <div style={{
@@ -171,6 +224,8 @@ export default function DossierPanel({ case_, connectionError }) {
         role={case_.suspect_a.motive}
         fileId={`${case_.suspect_a.name.replace(/\s+/g, '')}.POI`}
         image={`${import.meta.env.BASE_URL}assets/${suspectAImg}`}
+        onAccuse={onAccuse}
+        gameState={gameState}
       />
 
       <ProfileCard
@@ -179,7 +234,22 @@ export default function DossierPanel({ case_, connectionError }) {
         role={case_.suspect_b.motive}
         fileId={`${case_.suspect_b.name.replace(/\s+/g, '')}.POI`}
         image={`${import.meta.env.BASE_URL}assets/${suspectBImg}`}
+        onAccuse={onAccuse}
+        gameState={gameState}
       />
+
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.6rem',
+        color: 'var(--gold-metallic)',
+        letterSpacing: '0.15em',
+        marginTop: '20px',
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        opacity: 0.8,
+      }}>
+        Hover To Vote or Accuse Your Suspect
+      </div>
     </div>
   )
 }
