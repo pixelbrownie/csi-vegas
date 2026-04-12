@@ -3,7 +3,6 @@ import logging
 import time
 from agents import witness_agent, analyst_agent, narrator_agent, auditor_agent, AuditResult
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
-from memory import store_memory
 from logging_config import get_logger, log_orchestration_decision, log_agent_interaction
 
 logger = get_logger(__name__)

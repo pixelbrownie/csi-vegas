@@ -4,7 +4,6 @@ import re
 import json
 from pydantic import BaseModel, Field
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
-from memory import retrieve_relevant
 from logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -231,7 +230,7 @@ REASONING:"""
 
 def auditor_agent(question: str, response: str, case: dict) -> AuditResult:
     """
-    Checks if the witness just lied by comparing response to Case Truth + Memory.
+    Checks if the witness just lied by comparing response to Case Truth.
     Returns a structured AuditResult.
     """
     victim = case["victim"]

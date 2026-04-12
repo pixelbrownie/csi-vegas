@@ -1,7 +1,5 @@
 fastapi
 uvicorn[standard]
 pydantic
-chromadb
 langchain-groq
-sentence-transformers
 python-dotenv

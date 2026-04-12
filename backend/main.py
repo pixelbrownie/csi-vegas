@@ -22,7 +22,6 @@ logger.info("CSI Vegas Backend Starting Up...")
 from scenario_generator import generate_case
 from orchestrator import orchestrate
 from llm_client import LLMUnavailableError, llm_health_status
-from memory import clear_memory, store_memory
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
