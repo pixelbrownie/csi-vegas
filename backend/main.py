@@ -7,10 +7,17 @@ from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
+import time
 from dotenv import load_dotenv
 
 # Load environment variables from .env
 load_dotenv()
+
+# Initialize logging system
+from logging_config import setup_logging, get_logger, log_api_request
+setup_logging()
+logger = get_logger(__name__)
+logger.info("CSI Vegas Backend Starting Up...")
 
 from scenario_generator import generate_case
 from orchestrator import orchestrate

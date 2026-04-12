@@ -1,6 +1,7 @@
 // ChatRoom.jsx
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import logger from '../utils/logger.js'
 
 function MessageBubble({ msg, isLast }) {
   const [showReasoning, setShowReasoning] = useState(false)
@@ -180,12 +181,29 @@ export default function ChatRoom({
   const handleSend = () => {
     const msg = input.trim()
     if (msg && !isThinking && gameState === 'playing') {
+      logger.logUserAction('send_message', { 
+        messageLength: msg.length, 
+        suspectTarget: selectedSuspect 
+      });
+      
       // Add suspect targeting if selected
       const targetedMsg = selectedSuspect 
         ? `${selectedSuspect}, ${msg}`
         : msg
+      
+      const startTime = Date.now();
       onSend(targetedMsg)
       setInput('')
+      
+      // Log processing time when response comes back
+      setTimeout(() => {
+        logger.logAgentInteraction(
+          selectedSuspect ? `witness_${selectedSuspect}` : 'auto_agent',
+          targetedMsg,
+          '', // Will be filled when response arrives
+          Date.now() - startTime
+        );
+      }, 100);
     }
   }
 
@@ -300,7 +318,12 @@ export default function ChatRoom({
           <div style={{ marginBottom: '12px' }}>
             <select
               value={selectedSuspect}
-              onChange={(e) => setSelectedSuspect(e.target.value)}
+              onChange={(e) => {
+                const previous = selectedSuspect;
+                const newSelection = e.target.value;
+                setSelectedSuspect(newSelection);
+                logger.logSuspectSelection(newSelection, previous);
+              }}
               style={{
                 width: '100%',
                 padding: '8px 16px',

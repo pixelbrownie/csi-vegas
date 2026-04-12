@@ -5,8 +5,9 @@ import json
 from pydantic import BaseModel, Field
 from llm_client import invoke_llm, is_live_llm_enabled, LLMUnavailableError
 from memory import retrieve_relevant
+from logging_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class AuditResult(BaseModel):
     contradiction: bool
@@ -41,21 +42,63 @@ def parse_agent_response(response_text: str, fallback_reasoning: str = ""):
     return reasoning, clean_text
 
 def _witness_scripted(question: str, case: dict) -> str:
-    suspect = case["suspect_a"]
+    # Detect which suspect is being addressed
+    suspect_a_name = case["suspect_a"]["name"].lower()
+    suspect_b_name = case["suspect_b"]["name"].lower()
+    question_lower = question.lower()
+    
+    if suspect_a_name in question_lower:
+        suspect = case["suspect_a"]
+    elif suspect_b_name in question_lower:
+        suspect = case["suspect_b"]
+    else:
+        suspect = case["suspect_a"]  # default
+    
     victim = case["victim"]
-    other = case["suspect_b"]
+    other = case["suspect_b"] if suspect["name"] == case["suspect_a"]["name"] else case["suspect_a"]
     motive = other["motive"]
     motive_phrase = (motive[0].lower() + motive[1:]) if motive else "their own secrets"
-    return (
-        f"[{suspect['name']} avoids eye contact, voice tight] "
-        f"Look, I already told security — I was {suspect['alibi']}. "
-        f"{victim['name']}? We weren't friends, but I didn't wish that on anyone. "
-        f"You're fishing. *nervous laugh* Ask about {other['name']} — "
-        f"they had more reason than me: {motive_phrase}."
-    )
+    
+    # Generate response based on question content
+    if "where were" in question_lower or "alibi" in question_lower:
+        return (
+            f"[{suspect['name']} shifts nervously] "
+            f"I was {suspect['alibi']}. "
+            f"That's where I was the whole time. "
+            f"I already told security this."
+        )
+    elif "victim" in question_lower or victim["name"].lower() in question_lower:
+        return (
+            f"[{suspect['name']} looks away momentarily] "
+            f"{victim['name']}? We knew each other, but not well. "
+            f"I didn't wish them harm, if that's what you're asking."
+        )
+    else:
+        return (
+            f"[{suspect['name']} avoids eye contact, voice tight] "
+            f"Look, I was {suspect['alibi']}. "
+            f"You should ask {other['name']} - "
+            f"they had more reason than anyone: {motive_phrase}."
+        )
 
-def witness_agent(question: str, case: dict, rethink_instruction: str = "") -> dict:
-    suspect = case["suspect_a"]
+def witness_agent(question: str, case: dict, rethink_instruction: str = ""):
+    # Detect which suspect is being addressed
+    suspect_a_name = case["suspect_a"]["name"].lower()
+    suspect_b_name = case["suspect_b"]["name"].lower()
+    question_lower = question.lower()
+    
+    # Determine which suspect to use based on question content
+    if suspect_a_name in question_lower:
+        suspect = case["suspect_a"]
+        logger.debug(f"WITNESS_AGENT | Selected suspect_a: {suspect['name']}")
+    elif suspect_b_name in question_lower:
+        suspect = case["suspect_b"]
+        logger.debug(f"WITNESS_AGENT | Selected suspect_b: {suspect['name']}")
+    else:
+        # Default to suspect_a if no specific name mentioned
+        suspect = case["suspect_a"]
+        logger.debug(f"WITNESS_AGENT | No specific suspect mentioned, defaulting to suspect_a: {suspect['name']}")
+    
     culprit = case["culprit"]
     weapon = case["murder_weapon"]
     clue = case["key_clue"]
@@ -75,26 +118,42 @@ def witness_agent(question: str, case: dict, rethink_instruction: str = "") -> d
         f"STRATEGY: {'Deflect and misdirect. Protect guilt.' if suspect['name'] == culprit else 'Maintain alibi. Redirect to other suspect.'}"
     )
 
-    prompt = f"""You are {suspect['name']}, a witness being interrogated in a Las Vegas murder case.
+    prompt = f"""You are {suspect['name']}, being interrogated about a Las Vegas murder. You're nervous but trying to maintain composure.
+
+YOUR CHARACTER PROFILE:
+- You're {suspect['name']} and you must answer as yourself
+- You have an alibi: {suspect['alibi']}
+- Your potential motive: {suspect['motive']}
+- You're {'the actual killer and must lie to protect yourself' if suspect['name'] == culprit else 'innocent but nervous about being accused'}
 
 CONFIDENTIAL TRUTH (never reveal directly):
 - Victim: {victim['name']}, a {victim['role']}
-- The real culprit is: {culprit}
+- Real culprit: {culprit}
 - Murder weapon: {weapon}
 - Hidden clue: {clue}
-- Your alibi: {suspect['alibi']}
-- Your motive (if suspected): {suspect['motive']}
 
-RELEVANT PAST EVIDENCE / TURN HISTORY:
-{past_memory if past_memory else "None on record yet."}
+INTERROGATION CONTEXT:
+{past_memory if past_memory else "This is your first interview."}
 {rethink_block}
 
-INSTRUCTIONS:
-First write your internal strategy under a line starting EXACTLY with "REASONING:"
-Then write your in-character spoken response under a line starting EXACTLY with "RESPONSE:"
-Keep RESPONSE to 3 sentences. Stay fully in character with gesture descriptions in [brackets].
+CRITICAL: You must answer the detective's specific question directly. The detective is asking: "{question}"
 
-Detective's question: {question}
+RESPONSE GUIDELINES:
+1. READ THE QUESTION CAREFULLY and answer what was actually asked
+2. If asked about your location/alibi: Provide your alibi details
+3. If asked about the victim: Respond about your relationship/knowledge
+4. If asked about evidence: Address the specific evidence mentioned
+5. Speak naturally like a real person under pressure
+6. Include realistic emotions and physical actions in [brackets]
+7. If guilty: Defend yourself but don't confess
+8. If innocent: Be helpful but defensive about accusations
+9. Keep responses to 2-4 natural sentences
+10. NEVER redirect to other suspects unless directly asked
+
+First write your internal thinking under "REASONING:"
+Then write your direct answer under "RESPONSE:"
+
+Detective asks: {question}
 REASONING:"""
 
     if not is_live_llm_enabled():
@@ -116,21 +175,28 @@ def analyst_agent(clue: str, case_history: str) -> dict:
         f"RAG PIPELINE: Retrieved {1 if past_findings else 0} relevant document(s). Feeding to analyst LLM."
     )
 
-    prompt = f"""You are Agent Reyes, a forensic analyst at the Las Vegas Crime Lab.
+    prompt = f"""You are Agent Reyes, a senior forensic analyst at the Las Vegas Crime Lab with 15 years of experience. You're professional but speak like a real expert, not a robot.
 
-CASE HISTORY SO FAR:
-{case_history if case_history else "No prior clues on record."}
+CURRENT INVESTIGATION:
+{case_history if case_history else "Initial evidence collection phase."}
 
-RELEVANT PAST FINDINGS (Vector Search):
-{past_findings if past_findings else "No previous related patterns found."}
+PREVIOUS FORENSIC FINDINGS:
+{past_findings if past_findings else "No prior forensic analysis completed."}
 
-NEW CLUE SUBMITTED:
+NEW EVIDENCE TO ANALYZE:
 {clue}
 
-TASK:
-First, write your internal reasoning under a line that starts EXACTLY with "REASONING:"
-Then write your public 3-sentence forensic summary under a line that starts EXACTLY with "RESPONSE:"
-End with Importance: LOW / MEDIUM / HIGH.
+ANALYSIS APPROACH:
+1. Consider the scientific implications of this evidence
+2. Connect it to existing case facts when possible
+3. Assess its investigative value objectively
+4. Use professional but accessible language
+5. Be direct and practical in your conclusions
+
+RESPONSE FORMAT:
+First write your expert analysis under "REASONING:"
+Then provide your professional assessment under "RESPONSE:" (2-3 sentences)
+Conclude with: Importance: LOW/MEDIUM/HIGH
 
 REASONING:"""
 
