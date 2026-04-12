@@ -1,0 +1,23 @@
+Analyst Agent Error: analyst_agent: Gemini HTTP 429: {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota ex
+RuntimeError: Gemini HTTP 429: {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota ex
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ananya Singh\OneDrive\Desktop\csi-vegas\backend\agents.py", line 211, in analyst_agent
+    raw_res = invoke_llm(prompt, "analyst_agent")
+  File "C:\Users\Ananya Singh\OneDrive\Desktop\csi-vegas\backend\llm_client.py", line 101, in invoke_llm
+    return _gemini_chat(prompt, purpose)
+  File "C:\Users\Ananya Singh\OneDrive\Desktop\csi-vegas\backend\llm_client.py", line 84, in _gemini_chat
+    raise LLMUnavailableError(f"{purpose}: {last_error}") from last_error
+llm_client.LLMUnavailableError: analyst_agent: Gemini HTTP 429: {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota ex
+

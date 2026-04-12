@@ -90,9 +90,6 @@ def _new_case_payload():
     """Shared case generation used by POST (and safe wake/no-op methods)."""
     case = generate_case()
     
-    # RAG: Clear memory for a new investigation
-    clear_memory()
-    
     case_file = (
         f"A body was discovered at the Bellagio. "
         f"Victim: {case['victim']['name']}, "
@@ -100,10 +97,6 @@ def _new_case_payload():
         f"Location: {case.get('location', 'High-stakes Room')}. "
         "Investigation begins."
     )
-    
-    # RAG: Store initial case facts
-    store_memory(case_file, "narrator")
-    store_memory(f"Victim: {case['victim']['name']}, Role: {case['victim']['role']}", "evidence")
     
     return {
         "case": case,

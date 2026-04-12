@@ -17,12 +17,10 @@ def _classify_intent_keywords(user_input: str) -> str:
     return "narrator"
 
 def classify_intent(user_input: str) -> str:
-    logger.debug(f"CLASSIFY_INTENT_START | Input: '{user_input}' | LLM_Enabled: {is_live_llm_enabled()}")
-    
-    if not is_live_llm_enabled(): 
-        fallback_result = _classify_intent_keywords(user_input)
-        logger.debug(f"CLASSIFY_INTENT_FALLBACK | Result: {fallback_result}")
-        return fallback_result
+    # HIGH-EFFICIENCY MODE: Always use keywords to save tokens
+    fallback_result = _classify_intent_keywords(user_input)
+    logger.debug(f"CLASSIFY_INTENT_FAST | Result: {fallback_result}")
+    return fallback_result
         
     prompt = f"Classify intent: '{user_input}'. Reply with EXACTLY one word: witness, analyst, or narrator."
     try:
@@ -60,13 +58,10 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
     reasoning = ""
     audit_results: AuditResult = AuditResult(contradiction=False, explanation="")
 
-    # RAG: Store query
-    store_memory(f"Detective: {user_input}", "detective")
-    logger.debug(f"MEMORY_STORED | Detective query")
-
+    # Main interaction logic
     if intent == "witness":
         logger.debug(f"AGENT_DISPATCH | witness_agent")
-        # PASS 1: Generate initial response
+        # SINGLE CALL: Only the character speaks
         agent_res = witness_agent(user_input, case, target_suspect=suspect_name)
         response = agent_res["response"]
         reasoning = agent_res["reasoning"]
@@ -74,24 +69,8 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
         
         log_agent_interaction("witness", user_input, response, reasoning)
         
-        # AUDIT: Run the forensic auditor
-        logger.debug(f"AUDIT_START | Checking witness response for contradictions")
-        audit_results = auditor_agent(user_input, response, case)
-        logger.debug(f"AUDIT_RESULT | Contradiction: {audit_results.contradiction}")
-        
-        # PASS 2: Agentic Confrontation Loop
-        if audit_results.contradiction:
-            logger.warning(f"CONTRADICTION_DETECTED | {audit_results.explanation}")
-            # Witness is lying or caught in a contradiction; give them a chance to "re-think"
-            rethink_res = witness_agent(user_input, case, rethink_instruction=audit_results.explanation, target_suspect=suspect_name)
-            response = rethink_res["response"]
-            reasoning = f"[CONTRADICTION DETECTED] {audit_results.explanation}\n\n[RETHINKING] {rethink_res['reasoning']}"
-            logger.info(f"WITNESS_RETHINK | Contradiction addressed")
-        
-        store_memory(f"Witness Response: {response}", "witness")
-        logger.debug(f"MEMORY_STORED | Witness response")
-        narrator_update = narrator_agent(f"Interrogated witness. Response: '{response[:80]}...'", case_file)
-        updated_case_file = case_file + "\n" + narrator_update
+        # Auditor and Narrator disabled for High-Efficiency Mode
+        updated_case_file = case_file + f"\nInterrogated {suspect_name if suspect_name else 'witness'}."
 
     elif intent == "analyst":
         logger.debug(f"AGENT_DISPATCH | analyst_agent")
@@ -102,18 +81,14 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
 
         log_agent_interaction("analyst", user_input, response, reasoning)
         
-        store_memory(f"Analyst Findings: {response}", "analyst")
-        logger.debug(f"MEMORY_STORED | Analyst findings")
-        narrator_update = narrator_agent(f"Lab analysis complete: {response[:80]}...", case_file)
-        updated_case_file = case_file + "\n" + narrator_update
+        updated_case_file = case_file + "\nLab analysis complete."
 
     else:
         logger.debug(f"AGENT_DISPATCH | narrator_agent")
-        response = narrator_agent(user_input, case_file)
+        # Use simple template for Narrator to save tokens
+        response = f"Vegas doesn't care about the truth, only the stakes. {user_input[:50]}..." if not is_live_llm_enabled() else narrator_agent(user_input, case_file)
         agent_used = "NARRATOR"
-        reasoning = "Generating narrative flavor and updating case log."
-        store_memory(f"Narrative Log: {response}", "narrator")
-        logger.debug(f"MEMORY_STORED | Narrative log")
+        reasoning = "Generating narrative update."
         updated_case_file = case_file + "\n" + response
 
     # Calculate processing time and log completion

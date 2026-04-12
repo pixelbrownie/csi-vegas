@@ -45,8 +45,8 @@ def _gemini_chat(prompt: str, purpose: str) -> str:
     if not api_key:
         raise LLMUnavailableError("GEMINI_API_KEY is not set")
     
-    # Use the STABLE v1 endpoint and Gemini 3.1 Flash (Final Hail Mary for quota)
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-3.1-flash-live-preview:generateContent?key={api_key}"
+    # Use the STABLE v1 endpoint and Gemini 2.0 Flash (Highest reliability for demo)
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key={api_key}"
     payload = {
         "contents": [{"parts":[{"text": prompt}]}]
     }
