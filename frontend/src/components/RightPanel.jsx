@@ -21,35 +21,35 @@ function CaseResult({ gameState, case_, onNewCase }) {
         boxShadow: `0 0 30px ${isSolved ? 'rgba(0,163,108,0.2)' : 'rgba(139,0,0,0.2)'}`,
       }}
     >
-      <h3 style={{ 
-        fontFamily: 'var(--font-hero)', 
-        color: isSolved ? 'var(--success-green)' : 'var(--crimson-accent)', 
+      <h3 style={{
+        fontFamily: 'var(--font-hero)',
+        color: isSolved ? 'var(--success-green)' : 'var(--crimson-accent)',
         marginBottom: '10px',
         letterSpacing: '0.1em'
       }}>
         {isSolved ? 'CASE RESOLVED' : 'CASE COMPROMISED'}
       </h3>
-      <p style={{ 
-        fontFamily: 'var(--font-ui)', 
-        fontSize: '0.85rem', 
-        color: 'var(--white-pure)', 
+      <p style={{
+        fontFamily: 'var(--font-ui)',
+        fontSize: '0.85rem',
+        color: 'var(--white-pure)',
         marginBottom: '20px',
         opacity: 0.9
       }}>
-        {isSolved 
+        {isSolved
           ? `Exceptional work. The culprit was indeed ${case_.culprit}.`
           : `A false accusation was made. The suspect escaped into the night.`
         }
       </p>
-      <button 
-        className="lp-btn" 
-        style={{ 
-          width: '100%', 
-          padding: '12px', 
+      <button
+        className="lp-btn"
+        style={{
+          width: '100%',
+          padding: '12px',
           fontSize: '0.75rem',
           background: isSolved ? 'var(--success-green)' : 'var(--crimson-accent)',
           color: isSolved ? 'var(--black-pure)' : 'white'
-        }} 
+        }}
         onClick={onNewCase}
       >
         {isSolved ? 'NEXT CASE' : 'TRY AGAIN'}
@@ -61,7 +61,7 @@ function CaseResult({ gameState, case_, onNewCase }) {
 function CaseFile({ text }) {
   const [displayedText, setDisplayedText] = useState('')
   const prevFullTextRef = useRef('')
-  
+
   useEffect(() => {
     if (!text) {
       setDisplayedText('')
@@ -72,11 +72,11 @@ function CaseFile({ text }) {
     // Check if new text is an extension of the previously typed text
     const isExtension = text.startsWith(prevFullTextRef.current) && prevFullTextRef.current !== ''
     const startFrom = isExtension ? prevFullTextRef.current.length : 0
-    
+
     if (!isExtension) {
       setDisplayedText('')
     }
-    
+
     let i = startFrom
     const interval = setInterval(() => {
       // Don't type more than the current text length
@@ -88,7 +88,7 @@ function CaseFile({ text }) {
         prevFullTextRef.current = text
       }
     }, 25) // Slightly faster typewriter
-    
+
     return () => clearInterval(interval)
   }, [text])
 
@@ -143,7 +143,7 @@ function CaseFile({ text }) {
           pointerEvents: 'none',
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }} />
-        
+
         <div style={{
           padding: '8px 4px',
           minHeight: '140px',
@@ -180,7 +180,7 @@ function Instructions() {
         marginBottom: '16px',
         textTransform: 'uppercase',
       }}>
-        Operational Guidance
+        SAMPLE QUESTIONS
       </div>
       <div style={{
         fontFamily: 'var(--font-ui)',
@@ -188,9 +188,22 @@ function Instructions() {
         color: 'var(--grey-chic)',
         lineHeight: 1.6,
       }}>
-        - Question suspects about motive.<br />
-        - Analyze evidence via the sensor.<br />
-        - Accuse only when certain.
+        WITNESS AGENT:<br />
+        1. Where were you at the time of the murder?<br />
+        2. I saw you leaving the high-stakes room, did you kill them?<br />
+        3. Tell me about your relationship with the victim<br />
+        4. You're lying about not needing to harm him. What really happened?<br /><br />
+
+
+        ANALYST AGENT:<br />
+        1. Sweep the crime scene for any overlooked clues?<br />
+        2. Analyze the toxicology report<br />
+        3. What's the atmosphere of the scene?<br /><br />
+
+        NARRATOR AGENT:<br />
+        1. Anything else you say<br />
+        2. Drop clues<br />
+        3. Add to the story<br /><br />
       </div>
     </div>
   )
@@ -202,7 +215,7 @@ export default function RightPanel({ case_, caseFile, gameState, onNewCase }) {
     <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
       <CaseResult gameState={gameState} case_={case_} onNewCase={onNewCase} />
       <CaseFile text={caseFile} />
-      
+
       <div style={{
         fontFamily: 'var(--font-mono)',
         fontSize: '0.6rem',
