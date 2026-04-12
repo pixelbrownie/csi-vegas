@@ -1,6 +1,5 @@
 // Sidebar.jsx — timer + location + new case only
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 
 const TOTAL = 30 * 60
 
@@ -77,26 +76,21 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       <div style={{ position: 'relative', width: '90px', height: '90px', marginBottom: '32px' }}>
         <svg width="90" height="90" style={{ transform: 'rotate(-90deg)' }}>
           <circle cx="45" cy="45" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
-          <motion.circle
+          <circle
             cx="45" cy="45" r={r} fill="none"
             stroke={timerColor} strokeWidth="3" strokeLinecap="round"
             strokeDasharray={circ}
-            animate={{ strokeDashoffset: circ * (1 - pct) }}
-            transition={{ duration: 0.9, ease: 'linear' }}
+            strokeDashoffset={circ * (1 - pct)}
+            style={{ transition: 'stroke-dashoffset 0.9s linear' }}
           />
         </svg>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={secs}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              style={{
-                fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 600,
-                color: timerColor,
-              }}
-            >{mins}:{secs}</motion.span>
-          </AnimatePresence>
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 600,
+              color: timerColor,
+            }}
+          >{mins}:{secs}</span>
         </div>
       </div>
 
@@ -132,10 +126,9 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
       </div>
 
       {/* New Case Button */}
-      <motion.button
-        whileHover={{ scale: 1.02, backgroundColor: 'var(--gold-pale)' }}
-        whileTap={{ scale: 0.98 }}
+      <button
         onClick={onNewCase}
+        className="lp-btn"
         style={{
           width: '100%',
           padding: '16px',
@@ -148,13 +141,12 @@ export default function Sidebar({ startTime, gameState, onTimeUp, onNewCase }) {
           letterSpacing: '0.15em',
           cursor: 'pointer',
           borderRadius: 'var(--radius-pill)',
-          transition: 'all 0.3s ease',
           marginBottom: '20px',
           textTransform: 'uppercase',
         }}
       >
         NEW INVESTIGATION
-      </motion.button>
+      </button>
 
       {/* Hint */}
       <div style={{

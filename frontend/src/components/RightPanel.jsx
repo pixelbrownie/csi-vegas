@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import SecretReveal from './SecretReveal.jsx'
 
 function CaseResult({ gameState, case_, onNewCase }) {
@@ -8,9 +7,7 @@ function CaseResult({ gameState, case_, onNewCase }) {
   if (!isSolved && !isFailed) return null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+    <div
       style={{
         padding: '24px',
         marginBottom: '20px',
@@ -54,7 +51,7 @@ function CaseResult({ gameState, case_, onNewCase }) {
       >
         {isSolved ? 'NEXT CASE' : 'TRY AGAIN'}
       </button>
-    </motion.div>
+    </div>
   )
 }
 
@@ -93,9 +90,7 @@ function CaseFile({ text }) {
   }, [text])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       style={{
         position: 'relative',
         marginTop: '20px',
@@ -150,22 +145,21 @@ function CaseFile({ text }) {
         }}>
           <div style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.72rem', // Decreased font size as requested
+            fontSize: '0.72rem',
             color: '#3d251a',
             lineHeight: 1.5,
             whiteSpace: 'pre-wrap',
             fontWeight: 600,
           }}>
             {displayedText}
-            <motion.span
-              animate={{ opacity: [1, 0] }}
-              transition={{ repeat: Infinity, duration: 0.8 }}
+            <span
+              className="terminal-cursor"
               style={{ borderRight: '2px solid #3d251a', marginLeft: '2px' }}
             />
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

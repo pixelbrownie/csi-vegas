@@ -1,83 +1,71 @@
 import React, { useState, useEffect } from 'react'
-import { motion, useTransform, useMotionValue, useSpring } from 'framer-motion'
 
 function FloatingAsset({ src, initialPos, duration, delay }) {
+  const [randomId] = useState(() => Math.random().toString(36).substr(2, 9))
+  
   return (
-    <motion.img
-      src={src}
-      initial={{ ...initialPos, opacity: 0 }}
-      animate={{ 
-        y: [initialPos.y, initialPos.y - 40, initialPos.y],
-        rotate: [0, 10, -10, 0],
-        opacity: [0, 0.4, 0.4, 0]
-      }}
-      transition={{ 
-        duration: duration, 
-        repeat: Infinity, 
-        delay: delay,
-        ease: "easeInOut" 
-      }}
-      style={{
-        position: 'absolute',
-        width: '120px',
-        pointerEvents: 'none',
-        zIndex: 2,
-        filter: 'blur(1px) drop-shadow(0 10px 20px rgba(0,0,0,0.5))',
-      }}
-    />
+    <>
+      <style>{`
+        @keyframes float-${randomId} {
+          0% { transform: translateY(0) rotate(0); opacity: 0; }
+          10% { opacity: 0.4; }
+          50% { transform: translateY(-40px) rotate(10deg); opacity: 0.4; }
+          90% { opacity: 0.4; }
+          100% { transform: translateY(0) rotate(0); opacity: 0; }
+        }
+      `}</style>
+      <img
+        src={src}
+        style={{
+          ...initialPos,
+          position: 'absolute',
+          width: '120px',
+          pointerEvents: 'none',
+          zIndex: 2,
+          filter: 'blur(1px) drop-shadow(0 10px 20px rgba(0,0,0,0.5))',
+          animation: `float-${randomId} ${duration}s ease-in-out infinite`,
+          animationDelay: `${delay}s`,
+          opacity: 0,
+        }}
+      />
+    </>
   )
 }
 
 function Particle({ size, top, left, delay }) {
+  const [randomId] = useState(() => Math.random().toString(36).substr(2, 9))
+  
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ 
-        opacity: [0, 0.5, 0], 
-        scale: [0, 1, 0],
-        y: [0, -100]
-      }}
-      transition={{ 
-        duration: 4 + Math.random() * 4, 
-        repeat: Infinity, 
-        delay: delay 
-      }}
-      style={{
-        position: 'absolute',
-        top: `${top}%`,
-        left: `${left}%`,
-        width: size,
-        height: size,
-        background: 'var(--gold-metallic)',
-        borderRadius: '50%',
-        filter: 'blur(2px)',
-        zIndex: 3,
-      }}
-    />
+    <>
+      <style>{`
+        @keyframes drift-${randomId} {
+          0% { transform: translateY(0) scale(0); opacity: 0; }
+          50% { opacity: 0.5; scale: 1; }
+          100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
+      `}</style>
+      <div
+        style={{
+          position: 'absolute',
+          top: `${top}%`,
+          left: `${left}%`,
+          width: size,
+          height: size,
+          background: 'var(--gold-metallic)',
+          borderRadius: '50%',
+          filter: 'blur(2px)',
+          zIndex: 3,
+          animation: `drift-${randomId} ${4 + Math.random() * 4}s linear infinite`,
+          animationDelay: `${delay}s`,
+          opacity: 0,
+        }}
+      />
+    </>
   )
 }
 
 export default function LandingPage({ onStart }) {
-  const bgPath = `${import.meta.env.BASE_URL}assets/vegas_high_roller_bg.png`
   const chipPath = `${import.meta.env.BASE_URL}assets/poker_chip.png`
-
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-
-  const springX = useSpring(mouseX, { damping: 50, stiffness: 200 })
-  const springY = useSpring(mouseY, { damping: 50, stiffness: 200 })
-
-  const moveX = useTransform(springX, [0, window.innerWidth], [-10, 10])
-  const moveY = useTransform(springY, [0, window.innerHeight], [-10, 10])
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      mouseX.set(e.clientX)
-      mouseY.set(e.clientY)
-    }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [mouseX, mouseY])
 
   return (
     <div className="lp-container">
@@ -131,6 +119,7 @@ export default function LandingPage({ onStart }) {
           margin-bottom: 30px;
           display: block;
           text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+          animation: fadeIn 1.5s ease-out forwards;
         }
 
         .lp-title {
@@ -141,7 +130,7 @@ export default function LandingPage({ onStart }) {
           margin-bottom: 40px;
           letter-spacing: -0.01em;
           text-shadow: 0 10px 50px rgba(0,0,0,0.8);
-          animation: slowGlow 8s ease-in-out infinite;
+          animation: slowGlow 8s ease-in-out infinite, fadeInUp 1s ease-out forwards;
         }
 
         .lp-subtitle {
@@ -157,6 +146,13 @@ export default function LandingPage({ onStart }) {
           border-left: 2px solid var(--gold-metallic);
           border-right: 2px solid var(--gold-metallic);
           background: rgba(212, 175, 55, 0.03);
+          animation: fadeInUp 1s ease-out 0.3s forwards;
+          opacity: 0;
+        }
+
+        .lp-btn-container {
+          animation: fadeInUp 1s ease-out 0.6s forwards;
+          opacity: 0;
         }
 
         .lp-btn {
@@ -190,17 +186,27 @@ export default function LandingPage({ onStart }) {
           z-index: 5;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
+
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
       `}</style>
 
-      <motion.div className="lp-bg-wrapper" style={{ x: moveX, y: moveY }}>
+      <div className="lp-bg-wrapper">
         <div className="lp-bg" />
-      </motion.div>
+      </div>
       <div className="lp-overlay" />
       <div className="lp-noise" />
 
       {/* Floating Assets */}
-      <FloatingAsset src={chipPath} initialPos={{ top: '20%', left: '10%', x: 0, y: 0 }} duration={8} delay={0} />
-      <FloatingAsset src={chipPath} initialPos={{ top: '60%', right: '10%', x: 0, y: 0 }} duration={10} delay={2} />
+      <FloatingAsset src={chipPath} initialPos={{ top: '20%', left: '10%' }} duration={8} delay={0} />
+      <FloatingAsset src={chipPath} initialPos={{ top: '60%', right: '10%' }} duration={10} delay={2} />
       
       {/* Particles */}
       {[...Array(15)].map((_, i) => (
@@ -214,44 +220,25 @@ export default function LandingPage({ onStart }) {
       ))}
 
       <main className="lp-content">
-        <motion.span 
-          className="lp-eyebrow"
-          initial={{ opacity: 0, tracking: 1 }}
-          animate={{ opacity: 1, tracking: 0.6 }}
-          transition={{ duration: 1.5 }}
-        >
+        <span className="lp-eyebrow">
           AN EXCLUSIVE LAS VEGAS INVESTIGATION
-        </motion.span>
+        </span>
 
-        <motion.h1 
-          className="lp-title gold-text-metallic"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        >
+        <h1 className="lp-title gold-text-metallic">
           CSI VEGAS
-        </motion.h1>
+        </h1>
 
-        <motion.div 
-          className="lp-subtitle"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
-        >
+        <div className="lp-subtitle">
           In a city built on secrets, the truth is just another gamble. 
           You have 30 minutes, key suspects, and a multi-agent AI framework. 
           Can you crack the code before the trail goes cold?
-        </motion.div>
+        </div>
 
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.6 }}
-        >
+        <div className="lp-btn-container">
           <button className="lp-btn" onClick={onStart}>
             INITIATE INVESTIGATION
           </button>
-        </motion.div>
+        </div>
       </main>
     </div>
   )

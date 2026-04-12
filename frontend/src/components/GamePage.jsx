@@ -1,6 +1,3 @@
-// GamePage.jsx — 4-column layout: Sidebar | DossierPanel | ChatRoom | RightPanel
-
-import { motion } from 'framer-motion'
 import Sidebar from './Sidebar.jsx'
 import DossierPanel from './DossierPanel.jsx'
 import ChatRoom from './ChatRoom.jsx'
@@ -117,10 +114,7 @@ export default function GamePage({
         }}
       >
         {/* Col 1: Sidebar */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
+        <div
           style={{
             overflow: 'hidden',
             minWidth: 0,
@@ -136,13 +130,10 @@ export default function GamePage({
             onTimeUp={onTimeUp}
             onNewCase={onNewCase}
           />
-        </motion.div>
+        </div>
 
         {/* Col 2: Dossier */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.08 }}
+        <div
           style={{
             background: 'var(--black-rich)',
             borderRadius: 'var(--radius-card)',
@@ -159,13 +150,10 @@ export default function GamePage({
             onAccuse={onAccuse}
             gameState={gameState}
           />
-        </motion.div>
+        </div>
 
         {/* Col 3: Chat */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.14 }}
+        <div
           style={{
             overflow: 'hidden',
             display: 'flex',
@@ -187,13 +175,10 @@ export default function GamePage({
             apiBaseUrl={apiBaseUrl}
             onConnectionRetry={onConnectionRetry}
           />
-        </motion.div>
+        </div>
 
         {/* Col 4: Right panel */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+        <div
           style={{
             background: 'var(--black-rich)',
             borderRadius: 'var(--radius-card)',
@@ -213,7 +198,7 @@ export default function GamePage({
             connectionError={connectionError}
             apiBaseUrl={apiBaseUrl}
           />
-        </motion.div>
+        </div>
       </div>
     </div>
   )

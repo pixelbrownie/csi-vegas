@@ -1,6 +1,4 @@
-// ChatRoom.jsx
 import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import logger from '../utils/logger.js'
 
 function MessageBubble({ msg, isLast }) {
@@ -9,9 +7,7 @@ function MessageBubble({ msg, isLast }) {
   const hasContradiction = isAssistant && msg.audit?.contradiction
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -36,13 +32,11 @@ function MessageBubble({ msg, isLast }) {
       }}>
         {msg.role === 'user' ? 'DETECTIVE' : (msg.agent || 'SYSTEM')}
         {hasContradiction && (
-          <motion.span 
-            animate={{ opacity: [1, 0.4, 1] }} 
-            transition={{ repeat: Infinity, duration: 1.5 }}
+          <span 
             style={{ fontWeight: 900, letterSpacing: '0.05em' }}
           >
             [ ! ] DISCREPANCY DETECTED
-          </motion.span>
+          </span>
         )}
       </div>
       
@@ -87,10 +81,9 @@ function MessageBubble({ msg, isLast }) {
 
       {isAssistant && msg.reasoning && (
         <div style={{ marginTop: '8px', paddingLeft: '16px' }}>
-          <motion.button 
+          <button 
             onClick={() => setShowReasoning(!showReasoning)}
-            animate={hasContradiction ? { scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] } : {}}
-            transition={{ repeat: Infinity, duration: 2 }}
+            className={hasContradiction ? "critical-alert" : ""}
             style={{
               background: 'transparent',
               border: 'none',
@@ -110,51 +103,46 @@ function MessageBubble({ msg, isLast }) {
             <span style={{ fontSize: '0.8rem' }}>{showReasoning ? '▽' : '▷'}</span>
             {showReasoning ? 'Hide Diagnostic Trace' : 'View Analysis'}
             {hasContradiction && !showReasoning && <span style={{ fontSize: '0.5rem' }}>(CRITICAL)</span>}
-          </motion.button>
+          </button>
           
-          <AnimatePresence>
-            {showReasoning && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                style={{
-                  background: 'rgba(5, 10, 20, 0.6)',
-                  borderLeft: `2px solid ${hasContradiction ? 'var(--crimson-accent)' : 'var(--gold-metallic)'}`,
-                  padding: '16px',
-                  marginTop: '6px',
-                  borderRadius: '0 12px 12px 0',
-                  maxWidth: '450px',
-                  overflow: 'hidden',
-                  backdropFilter: 'blur(8px)',
-                  boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)',
-                }}
-              >
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.68rem',
-                  color: 'var(--grey-chic)',
-                  lineHeight: 1.6,
-                  whiteSpace: 'pre-wrap',
+          {showReasoning && (
+            <div
+              style={{
+                background: 'rgba(5, 10, 20, 0.6)',
+                borderLeft: `2px solid ${hasContradiction ? 'var(--crimson-accent)' : 'var(--gold-metallic)'}`,
+                padding: '16px',
+                marginTop: '6px',
+                borderRadius: '0 12px 12px 0',
+                maxWidth: '450px',
+                overflow: 'hidden',
+                backdropFilter: 'blur(8px)',
+                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)',
+              }}
+            >
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.68rem',
+                color: 'var(--grey-chic)',
+                lineHeight: 1.6,
+                whiteSpace: 'pre-wrap',
+              }}>
+                <div style={{ 
+                  color: hasContradiction ? 'var(--crimson-accent)' : 'var(--gold-metallic)', 
+                  opacity: 1,
+                  marginBottom: '8px',
+                  fontSize: '0.6rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.15em'
                 }}>
-                  <div style={{ 
-                    color: hasContradiction ? 'var(--crimson-accent)' : 'var(--gold-metallic)', 
-                    opacity: 1,
-                    marginBottom: '8px',
-                    fontSize: '0.6rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.15em'
-                  }}>
-                    // NVPD FORENSIC ANALYTICS // NODE_ID: {Math.floor(Math.random()*10000)}
-                  </div>
-                  {msg.reasoning}
+                  // NVPD FORENSIC ANALYTICS // NODE_ID: {Math.floor(Math.random()*10000)}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {msg.reasoning}
+              </div>
+            </div>
+          )}
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }
 
@@ -187,17 +175,15 @@ export default function ChatRoom({
         suspectTarget: selectedSuspect 
       });
       
-      // We now pass the suspect explicitly to the backend instead of prepending
       const startTime = Date.now();
       onSend(msg, selectedSuspect)
       setInput('')
       
-      // Log processing time when response comes back
       setTimeout(() => {
         logger.logAgentInteraction(
           selectedSuspect ? `witness_${selectedSuspect}` : 'auto_agent',
           msg,
-          '', // Will be filled when response arrives
+          '', 
           Date.now() - startTime
         );
       }, 100);
@@ -259,49 +245,44 @@ export default function ChatRoom({
           zIndex: 1,
         }}
       >
-        <AnimatePresence initial={false}>
-          {history.map((msg, idx) => (
-            <MessageBubble 
-              key={idx} 
-              msg={msg} 
-              isLast={idx === history.length - 1} 
-            />
-          ))}
+        {history.map((msg, idx) => (
+          <MessageBubble 
+            key={idx} 
+            msg={msg} 
+            isLast={idx === history.length - 1} 
+          />
+        ))}
 
-          {isThinking && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+        {isThinking && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '0 12px',
+            }}
+          >
+            <div className="shimmer" style={{
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.7rem',
+              color: 'var(--gold-metallic)',
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+            }}>
+              Analyzing Evidence
+            </div>
+            <div
+              className="pulse-dot"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '0 12px',
+                width: '6px',
+                height: '6px',
+                background: 'var(--gold-metallic)',
+                borderRadius: '50%',
+                boxShadow: '0 0 12px var(--gold-metallic)',
               }}
-            >
-              <div className="shimmer" style={{
-                fontFamily: 'var(--font-ui)',
-                fontSize: '0.7rem',
-                color: 'var(--gold-metallic)',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-              }}>
-                Analyzing Evidence
-              </div>
-              <motion.div
-                animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.8, 0.3] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  background: 'var(--gold-metallic)',
-                  borderRadius: '50%',
-                  boxShadow: '0 0 12px var(--gold-metallic)',
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            />
+          </div>
+        )}
       </div>
 
       {/* Input area */}
@@ -325,11 +306,8 @@ export default function ChatRoom({
                 setSelectedSuspect(newSelection);
                 logger.logSuspectSelection(newSelection, previous);
 
-                // AUTO-PREFIX LOGIC: If message is empty, fill with suspect name
-                // This helps the user start questioning immediately
                 if (newSelection && (!input.trim())) {
                   setInput(`[${newSelection}]: `);
-                  // Brief delay to ensure state update before focusing
                   setTimeout(() => inputRef.current?.focus(), 10);
                 }
               }}
@@ -345,7 +323,7 @@ export default function ChatRoom({
                 outline: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                appearance: 'none', // Custom arrow implementation
+                appearance: 'none',
                 boxShadow: isSelectHovered ? '0 0 15px rgba(212, 175, 55, 0.1)' : 'none',
               }}
             >
@@ -423,9 +401,7 @@ export default function ChatRoom({
               display: 'block',
             }}
           />
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          <button
             onClick={handleSend}
             disabled={isInputDisabled || !input.trim()}
             style={{
@@ -441,10 +417,13 @@ export default function ChatRoom({
               cursor: (isInputDisabled || !input.trim()) ? 'default' : 'pointer',
               opacity: (isInputDisabled || !input.trim()) ? 0.3 : 1,
               flexShrink: 0,
+              transition: 'transform 0.2s ease',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
             <span style={{ fontSize: '0.9rem', marginLeft: '2px' }}>{'>'}</span>
-          </motion.button>
+          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 
 function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -7,68 +6,60 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
   const canAccuse = isSuspect && gameState === 'playing'
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         background: 'var(--gold-gradient)',
         border: '1px solid #7d6b35',
         borderRadius: 'var(--radius-sharp)',
-        padding: '12px 16px', // Balanced padding
+        padding: '12px 16px',
         marginBottom: '10px',
         position: 'relative',
         display: 'flex',
-        gap: '14px', // Reduced gap for symmetry
+        gap: '14px',
         alignItems: 'center',
         boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
         cursor: canAccuse ? 'pointer' : 'default',
         overflow: 'hidden',
       }}
     >
-      <AnimatePresence>
-        {isHovered && canAccuse && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      {isHovered && canAccuse && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            background: 'rgba(0,0,0,0.75)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <button
+            className="lp-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              onAccuse(name)
+            }}
             style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 10,
-              background: 'rgba(0,0,0,0.75)',
-              backdropFilter: 'blur(5px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              background: 'var(--gold-metallic)',
+              color: 'var(--black-pure)',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-pill)',
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
             }}
           >
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: '0 0 20px var(--gold-glow)' }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.stopPropagation()
-                onAccuse(name)
-              }}
-              style={{
-                background: 'var(--gold-metallic)',
-                color: 'var(--black-pure)',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: 'var(--radius-pill)',
-                fontFamily: 'var(--font-ui)',
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                letterSpacing: '0.05em',
-                cursor: 'pointer',
-              }}
-            >
-              DELIVER VERDICT
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            DELIVER VERDICT
+          </button>
+        </div>
+      )}
 
       {/* Character Image Frame - Reduced size */}
       <div style={{
@@ -87,7 +78,7 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
           fontFamily: 'var(--font-title)',
-          fontSize: '0.75rem', // Smaller
+          fontSize: '0.75rem',
           color: 'var(--rust-text)',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
@@ -101,7 +92,7 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
         
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '1.05rem', // Slightly smaller for mono
+          fontSize: '1.05rem',
           color: 'var(--rust-text)',
           fontWeight: 700,
           marginBottom: '4px',
@@ -116,7 +107,7 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
 
         <div style={{
           fontFamily: 'var(--font-ui)',
-          fontSize: '0.68rem', // Smaller
+          fontSize: '0.68rem',
           color: 'var(--rust-text)',
           marginBottom: '6px',
           fontWeight: 500,
@@ -133,7 +124,7 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
 
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.62rem', // Smaller
+          fontSize: '0.62rem',
           color: 'var(--rust-text)',
           lineHeight: 1.3,
           opacity: 0.9,
@@ -143,7 +134,7 @@ function ProfileCard({ title, name, role, image, fileId, onAccuse, gameState }) 
           STATUS: <span style={{ textDecoration: 'underline' }}>{title === 'THE DECEASED' ? 'CLOSED_V' : 'UNDER SURVEILLANCE'}</span>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

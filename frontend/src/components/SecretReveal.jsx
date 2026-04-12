@@ -1,6 +1,5 @@
 // SecretReveal.jsx
 import { useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 
 export default function SecretReveal({ secretText }) {
   const boxRef = useRef(null)
@@ -95,9 +94,8 @@ export default function SecretReveal({ secretText }) {
 
         {/* Pulse ring on hover */}
         {showPulse && (
-          <motion.div
-            animate={{ scale: [1, 1.4], opacity: [0.3, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+          <div
+            className="pulse-ring"
             style={{
               position: 'absolute',
               width: '120px', height: '120px',
