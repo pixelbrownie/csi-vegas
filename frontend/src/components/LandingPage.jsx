@@ -220,7 +220,7 @@ export default function LandingPage({ onStart }) {
           animate={{ opacity: 1, tracking: 0.6 }}
           transition={{ duration: 1.5 }}
         >
-          An Exclusive Sin City Suite
+          AN EXCLUSIVE LAS VEGAS INVESTIGATION
         </motion.span>
 
         <motion.h1 
@@ -238,9 +238,9 @@ export default function LandingPage({ onStart }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
         >
-          A new murder has shaken the foundations of the Strip. 
-          Step into the role of lead investigator in this high-stakes forensic suit. 
-          Reveal the suspects, decrypt the clues, and find the killer before they flee into the neon lights of Las Vegas.
+          In a city built on secrets, the truth is just another gamble. 
+          You have 30 minutes, key suspects, and a multi-agent AI framework. 
+          Can you crack the code before the trail goes cold?
         </motion.div>
 
         <motion.div 
@@ -249,7 +249,7 @@ export default function LandingPage({ onStart }) {
           transition={{ duration: 1, delay: 0.6 }}
         >
           <button className="lp-btn" onClick={onStart}>
-            ENLIST NOW
+            INITIATE INVESTIGATION
           </button>
         </motion.div>
       </main>
