@@ -116,6 +116,9 @@ FALLBACK_CASES = [
 ]
 
 
+# Global index to ensure round-robin rotation during fallback
+FALLBACK_INDEX = 0
+
 def _generate_case_llm() -> dict:
     prompt = """Generate a NEW Las Vegas murder mystery scenario as a single JSON object.
 Required keys:
@@ -157,13 +160,19 @@ def generate_case():
     Generate a random Vegas murder scenario.
     Uses a remote LLM when enabled; otherwise rotates through scripted cases.
     """
+    global FALLBACK_INDEX
+    
+    selected_fallback = FALLBACK_CASES[FALLBACK_INDEX]
+    FALLBACK_INDEX = (FALLBACK_INDEX + 1) % len(FALLBACK_CASES)
+
     if is_live_llm_enabled():
         try:
             return _generate_case_llm()
         except Exception as e:
-            logger.warning("Groq case generation failed, using scripted case: %s", e)
-            return random.choice(FALLBACK_CASES)
-    return random.choice(FALLBACK_CASES)
+            logger.warning("LLM case generation failed, using scripted case: %s", e)
+            return selected_fallback
+            
+    return selected_fallback
 
 
 if __name__ == "__main__":

@@ -134,12 +134,20 @@ def new_case_head():
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     """Route a detective message to the correct agent."""
+    # Format history concisely to avoid token limits
+    formatted_history = []
+    for msg in req.history[-6:]:
+        role = "Detective" if msg.get("role") == "user" else msg.get("agent", "System")
+        content = msg.get("content", "")
+        formatted_history.append(f"{role}: {content}")
+    history_str = "\n".join(formatted_history)
+    
     try:
         result = orchestrate(
             req.message,
             req.case,
             req.case_file,
-            str(req.history[-10:]),
+            history_str,
             req.suspect
         )
         # Ensure we return exactly what ChatResponse expects
@@ -154,3 +162,4 @@ def chat(req: ChatRequest):
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+ 

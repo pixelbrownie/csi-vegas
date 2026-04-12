@@ -40,16 +40,15 @@ def is_live_llm_enabled() -> bool:
     return bool(_get_api_key())
 
 
-def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
+def _gemini_chat(prompt: str, purpose: str) -> str:
     api_key = _get_api_key()
     if not api_key:
-        raise LLMUnavailableError("GROQ_API_KEY is not set")
-    url = f"{GROQ_BASE_URL}/chat/completions"
-    payload: dict[str, Any] = {
-        "model": GROQ_MODEL,
-        "messages": messages,
-        "temperature": GROQ_TEMPERATURE,
-        "max_tokens": GROQ_MAX_TOKENS,
+        raise LLMUnavailableError("GEMINI_API_KEY is not set")
+    
+    # Use the STABLE v1 endpoint and Gemini 3.1 Flash (Final Hail Mary for quota)
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-3.1-flash-live-preview:generateContent?key={api_key}"
+    payload = {
+        "contents": [{"parts":[{"text": prompt}]}]
     }
 
     data = json.dumps(payload).encode("utf-8")
@@ -59,45 +58,30 @@ def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
         request = urllib.request.Request(
             url,
             data=data,
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": f"Bearer {api_key}",
-                "User-Agent": GROQ_USER_AGENT,
-            },
+            headers={"Content-Type": "application/json"},
             method="POST",
         )
         try:
             with urllib.request.urlopen(request, timeout=GROQ_TIMEOUT_S) as response:
                 raw = response.read().decode("utf-8", errors="replace")
             body = json.loads(raw)
-            choices = body.get("choices") or []
-            if not choices:
-                raise RuntimeError(f"Groq returned no choices: {raw[:500]}")
-            content = (choices[0].get("message") or {}).get("content")
-            if content is None or not str(content).strip():
-                raise RuntimeError("Groq returned empty content")
-            return str(content).strip()
+            candidates = body.get("candidates") or []
+            if not candidates:
+                raise RuntimeError(f"Gemini returned no candidates: {raw[:500]}")
+            text_parts = candidates[0].get("content", {}).get("parts") or []
+            if not text_parts:
+                raise RuntimeError("Gemini returned empty parts")
+            return str(text_parts[0].get("text", "")).strip()
         except urllib.error.HTTPError as exc:
             try:
                 err_body = exc.read().decode("utf-8", errors="replace")
             except Exception:
                 err_body = ""
-            try:
-                err_json = json.loads(err_body)
-                detail = err_json.get("error", {})
-                msg = detail.get("message", err_body[:300])
-            except Exception:
-                msg = err_body[:300] or str(exc)
-            last_error = RuntimeError(f"Groq HTTP {exc.code}: {msg}")
-            # Cloudflare blocks (403) sometimes clear after retry; rate limits and server errors too.
-            if exc.code in (403, 429, 500, 502, 503) and attempt < GROQ_RETRIES:
-                logger.warning("Groq request failed (%s), retrying attempt %s/%s", last_error, attempt, GROQ_RETRIES)
+            last_error = RuntimeError(f"Gemini HTTP {exc.code}: {err_body[:300]}")
+            if exc.code in (429, 500, 502, 503) and attempt < GROQ_RETRIES:
                 time.sleep(GROQ_RETRY_DELAY_MS / 1000.0)
                 continue
             raise LLMUnavailableError(f"{purpose}: {last_error}") from last_error
-        except LLMUnavailableError:
-            raise
         except Exception as exc:
             last_error = exc
             if attempt < GROQ_RETRIES:
@@ -110,12 +94,11 @@ def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
 
 def invoke_llm(prompt: str, purpose: str) -> str:
     """
-    Single-turn completion via Groq chat/completions.
+    Single-turn completion via Native Gemini REST API.
     """
     if not is_live_llm_enabled():
-        raise LLMUnavailableError("GROQ_API_KEY is not set; cannot call Groq")
-    messages = [{"role": "user", "content": prompt}]
-    return _groq_chat(messages, purpose)
+        raise LLMUnavailableError("API_KEY is not set")
+    return _gemini_chat(prompt, purpose)
 
 
 def llm_health_status() -> dict:

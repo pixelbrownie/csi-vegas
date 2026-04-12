@@ -95,7 +95,7 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
 
     elif intent == "analyst":
         logger.debug(f"AGENT_DISPATCH | analyst_agent")
-        agent_res = analyst_agent(user_input, case_history)
+        agent_res = analyst_agent(user_input, case_history, case)
         response = agent_res["response"]
         reasoning = agent_res["reasoning"]
         agent_used = "ANALYST"
