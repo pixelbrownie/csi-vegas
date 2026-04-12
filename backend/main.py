@@ -7,6 +7,10 @@ from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 from scenario_generator import generate_case
 from orchestrator import orchestrate
@@ -23,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # ─── Request / Response Models ─────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
@@ -34,6 +39,8 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     agent: str
     response: str
+    reasoning: str
+    audit: dict
     updated_case_file: str
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
@@ -126,9 +133,12 @@ def chat(req: ChatRequest):
             req.case_file,
             str(req.history[-10:])
         )
+        # Ensure we return exactly what ChatResponse expects
         return ChatResponse(
             agent=result["agent"],
             response=result["response"],
+            reasoning=result["reasoning"],
+            audit=result["audit"],
             updated_case_file=result["updated_case_file"]
         )
     except LLMUnavailableError as e:

@@ -1,12 +1,13 @@
-from __future__ import annotations
-
+import os
 import json
 import logging
-import os
 import time
 import urllib.error
 import urllib.request
 from typing import Any
+from dotenv import load_dotenv
+
+load_dotenv()  # Ensure .env is loaded even if this module is imported first
 
 logger = logging.getLogger(__name__)
 
@@ -15,16 +16,14 @@ class LLMUnavailableError(RuntimeError):
 
 
 # Groq OpenAI-compatible API: https://console.groq.com/docs/openai
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-# Override with any model ID from https://console.groq.com/docs/models (e.g. a Mistral id if available on your account).
-GROQ_MODEL = (os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip() or "llama-3.3-70b-versatile")
+# Config constants (can be overridden by env vars)
+GROQ_MODEL = (os.getenv("GROQ_MODEL", "llama-3.1-8b-instant").strip() or "llama-3.1-8b-instant")
 GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1").rstrip("/")
 GROQ_TIMEOUT_S = float(os.getenv("GROQ_TIMEOUT_S", "120"))
 GROQ_RETRIES = int(os.getenv("GROQ_RETRIES", "3"))
 GROQ_RETRY_DELAY_MS = int(os.getenv("GROQ_RETRY_DELAY_MS", "500"))
 GROQ_TEMPERATURE = float(os.getenv("GROQ_TEMPERATURE", "0.75"))
 GROQ_MAX_TOKENS = int(os.getenv("GROQ_MAX_TOKENS", "4096"))
-# Groq sits behind Cloudflare; bare urllib user-agents often get HTTP 403 / error 1010.
 _DEFAULT_UA = (
     "Mozilla/5.0 (compatible; CSI-Vegas/1.0; +https://github.com) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -32,11 +31,19 @@ _DEFAULT_UA = (
 GROQ_USER_AGENT = (os.getenv("GROQ_USER_AGENT", "").strip() or _DEFAULT_UA)
 
 
+def _get_api_key() -> str:
+    """Read the API key lazily so dotenv always has a chance to run first."""
+    return os.getenv("GROQ_API_KEY", "").strip()
+
+
 def is_live_llm_enabled() -> bool:
-    return bool(GROQ_API_KEY)
+    return bool(_get_api_key())
 
 
 def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
+    api_key = _get_api_key()
+    if not api_key:
+        raise LLMUnavailableError("GROQ_API_KEY is not set")
     url = f"{GROQ_BASE_URL}/chat/completions"
     payload: dict[str, Any] = {
         "model": GROQ_MODEL,
@@ -55,7 +62,7 @@ def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
             headers={
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Authorization": f"Bearer {api_key}",
                 "User-Agent": GROQ_USER_AGENT,
             },
             method="POST",
@@ -103,7 +110,7 @@ def _groq_chat(messages: list[dict[str, str]], purpose: str) -> str:
 
 def invoke_llm(prompt: str, purpose: str) -> str:
     """
-    Single-turn completion via Groq chat/completions (same prompts as agents / scenario / router).
+    Single-turn completion via Groq chat/completions.
     """
     if not is_live_llm_enabled():
         raise LLMUnavailableError("GROQ_API_KEY is not set; cannot call Groq")

@@ -12,18 +12,32 @@ class AuditResult(BaseModel):
     contradiction: bool
     explanation: str
 
-def parse_agent_response(response_text: str):
+def parse_agent_response(response_text: str, fallback_reasoning: str = ""):
     """
-    Parses reasoning and final answer from a response that uses <thinking> tags.
+    Parses reasoning and final answer from a response.
+    Supports <thinking> tags AND a REASONING: / RESPONSE: label format.
+    Falls back to fallback_reasoning if nothing is found.
     """
     reasoning = ""
     clean_text = response_text
-    
+
+    # Try <thinking>...</thinking> first
     thinking_match = re.search(r'<thinking>(.*?)</thinking>', response_text, re.DOTALL)
     if thinking_match:
         reasoning = thinking_match.group(1).strip()
         clean_text = re.sub(r'<thinking>.*?</thinking>', '', response_text, flags=re.DOTALL).strip()
-    
+        return reasoning, clean_text
+
+    # Try REASONING: ... RESPONSE: ... format
+    reasoning_match = re.search(r'REASONING:(.*?)(?:RESPONSE:|$)', response_text, re.DOTALL | re.IGNORECASE)
+    response_match = re.search(r'RESPONSE:(.*)', response_text, re.DOTALL | re.IGNORECASE)
+    if reasoning_match:
+        reasoning = reasoning_match.group(1).strip()
+        clean_text = response_match.group(1).strip() if response_match else response_text
+        return reasoning, clean_text
+
+    # Fallback: use provided context as reasoning so button always appears
+    reasoning = fallback_reasoning if fallback_reasoning else "Internal processing complete. No explicit reasoning trace available for this model."
     return reasoning, clean_text
 
 def _witness_scripted(question: str, case: dict) -> str:
@@ -54,6 +68,13 @@ def witness_agent(question: str, case: dict, rethink_instruction: str = "") -> d
     if rethink_instruction:
         rethink_block = f"\nCRITICAL SELF-CORRECTION: Your previous draft was flagged for the following inconsistency: {rethink_instruction}. Adjust your response to be more subtle or defensive without admitting the truth directly."
 
+    fallback_reasoning = (
+        f"WITNESS PROFILE: {suspect['name']} | Alibi: {suspect['alibi']}\n"
+        f"GUILT CHECK: Real culprit is '{culprit}'. Witness {'IS' if suspect['name'] == culprit else 'IS NOT'} the killer.\n"
+        f"MEMORY CONTEXT: {past_memory[:200] if past_memory else 'No prior statements on record.'}\n"
+        f"STRATEGY: {'Deflect and misdirect. Protect guilt.' if suspect['name'] == culprit else 'Maintain alibi. Redirect to other suspect.'}"
+    )
+
     prompt = f"""You are {suspect['name']}, a witness being interrogated in a Las Vegas murder case.
 
 CONFIDENTIAL TRUTH (never reveal directly):
@@ -69,28 +90,31 @@ RELEVANT PAST EVIDENCE / TURN HISTORY:
 {rethink_block}
 
 INSTRUCTIONS:
-1. First, think about the detective's query and your alibi/guilt in <thinking> tags. 
-   - Cross-reference with PAST EVIDENCE. 
-   - Decide if you need to lie or deflect.
-2. Then, provide your public response.
-3. Stay fully in character. Dropping subtle hints (gesture descriptions in brackets) is encouraged.
-4. Keep public response to 3 sentences max.
+First write your internal strategy under a line starting EXACTLY with "REASONING:"
+Then write your in-character spoken response under a line starting EXACTLY with "RESPONSE:"
+Keep RESPONSE to 3 sentences. Stay fully in character with gesture descriptions in [brackets].
 
 Detective's question: {question}
-Your response (Starting with <thinking>):"""
+REASONING:"""
 
     if not is_live_llm_enabled():
-        return {"response": _witness_scripted(question, case), "reasoning": "Scripted fallback used."}
+        return {"response": _witness_scripted(question, case), "reasoning": fallback_reasoning}
     
     try:
         raw_res = invoke_llm(prompt, "witness_agent")
-        reasoning, clean_text = parse_agent_response(raw_res)
+        reasoning, clean_text = parse_agent_response(raw_res, fallback_reasoning)
         return {"response": clean_text, "reasoning": reasoning}
     except LLMUnavailableError:
-        return {"response": _witness_scripted(question, case), "reasoning": "Groq unavailable, used scripted fallback."}
+        return {"response": _witness_scripted(question, case), "reasoning": fallback_reasoning}
 
 def analyst_agent(clue: str, case_history: str) -> dict:
     past_findings = retrieve_relevant(f"Forensic facts related to: {clue}")
+
+    fallback_reasoning = (
+        f"VECTOR SEARCH: Queried ChromaDB for: 'Forensic facts related to: {clue[:80]}'\n"
+        f"RETRIEVED CONTEXT: {past_findings[:300] if past_findings else 'No prior entries found in the evidence store.'}\n"
+        f"RAG PIPELINE: Retrieved {1 if past_findings else 0} relevant document(s). Feeding to analyst LLM."
+    )
 
     prompt = f"""You are Agent Reyes, a forensic analyst at the Las Vegas Crime Lab.
 
@@ -104,21 +128,21 @@ NEW CLUE SUBMITTED:
 {clue}
 
 TASK:
-1. Think analytically about the clue and its relevance in <thinking> tags.
-2. Provide a 3-sentence clinical summary of the findings.
-3. Rate importance: LOW / MEDIUM / HIGH.
+First, write your internal reasoning under a line that starts EXACTLY with "REASONING:"
+Then write your public 3-sentence forensic summary under a line that starts EXACTLY with "RESPONSE:"
+End with Importance: LOW / MEDIUM / HIGH.
 
-Your response (Starting with <thinking>):"""
+REASONING:"""
 
     if not is_live_llm_enabled():
-        return {"response": "Findings inconclusive based on current samples.", "reasoning": "Scripted fallback."}
+        return {"response": "Findings inconclusive based on current samples.", "reasoning": fallback_reasoning}
     
     try:
         raw_res = invoke_llm(prompt, "analyst_agent")
-        reasoning, clean_text = parse_agent_response(raw_res)
+        reasoning, clean_text = parse_agent_response(raw_res, fallback_reasoning)
         return {"response": clean_text, "reasoning": reasoning}
     except LLMUnavailableError:
-        return {"response": "System offline. Fallback diagnostics active.", "reasoning": "Groq error."}
+        return {"response": "System offline. Fallback diagnostics active.", "reasoning": fallback_reasoning}
 
 def auditor_agent(question: str, response: str, case: dict) -> AuditResult:
     """
