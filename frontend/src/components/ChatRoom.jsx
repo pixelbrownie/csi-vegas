@@ -186,20 +186,16 @@ export default function ChatRoom({
         suspectTarget: selectedSuspect 
       });
       
-      // Add suspect targeting if selected
-      const targetedMsg = selectedSuspect 
-        ? `${selectedSuspect}, ${msg}`
-        : msg
-      
+      // We now pass the suspect explicitly to the backend instead of prepending
       const startTime = Date.now();
-      onSend(targetedMsg)
+      onSend(msg, selectedSuspect)
       setInput('')
       
       // Log processing time when response comes back
       setTimeout(() => {
         logger.logAgentInteraction(
           selectedSuspect ? `witness_${selectedSuspect}` : 'auto_agent',
-          targetedMsg,
+          msg,
           '', // Will be filled when response arrives
           Date.now() - startTime
         );

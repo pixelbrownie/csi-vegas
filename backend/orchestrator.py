@@ -45,12 +45,16 @@ def classify_intent(user_input: str) -> str:
         logger.debug(f"CLASSIFY_INTENT_FALLBACK | Result: {fallback_result}")
         return fallback_result
 
-def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) -> dict:
+def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, suspect_name: str | None = None) -> dict:
     start_time = time.time()
     logger.info(f"ORCHESTRATE_START | Input: {user_input[:50]}...")
     
-    intent = classify_intent(user_input)
-    logger.debug(f"INTENT_CLASSIFIED | {intent}")
+    if suspect_name:
+        intent = "witness"
+        logger.debug(f"INTENT_OVERRIDE | Explicit suspect selected: {suspect_name}")
+    else:
+        intent = classify_intent(user_input)
+        logger.debug(f"INTENT_CLASSIFIED | {intent}")
     
     updated_case_file = case_file
     reasoning = ""
@@ -63,7 +67,7 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) 
     if intent == "witness":
         logger.debug(f"AGENT_DISPATCH | witness_agent")
         # PASS 1: Generate initial response
-        agent_res = witness_agent(user_input, case)
+        agent_res = witness_agent(user_input, case, target_suspect=suspect_name)
         response = agent_res["response"]
         reasoning = agent_res["reasoning"]
         agent_used = "WITNESS"
@@ -79,7 +83,7 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str) 
         if audit_results.contradiction:
             logger.warning(f"CONTRADICTION_DETECTED | {audit_results.explanation}")
             # Witness is lying or caught in a contradiction; give them a chance to "re-think"
-            rethink_res = witness_agent(user_input, case, rethink_instruction=audit_results.explanation)
+            rethink_res = witness_agent(user_input, case, rethink_instruction=audit_results.explanation, target_suspect=suspect_name)
             response = rethink_res["response"]
             reasoning = f"[CONTRADICTION DETECTED] {audit_results.explanation}\n\n[RETHINKING] {rethink_res['reasoning']}"
             logger.info(f"WITNESS_RETHINK | Contradiction addressed")

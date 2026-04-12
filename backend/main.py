@@ -42,6 +42,7 @@ class ChatRequest(BaseModel):
     case: dict
     case_file: str
     history: list
+    suspect: str | None = None
 
 class ChatResponse(BaseModel):
     agent: str
@@ -138,7 +139,8 @@ def chat(req: ChatRequest):
             req.message,
             req.case,
             req.case_file,
-            str(req.history[-10:])
+            str(req.history[-10:]),
+            req.suspect
         )
         # Ensure we return exactly what ChatResponse expects
         return ChatResponse(

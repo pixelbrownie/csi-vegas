@@ -16,6 +16,7 @@ class Suspect(BaseModel):
     name: str
     motive: str
     alibi: str
+    trait: str
 
 class Victim(BaseModel):
     name: str
@@ -46,11 +47,13 @@ FALLBACK_CASES = [
             "name": "Veronica Sloane",
             "motive": "caught the victim skimming the tip pool",
             "alibi": "couples massage at the spa until midnight",
+            "trait": "icy, composed, and extremely observant",
         },
         "suspect_b": {
             "name": "Danny Ricci",
             "motive": "owed fifty large after a bad marker",
             "alibi": "throwing dice at the craps pit, cameras can confirm",
+            "trait": "sweaty, fast-talking, desperate gambler",
         },
         "culprit": "Danny Ricci",
         "murder_weapon": "a weighted poker chip sleeve",
@@ -62,11 +65,13 @@ FALLBACK_CASES = [
             "name": "Felix Kwan",
             "motive": "Amber threatened to expose his off-book booking fees",
             "alibi": "sound check until 10, then green room with the band",
+            "trait": "arrogant, dismissive music producer",
         },
         "suspect_b": {
             "name": "Rita Morrow",
             "motive": "jealous understudy passed over for the Friday slot",
             "alibi": "front row for the early show, ushers remember her",
+            "trait": "fake-sweet, overly dramatic actress",
         },
         "culprit": "Felix Kwan",
         "murder_weapon": "a snapped microphone cable tightened like a garrote",
@@ -78,11 +83,13 @@ FALLBACK_CASES = [
             "name": "Nina Ortiz",
             "motive": "Hector froze her comp accounts after a dispute",
             "alibi": "inventory count in the back office with two cameras",
+            "trait": "efficient, exhausted, highly defensive",
         },
         "suspect_b": {
             "name": "Calvin Briggs",
             "motive": "rumored side deals with junket operators",
             "alibi": "smoke break alley — no witnesses, admits it",
+            "trait": "slick, overly confident hustler",
         },
         "culprit": "Calvin Briggs",
         "murder_weapon": "a brass dealer's buckle turned blunt instrument",
@@ -94,11 +101,13 @@ FALLBACK_CASES = [
             "name": "Priya Shah",
             "motive": "Jordan poached her whale clients",
             "alibi": "client dinner at Nobu, receipt timestamped",
+            "trait": "sharp, highly professional, secretly ruthless",
         },
         "suspect_b": {
             "name": "Theo Brand",
             "motive": "blackmail over off-menu perks",
             "alibi": "claims he was on a helicopter tour — flight log missing a page",
+            "trait": "entitled, easily irritated trust fund kid",
         },
         "culprit": "Priya Shah",
         "murder_weapon": "a broken champagne stem left in the private skybox",
@@ -111,8 +120,8 @@ def _generate_case_llm() -> dict:
     prompt = """Generate a NEW Las Vegas murder mystery scenario as a single JSON object.
 Required keys:
 - victim: { name: str, role: str }
-- suspect_a: { name: str, motive: str, alibi: str }
-- suspect_b: { name: str, motive: str, alibi: str }
+- suspect_a: { name: str, motive: str, alibi: str, trait: str }
+- suspect_b: { name: str, motive: str, alibi: str, trait: str }
 - culprit: string (MUST exactly match name of suspect_a or suspect_b)
 - murder_weapon: string (Vegas themed)
 - key_clue: string (specific evidence item)
@@ -120,7 +129,8 @@ Required keys:
 Rules:
 1. Invent fresh, noir-style names.
 2. The alibis should be plausible but one should have a subtle hole.
-3. Return ONLY raw JSON. No markdown fences.
+3. Assign each suspect a distinct, strong personality `trait` (e.g. arrogant high-roller, defensive burnout).
+4. Return ONLY raw JSON. No markdown fences.
 """
 
     last_error = None

@@ -81,23 +81,34 @@ def _witness_scripted(question: str, case: dict) -> str:
             f"they had more reason than anyone: {motive_phrase}."
         )
 
-def witness_agent(question: str, case: dict, rethink_instruction: str = ""):
+def witness_agent(question: str, case: dict, rethink_instruction: str = "", target_suspect: str | None = None):
     # Detect which suspect is being addressed
     suspect_a_name = case["suspect_a"]["name"].lower()
     suspect_b_name = case["suspect_b"]["name"].lower()
-    question_lower = question.lower()
     
-    # Determine which suspect to use based on question content
-    if suspect_a_name in question_lower:
-        suspect = case["suspect_a"]
-        logger.debug(f"WITNESS_AGENT | Selected suspect_a: {suspect['name']}")
-    elif suspect_b_name in question_lower:
-        suspect = case["suspect_b"]
-        logger.debug(f"WITNESS_AGENT | Selected suspect_b: {suspect['name']}")
-    else:
-        # Default to suspect_a if no specific name mentioned
-        suspect = case["suspect_a"]
-        logger.debug(f"WITNESS_AGENT | No specific suspect mentioned, defaulting to suspect_a: {suspect['name']}")
+    suspect = None
+    if target_suspect:
+        target_lower = target_suspect.lower()
+        if target_lower == suspect_a_name:
+            suspect = case["suspect_a"]
+            logger.debug(f"WITNESS_AGENT | Targeted suspect_a: {suspect['name']}")
+        elif target_lower == suspect_b_name:
+            suspect = case["suspect_b"]
+            logger.debug(f"WITNESS_AGENT | Targeted suspect_b: {suspect['name']}")
+
+    if not suspect:
+        question_lower = question.lower()
+        # Determine which suspect to use based on question content
+        if suspect_a_name in question_lower:
+            suspect = case["suspect_a"]
+            logger.debug(f"WITNESS_AGENT | Inferred suspect_a: {suspect['name']}")
+        elif suspect_b_name in question_lower:
+            suspect = case["suspect_b"]
+            logger.debug(f"WITNESS_AGENT | Inferred suspect_b: {suspect['name']}")
+        else:
+            # Default to suspect_a if no specific name mentioned
+            suspect = case["suspect_a"]
+            logger.debug(f"WITNESS_AGENT | No specific suspect, defaulting to suspect_a: {suspect['name']}")
     
     culprit = case["culprit"]
     weapon = case["murder_weapon"]
@@ -118,13 +129,14 @@ def witness_agent(question: str, case: dict, rethink_instruction: str = ""):
         f"STRATEGY: {'Deflect and misdirect. Protect guilt.' if suspect['name'] == culprit else 'Maintain alibi. Redirect to other suspect.'}"
     )
 
-    prompt = f"""You are {suspect['name']}, being interrogated about a Las Vegas murder. You're nervous but trying to maintain composure.
+    prompt = f"""You are {suspect['name']}, being interrogated about a Las Vegas murder. Maintain absolute character consistency.
 
 YOUR CHARACTER PROFILE:
 - You're {suspect['name']} and you must answer as yourself
+- Personality Trait: {suspect.get('trait', 'nervous but trying to maintain composure')}
 - You have an alibi: {suspect['alibi']}
 - Your potential motive: {suspect['motive']}
-- You're {'the actual killer and must lie to protect yourself' if suspect['name'] == culprit else 'innocent but nervous about being accused'}
+- You're {'the actual killer and must lie to protect yourself' if suspect['name'] == culprit else 'innocent and being wrongly accused'}
 
 CONFIDENTIAL TRUTH (never reveal directly):
 - Victim: {victim['name']}, a {victim['role']}
@@ -139,16 +151,16 @@ INTERROGATION CONTEXT:
 CRITICAL: You must answer the detective's specific question directly. The detective is asking: "{question}"
 
 RESPONSE GUIDELINES:
-1. READ THE QUESTION CAREFULLY and answer what was actually asked
-2. If asked about your location/alibi: Provide your alibi details
-3. If asked about the victim: Respond about your relationship/knowledge
-4. If asked about evidence: Address the specific evidence mentioned
-5. Speak naturally like a real person under pressure
-6. Include realistic emotions and physical actions in [brackets]
-7. If guilty: Defend yourself but don't confess
-8. If innocent: Be helpful but defensive about accusations
-9. Keep responses to 2-4 natural sentences
-10. NEVER redirect to other suspects unless directly asked
+1. READ THE QUESTION CAREFULLY and answer what was actually asked.
+2. Embody your Personality Trait exactly. Use vocabulary, sentence structure, and tone that matches it. Do not act uniformly nervous unless your trait dictates it.
+3. If asked about your location/alibi: Provide your alibi details naturally in conversation. Don't recite it like a robot.
+4. If asked about the victim: Respond based on your relationship as defined by motive.
+5. Speak naturally like a real person under pressure.
+6. Include realistic emotions and physical actions in [brackets] matching your trait (e.g. [rolls eyes], [adjusts tie], [stammers]).
+7. If guilty: Defend yourself but don't confess. Be manipulative, aggressive, or defensive according to your trait.
+8. If innocent: Act consistently with your trait (e.g., indignant, confused, scared).
+9. Keep responses to 2-4 natural sentences.
+10. NEVER redirect to other suspects unless directly asked.
 
 First write your internal thinking under "REASONING:"
 Then write your direct answer under "RESPONSE:"

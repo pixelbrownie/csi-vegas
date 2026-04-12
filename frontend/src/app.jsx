@@ -148,7 +148,7 @@ export default function App() {
     if (view === 'game' && gameState === 'idle') startNewCase()
   }, [view, gameState, startNewCase])
 
-  const sendMessage = useCallback(async (message) => {
+  const sendMessage = useCallback(async (message, suspect = null) => {
     if (!message.trim() || isThinking || gameState !== 'playing' || !case_) return
 
     const userMsg = { role: 'user', content: message }
@@ -161,6 +161,7 @@ export default function App() {
         case: case_,
         case_file: caseFile,
         history: [...history, userMsg],
+        suspect: suspect || null,
       })
       setCaseFile(res.data.updated_case_file)
       setHistory(prev => [...prev, {
