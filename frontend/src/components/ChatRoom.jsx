@@ -163,8 +163,10 @@ export default function ChatRoom({
   gameState,
   onSend,
   connectionError,
+  case_,
 }) {
   const [input, setInput] = useState('')
+  const [selectedSuspect, setSelectedSuspect] = useState('')
   const [isInputHovered, setIsInputHovered] = useState(false)
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
@@ -178,7 +180,11 @@ export default function ChatRoom({
   const handleSend = () => {
     const msg = input.trim()
     if (msg && !isThinking && gameState === 'playing') {
-      onSend(msg)
+      // Add suspect targeting if selected
+      const targetedMsg = selectedSuspect 
+        ? `${selectedSuspect}, ${msg}`
+        : msg
+      onSend(targetedMsg)
       setInput('')
     }
   }
@@ -289,6 +295,41 @@ export default function ChatRoom({
         background: 'transparent',
         zIndex: 2,
       }}>
+        {/* Suspect Dropdown */}
+        {case_ && gameState === 'playing' && (
+          <div style={{ marginBottom: '12px' }}>
+            <select
+              value={selectedSuspect}
+              onChange={(e) => setSelectedSuspect(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 16px',
+                background: '#0a0a0a',
+                border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
+                borderRadius: 'var(--radius-pill)',
+                color: 'var(--white-pure)',
+                fontFamily: 'var(--font-ui)',
+                fontSize: '0.9rem',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <option value="">All Agents (Auto-detect)</option>
+              {case_.suspect_a && (
+                <option value={case_.suspect_a.name}>
+                  {case_.suspect_a.name} - Suspect Alpha
+                </option>
+              )}
+              {case_.suspect_b && (
+                <option value={case_.suspect_b.name}>
+                  {case_.suspect_b.name} - Suspect Beta
+                </option>
+              )}
+            </select>
+          </div>
+        )}
+        
         <div 
           onMouseEnter={() => setIsInputHovered(true)}
           onMouseLeave={() => setIsInputHovered(false)}
@@ -311,7 +352,13 @@ export default function ChatRoom({
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={isInputDisabled ? 'INVESTIGATION SUSPENDED' : 'SEND MESSAGE'}
+            placeholder={
+              isInputDisabled 
+                ? 'INVESTIGATION SUSPENDED' 
+                : selectedSuspect 
+                  ? `Questioning ${selectedSuspect}...`
+                  : 'SEND MESSAGE'
+            }
             disabled={isInputDisabled}
             onKeyDown={handleKeyDown}
             style={{
@@ -349,7 +396,7 @@ export default function ChatRoom({
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: '0.9rem', marginLeft: '2px' }}>➤</span>
+            <span style={{ fontSize: '0.9rem', marginLeft: '2px' }}>{'>'}</span>
           </motion.button>
         </div>
       </div>

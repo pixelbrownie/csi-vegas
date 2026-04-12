@@ -183,6 +183,7 @@ export default function GamePage({
             gameState={gameState}
             onSend={onSend}
             connectionError={connectionError}
+            case_={case_}
             apiBaseUrl={apiBaseUrl}
             onConnectionRetry={onConnectionRetry}
           />

@@ -1,20 +1,69 @@
 # CSI Vegas 🎰🔍
 
-A multi-agent AI murder mystery game set in Las Vegas. Interrogate suspects, analyze clues, and solve the case before time runs out.
+A sophisticated multi-agent AI murder mystery game set in Las Vegas. Interrogate suspects, analyze forensic evidence, detect contradictions, and solve cases before time runs out.
+
+---
+
+## 🎯 **New Features Showcase**
+
+### **🤖 Advanced Multi-Agent System**
+- **🕵️ Witness Agent**: Interactive suspect interrogation with personality-driven responses
+- **🔬 Analyst Agent**: Professional forensic evidence processing and analysis  
+- **🎙️ Narrator Agent**: Atmospheric noir storytelling and case progression
+- **🔍 Auditor Agent**: Real-time contradiction detection and lie identification
+
+### **🧠 Intelligent Features**
+- **🔄 Self-Correction Loops**: Suspects adjust stories when caught in contradictions
+- **🎭 Dynamic Persona Consistency**: Each agent maintains distinct voice and behavior
+- **📊 Evidence Importance Grading**: LOW/MEDIUM/HIGH priority classification
+- **⚡ Live LLM Integration**: Groq-powered responses with graceful fallback
+- **🗄️ RAG Memory System**: Vector-based context retrieval across interactions
+
+### **🎮 Enhanced Gameplay**
+- **[! ] Contradiction Alerts**: Visual indicators when suspects lie
+- **🔍 Forensic Analysis**: Detailed evidence breakdown with reasoning traces
+- **📋 Live Case File**: Real-time narrative updates
+- **⏱️ 30-Minute Timer**: Pressure-filled investigation experience
+- **🎯 Smart Accusation System**: Case resolution with feedback
 
 ---
 
 ## How It Works
 
-The game uses three specialized AI agents, each routed automatically based on what you type:
+The game uses **four specialized AI agents**, each routed automatically based on your input:
 
-| Agent | Trigger | Role |
-|---|---|---|
-| 🕵️ Witness Agent | Questions about suspects, alibis, whereabouts | Plays a nervous suspect — drops hints without confessing |
-| 🔬 Analyst Agent | Clue submission, forensic analysis | Cross-checks evidence and flags contradictions |
-| 🎙️ Narrator Agent | Story observations, anything else | Updates the live case file in noir style |
+| Agent | Trigger | Role | Advanced Features |
+|---|---|---|---|
+| 🕵️ Witness Agent | Questions about suspects, alibis, whereabouts | Personality-driven responses + contradiction detection + self-correction |
+| 🔬 Analyst Agent | Clue submission, forensic analysis | Evidence grading + RAG memory integration + importance classification |
+| 🎙️ Narrator Agent | Story observations, anything else | Atmospheric updates + case file management |
+| 🔍 Auditor Agent | All witness responses | Real-time lie detection + contradiction explanations |
 
-A new crime scenario is generated each game (victim, two suspects, culprit, weapon, key clue). You have 30 minutes to interrogate, gather evidence, and make your accusation.
+**Dual-layer routing**: Intelligent intent classification with keyword fallback ensures reliable agent selection.
+
+**Dynamic case generation**: Each game creates unique scenarios with victim, suspects, culprit, weapon, and key clue.
+
+---
+
+## 🏗️ **Technical Architecture**
+
+### **Backend Orchestration**
+```
+User Input → Intent Classification → Agent Selection → Response Generation → Audit → Memory Storage
+```
+
+**Key Components:**
+- **Orchestrator**: Intelligent routing with dual-layer classification
+- **Agent System**: Four specialized agents with consistent personas
+- **Memory Layer**: ChromaDB vector store for semantic retrieval
+- **Audit System**: Real-time contradiction detection and validation
+- **LLM Client**: Groq integration with retry logic and fallback
+
+### **Frontend Architecture**
+- **React + Vite**: Modern SPA with component-based design
+- **Real-time Updates**: Live chat with animated indicators
+- **Responsive UI**: Mobile-friendly investigation interface
+- **State Management**: Centralized game state with error handling
 
 ---
 
@@ -23,11 +72,12 @@ A new crime scenario is generated each game (victim, two suspects, culprit, weap
 ```
 csi-vegas/
 ├── backend/
-│   ├── main.py
-│   ├── llm_client.py
-│   ├── orchestrator.py
-│   ├── agents.py
-│   ├── scenario_generator.py
+│   ├── main.py                 # FastAPI server with REST endpoints
+│   ├── llm_client.py          # Groq integration with retry logic
+│   ├── orchestrator.py         # Intent classification and routing
+│   ├── agents.py              # Four specialized AI agents
+│   ├── scenario_generator.py   # Dynamic case generation
+│   ├── memory.py              # ChromaDB vector storage
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/ 
@@ -36,12 +86,12 @@ csi-vegas/
 │   │   ├── style_fixed.css    # Global styles and CSS variables
 │   │   └── components/
 │   │       ├── GamePage.jsx       # 4-column game layout
-│   │       ├── LandingPage.jsx    # Hero + agent explainer
-│   │       ├── ChatRoom.jsx       # Chat UI with agent-styled bubbles
+│   │       ├── LandingPage.jsx    # Hero + feature showcase
+│   │       ├── ChatRoom.jsx       # Chat UI with contradiction alerts
 │   │       ├── DossierPanel.jsx   # Victim + suspect cards
-│   │       ├── RightPanel.jsx     # Case file, accusation, how-to-play
-│   │       ├── Sidebar.jsx        # Timer + location + new case
-│   │       └── SecretReveal.jsx   # Hover-to-reveal secret clue widget
+│   │       ├── RightPanel.jsx     # Case file, accusation, timer
+│   │       ├── Sidebar.jsx        # Game controls + navigation
+│   │       └── SecretReveal.jsx   # Evidence reveal widget
 │   ├── index.html
 │   └── vite.config.js
 └── README.md
@@ -197,7 +247,55 @@ Run FastAPI with uvicorn (`--host 0.0.0.0` and the port your host expects).
 
 ---
 
-## Troubleshooting
+## 🎯 **Sample Gameplay Flow**
+
+```text
+DETECTIVE: Where were you during the murder?
+
+🕵️ Witness: [Adjusts tie nervously] I was at the poker tournament all night.
+
+[! ] DISCREPANCY DETECTED
+FORENSIC AUDIT: Witness claims to be at tournament all night, but security shows 30-minute gap.
+
+DETECTIVE: Security shows you left for 30 minutes. Explain that.
+
+🕵️ Witness: [CONTRADICTION DETECTED] I only stepped outside for a phone call about my daughter!
+
+DETECTIVE: Analyze the torn fabric found at the scene.
+
+🔬 Analyst: Fabric matches designer gown material. 99.8% match to suspect's dress. Importance: HIGH.
+
+DETECTIVE: I accuse Lola Luxe of the murder!
+
+🎙️ Narrator: The final card is played. Justice comes calling in Vegas.
+```
+
+---
+
+## 🌐 **Deployment Options**
+
+### **Development**
+- **Backend**: `uvicorn main:app --reload --port 8000`
+- **Frontend**: `npm run dev` → `http://localhost:5173`
+
+### **Production - Render**
+1. Deploy backend to Render with `GROQ_API_KEY` environment variable
+2. Set start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+3. Configure CORS for frontend access
+
+### **Production - GitHub Pages**
+1. Set `VITE_API_URL` secret in GitHub repo
+2. Auto-deploy on push to main branch
+3. Static hosting with API configuration
+
+### **Self-Hosted**
+- Docker containerization available
+- Environment variables for all configurations
+- Scalable deployment options
+
+---
+
+## 🔍 **Troubleshooting**
 
 **CORS errors in the browser**
 The API is configured to allow any origin. If you still see CORS errors, confirm the browser is actually talking to your FastAPI app (correct `VITE_API_URL` / `api-config.json`) and that no corporate extension is blocking requests.
@@ -210,3 +308,50 @@ Open the browser console and check for API errors. Confirm the `/new-case` endpo
 
 **Groq `403` / `error code: 1010` in the error text**
 That response is from **Groq (Cloudflare)**, not your React app. Ensure `GROQ_API_KEY` is valid and the model id exists for your account. After deploying the latest backend, requests include a normal `User-Agent` and retries on 403. If it still fails, remove `GROQ_API_KEY` on Render to run **fully offline**, or contact Groq support with the `cf-ray` id from the error response.
+
+---
+
+## 🎖️ **Advanced Features**
+
+### **Intelligence Layer**
+- **Semantic Memory**: Cross-references evidence across entire investigation
+- **Contradiction Detection**: Real-time lie identification with explanations
+- **Evidence Grading**: Automatic importance classification (LOW/MEDIUM/HIGH)
+- **Persona Consistency**: Each agent maintains character voice throughout
+
+### **User Experience**
+- **Animated Feedback**: Visual indicators for system status
+- **Reasoning Traces**: Transparent AI decision-making process
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Progressive Disclosure**: Evidence revealed through investigation
+
+### **Technical Excellence**
+- **Graceful Degradation**: Works offline without API keys
+- **Error Recovery**: Automatic retry and fallback mechanisms
+- **Performance Optimized**: Efficient vector search and caching
+- **Scalable Architecture**: Easy to add new agents and features
+
+---
+
+## 📞 **Support & Contributing**
+
+### **Getting Help**
+- Check this README for common issues
+- Review browser console for error details
+- Verify backend logs for API problems
+
+### **Contributing**
+1. Fork repository
+2. Create feature branch
+3. Test thoroughly with both online and offline modes
+4. Submit pull request with detailed description
+
+### **Feature Requests**
+- New agent types welcome
+- Additional evidence types supported
+- UI/UX improvements encouraged
+- Performance optimizations appreciated
+
+---
+
+**CSI Vegas** - Where every case tells a story, and every story has a killer to catch. 🎰🔍
