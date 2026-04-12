@@ -1,3 +1,0 @@
-2026-04-12 14:54:52 | INFO     | main            | <module>    :20   | CSI Vegas Backend Starting Up...
-2026-04-12 14:54:54 | DEBUG    | chromadb.config | start       :355  | Starting component System
-2026-04-12 14:54:54 | DEBUG    | chromadb.config | start       :355  | Starting component Posthog
