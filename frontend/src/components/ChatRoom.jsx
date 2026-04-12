@@ -169,6 +169,7 @@ export default function ChatRoom({
   const [input, setInput] = useState('')
   const [selectedSuspect, setSelectedSuspect] = useState('')
   const [isInputHovered, setIsInputHovered] = useState(false)
+  const [isSelectHovered, setIsSelectHovered] = useState(false)
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -311,7 +312,11 @@ export default function ChatRoom({
       }}>
         {/* Suspect Dropdown */}
         {case_ && gameState === 'playing' && (
-          <div style={{ marginBottom: '12px' }}>
+          <div 
+            style={{ marginBottom: '12px', position: 'relative' }}
+            onMouseEnter={() => setIsSelectHovered(true)}
+            onMouseLeave={() => setIsSelectHovered(false)}
+          >
             <select
               value={selectedSuspect}
               onChange={(e) => {
@@ -319,12 +324,20 @@ export default function ChatRoom({
                 const newSelection = e.target.value;
                 setSelectedSuspect(newSelection);
                 logger.logSuspectSelection(newSelection, previous);
+
+                // AUTO-PREFIX LOGIC: If message is empty, fill with suspect name
+                // This helps the user start questioning immediately
+                if (newSelection && (!input.trim())) {
+                  setInput(`[${newSelection}]: `);
+                  // Brief delay to ensure state update before focusing
+                  setTimeout(() => inputRef.current?.focus(), 10);
+                }
               }}
               style={{
                 width: '100%',
-                padding: '8px 16px',
+                padding: '10px 16px',
                 background: '#0a0a0a',
-                border: `1px solid ${isInputHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
+                border: `1px solid ${isSelectHovered ? 'var(--gold-metallic)' : 'rgba(212, 175, 55, 0.15)'}`,
                 borderRadius: 'var(--radius-pill)',
                 color: 'var(--white-pure)',
                 fontFamily: 'var(--font-ui)',
@@ -332,20 +345,35 @@ export default function ChatRoom({
                 outline: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
+                appearance: 'none', // Custom arrow implementation
+                boxShadow: isSelectHovered ? '0 0 15px rgba(212, 175, 55, 0.1)' : 'none',
               }}
             >
               <option value="">All Agents (Auto-detect)</option>
               {case_.suspect_a && (
                 <option value={case_.suspect_a.name}>
-                  {case_.suspect_a.name} - Suspect Alpha
+                  {case_.suspect_a.name} (Suspect Alpha)
                 </option>
               )}
               {case_.suspect_b && (
                 <option value={case_.suspect_b.name}>
-                  {case_.suspect_b.name} - Suspect Beta
+                  {case_.suspect_b.name} (Suspect Beta)
                 </option>
               )}
             </select>
+            {/* Custom Arrow */}
+            <div style={{
+              position: 'absolute',
+              right: '20px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--gold-metallic)',
+              pointerEvents: 'none',
+              fontSize: '0.6rem',
+              opacity: 0.7,
+            }}>
+              ▽
+            </div>
           </div>
         )}
         

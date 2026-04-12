@@ -9,10 +9,13 @@ logger = get_logger(__name__)
 
 def _classify_intent_keywords(user_input: str) -> str:
     u = user_input.lower()
-    analyst_hits = ("clue", "evidence", "analyze", "analysis", "forensic", "lab", "sample", "dna", "print", "fiber", "ballistic", "swab", "weapon", "sweep", "scanner", "reyes", "crime scene")
+    analyst_hits = ("clue", "evidence", "analyze", "analysis", "forensic", "lab", "sample", "dna", "print", "fiber", "ballistic", "swab", "weapon", "sweep", "scanner", "reyes", "crime scene", "fingerprint", "autopsy", "toxicology", "blood", "residue", "trace", "microscope", "chemical", "match", "profile")
     witness_hits = ("where were", "alibi", "saw you", "did you", "why did", "tell me about", "suspect", "witness", "were you", "you were", "know anything")
+    narrator_hits = ("mood", "atmosphere", "recap", "summary", "story", "background", "setting", "scene", "describe")
+    
     if any(w in u for w in analyst_hits): return "analyst"
     if any(w in u for w in witness_hits): return "witness"
+    if any(w in u for w in narrator_hits): return "narrator"
     return "narrator"
 
 def classify_intent(user_input: str) -> str:

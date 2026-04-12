@@ -179,7 +179,7 @@ def analyst_agent(clue: str, case_history: str, case: dict = None) -> dict:
         f"Synthesizing forensic indicators to provide investigative lead."
     )
 
-    prompt = f"""You are Agent Reyes, a senior forensic analyst at the Las Vegas Crime Lab.
+    prompt = f"""You are Agent Reyes, a grizzled senior forensic analyst at the Las Vegas Crime Lab. You've seen everything Vegas can throw at a person, from desert burials to casino-floor executions.
 
 GROUND TRUTH EVIDENCE (Only reveal if specifically investigated or relevant to the clue):
 - Murder Weapon: {case.get('murder_weapon', 'Unknown') if case else 'Unknown'}
@@ -192,14 +192,15 @@ NEW EVIDENCE TO ANALYZE:
 {clue}
 
 ANALYSIS APPROACH:
-1. Consider the scientific implications of this evidence
-2. If the user asks to "sweep the crime scene" or asks generally about weapons/clues, gently reveal the Murder Weapon and Key Clue.
-3. Be direct and practical in your conclusions
+1. Provide a professional, scientific assessment of the evidence.
+2. If the detective asks to "sweep the crime scene" or asks generally about weapons/clues, reveals the Murder Weapon and Key Clue from the Ground Truth.
+3. Maintain a no-nonsense, slightly cynical professional tone. Use technical terminology when appropriate.
+4. If requested to "match" or "profile" something, refer back to the Ground Truth evidence.
 
 RESPONSE FORMAT:
 First write your expert analysis under "REASONING:"
-Then provide your professional assessment under "RESPONSE:" (2-3 sentences)
-Conclude with: Importance: LOW/MEDIUM/HIGH
+Then provide your professional assessment under "RESPONSE:" (2-4 sentences)
+Conclude with: Importance: LOW/MEDIUM/HIGH/CRITICAL
 
 REASONING:"""
 
@@ -223,7 +224,9 @@ REASONING:"""
         fallback_templates = [
             f"Initial spectrum analysis complete. We identified the primary instrument as {weapon}. Furthermore, regional sweeps isolated a distinct trace: {key_clue}. Logging this into the evidence locker now.\n\nImportance: HIGH",
             f"Forensics processed the site. The findings confirm the use of a {weapon}. We also recovered a specific evidence item: {key_clue}. All data has been uploaded to the Case Dossier.\n\nImportance: CRITICAL",
-            f"Lab results are in from the crime scene sweep. The trauma matches a {weapon}, and our team secured a critical clue: {key_clue}. Proceed with the investigation based on these leads.\n\nImportance: HIGH"
+            f"Lab results are in from the crime scene sweep. The trauma matches a {weapon}, and our team secured a critical clue: {key_clue}. Proceed with the investigation based on these leads.\n\nImportance: HIGH",
+            f"Analysis of the trace materials is conclusive. External trauma was caused by a {weapon}. We've also isolated {key_clue} from the proximity sweep. This is a significant lead.\n\nImportance: MEDIUM",
+            f"The lab has finished the preliminary workup. The weapon involved is a {weapon}. Additionally, we recovered {key_clue} during the sweep. I've sent the details to your handheld.\n\nImportance: HIGH"
         ]
         
         return {"response": random.choice(fallback_templates), "reasoning": "Rerouting to localized heuristic diagnostics due to network packet loss. Pattern match on crime scene variables successful."}
@@ -270,15 +273,23 @@ TASK:
 
 def narrator_agent(event: str, case_file: str) -> str:
     import random
-    prompt = f"""You are the noir narrator of a Vegas murder mystery.
-Update the case file with 2 punchy, cinematic sentences based on: {event}. 
-Do NOT repeat the current file. Focus on the new mood."""
+    prompt = f"""You are a noir narrator in a neon-drenched, cynical Las Vegas.
+Update the investigation mood based on: {event}.
+Focus on the atmosphere, the clashing neon lights, the desert heat, and the thin line between luck and death.
+
+RESPONSE GUIDELINES:
+1. Use 2-3 punchy, cinematic sentences.
+2. Maintain a hard-boiled, philosophical tone.
+3. Do NOT repeat the current case file details. 
+4. If a "recap" or "summary" was requested, summarize the mood of the case so far."""
     
     fallbacks = [
         f"Vegas doesn't care about the truth, only the stakes. {event[:60]}...",
-        f"The neon signs flicker, casting long shadows over the new evidence. {event[:60]}...",
-        f"Another secret buried in the desert dirt. The investigation takes a turn: {event[:60]}...",
-        f"In a city built on illusions, you have to look closely to see the bloodstains. {event[:60]}..."
+        f"The neon signs flicker, casting long shadows over the new evidence. The city is breathing down our necks. {event[:60]}...",
+        f"Another secret buried in the desert dirt where the wind never stops screaming. {event[:60]}...",
+        f"In a city built on illusions, you have to look closely to see the bloodstains underneath the glitter. {event[:60]}...",
+        f"The heat off the asphalt still feels like a warning. The chips are down, and the house is winning. {event[:60]}...",
+        f"The slot machines keep chiming, a funeral march for the latest victim of the Strip. {event[:60]}..."
     ]
     
     if not is_live_llm_enabled():
