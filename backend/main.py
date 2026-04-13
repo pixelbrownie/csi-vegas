@@ -1,7 +1,3 @@
-# backend/main.py
-# FastAPI server — wraps all agents as REST API endpoints
-# Run with: uvicorn main:app --reload --port 8000
-
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,11 +5,9 @@ from pydantic import BaseModel
 import os
 import time
 from dotenv import load_dotenv
-
-# Load environment variables from .env
 load_dotenv()
 
-# Initialize logging system
+#init
 from logging_config import setup_logging, get_logger, log_api_request
 setup_logging()
 logger = get_logger(__name__)
@@ -25,8 +19,6 @@ from llm_client import LLMUnavailableError, llm_health_status
 
 app = FastAPI(title="CSI Vegas API", version="1.0.0")
 
-# Public JSON API (no cookie auth). Wildcard avoids broken handshakes from
-# GitHub Pages custom domains, other static hosts, or forked deployments.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -126,7 +118,7 @@ def new_case_head():
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     """Route a detective message to the correct agent."""
-    # Format history concisely to avoid token limits
+    # Format history
     formatted_history = []
     for msg in req.history[-6:]:
         role = "Detective" if msg.get("role") == "user" else msg.get("agent", "System")
@@ -142,7 +134,6 @@ def chat(req: ChatRequest):
             history_str,
             req.suspect
         )
-        # Ensure we return exactly what ChatResponse expects
         return ChatResponse(
             agent=result["agent"],
             response=result["response"],
@@ -154,4 +145,3 @@ def chat(req: ChatRequest):
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
- 

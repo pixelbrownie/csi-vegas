@@ -7,15 +7,14 @@ import urllib.request
 from typing import Any
 from dotenv import load_dotenv
 
-load_dotenv()  # Ensure .env is loaded even if this module is imported first
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 class LLMUnavailableError(RuntimeError):
     """Raised when Groq inference fails after retries or the API key is missing."""
 
-
-# Gemini API Configuration
+# Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GROQ_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash").strip()
 GEMINI_TIMEOUT_S = float(os.getenv("GEMINI_TIMEOUT_S", "120"))

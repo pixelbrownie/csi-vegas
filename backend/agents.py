@@ -1,4 +1,4 @@
-# agents.py
+
 import logging
 import re
 import json
@@ -21,14 +21,12 @@ def parse_agent_response(response_text: str, fallback_reasoning: str = ""):
     reasoning = ""
     clean_text = response_text
 
-    # Try <thinking>...</thinking> first
     thinking_match = re.search(r'<thinking>(.*?)</thinking>', response_text, re.DOTALL)
     if thinking_match:
         reasoning = thinking_match.group(1).strip()
         clean_text = re.sub(r'<thinking>.*?</thinking>', '', response_text, flags=re.DOTALL).strip()
         return reasoning, clean_text
 
-    # Try REASONING: ... RESPONSE: ... format
     reasoning_match = re.search(r'REASONING:(.*?)(?:RESPONSE:|$)', response_text, re.DOTALL | re.IGNORECASE)
     response_match = re.search(r'RESPONSE:(.*)', response_text, re.DOTALL | re.IGNORECASE)
     if reasoning_match:
@@ -36,7 +34,6 @@ def parse_agent_response(response_text: str, fallback_reasoning: str = ""):
         clean_text = response_match.group(1).strip() if response_match else response_text
         return reasoning, clean_text
 
-    # Fallback: use provided context as reasoning so button always appears
     reasoning = fallback_reasoning if fallback_reasoning else "Internal processing complete. No explicit reasoning trace available for this model."
     return reasoning, clean_text
 
@@ -58,7 +55,6 @@ def _witness_scripted(question: str, case: dict) -> str:
     motive = other["motive"]
     motive_phrase = (motive[0].lower() + motive[1:]) if motive else "their own secrets"
     
-    # Generate response based on question content
     if "where were" in question_lower or "alibi" in question_lower:
         return (
             f"[{suspect['name']} shifts nervously] "
@@ -97,7 +93,7 @@ def witness_agent(question: str, case: dict, rethink_instruction: str = "", targ
 
     if not suspect:
         question_lower = question.lower()
-        # Determine which suspect to use based on question content
+        # Determine which suspect
         if suspect_a_name in question_lower:
             suspect = case["suspect_a"]
             logger.debug(f"WITNESS_AGENT | Inferred suspect_a: {suspect['name']}")
@@ -105,7 +101,7 @@ def witness_agent(question: str, case: dict, rethink_instruction: str = "", targ
             suspect = case["suspect_b"]
             logger.debug(f"WITNESS_AGENT | Inferred suspect_b: {suspect['name']}")
         else:
-            # Default to suspect_a if no specific name mentioned
+            # Default to suspect_a if no name
             suspect = case["suspect_a"]
             logger.debug(f"WITNESS_AGENT | No specific suspect, defaulting to suspect_a: {suspect['name']}")
     
@@ -212,7 +208,7 @@ REASONING:"""
         reasoning, clean_text = parse_agent_response(raw_res, fallback_reasoning)
         return {"response": clean_text, "reasoning": reasoning}
     except LLMUnavailableError as e:
-        # FLAWLESS FALLBACK: If LLM fails, we provide a variety of scripted responses so it's not repetitive
+        #fallbacks
         import traceback
         import random
         with open("error_log.txt", "a") as f:

@@ -19,7 +19,7 @@ def _classify_intent_keywords(user_input: str) -> str:
     return "narrator"
 
 def classify_intent(user_input: str) -> str:
-    # HIGH-EFFICIENCY MODE: Always use keywords to save tokens
+    # use keywords to save tokens
     fallback_result = _classify_intent_keywords(user_input)
     logger.debug(f"CLASSIFY_INTENT_FAST | Result: {fallback_result}")
     return fallback_result
@@ -93,7 +93,6 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
         reasoning = "Generating narrative update."
         updated_case_file = case_file + "\n" + response
 
-    # Calculate processing time and log completion
     processing_time = time.time() - start_time
     log_orchestration_decision(user_input, intent, agent_used, processing_time)
     logger.info(f"ORCHESTRATE_COMPLETE | Agent: {agent_used} | Time: {processing_time:.2f}s")
