@@ -16,10 +16,18 @@ class LLMUnavailableError(RuntimeError):
 
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GROQ_API_KEY", "").strip()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash").strip()
+# Use GROQ_MODEL or GEMINI_MODEL, with a fallback to 2.0-flash
+GEMINI_MODEL = os.getenv("GROQ_MODEL", "").strip() or os.getenv("GEMINI_MODEL", "").strip() or "gemini-2.0-flash"
+
+# Basic validation: if they put something that doesn't look like a real version, use 2.0-flash
+if "gemini" not in GEMINI_MODEL.lower() or "2.5" in GEMINI_MODEL:
+    logger.warning(f"Invalid model detected: {GEMINI_MODEL}. Defaulting to gemini-2.0-flash.")
+    GEMINI_MODEL = "gemini-2.0-flash"
+
 GEMINI_TIMEOUT_S = float(os.getenv("GEMINI_TIMEOUT_S", "120"))
 GEMINI_RETRIES = int(os.getenv("GEMINI_RETRIES", "3"))
 GEMINI_RETRY_DELAY_MS = int(os.getenv("GEMINI_RETRY_DELAY_MS", "500"))
+
 
 def _get_api_key() -> str:
     """Read the API key lazily so dotenv always has a chance to run first."""

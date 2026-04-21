@@ -9,7 +9,8 @@ logger = get_logger(__name__)
 
 def _classify_intent_keywords(user_input: str) -> str:
     u = user_input.lower()
-    analyst_hits = ("clue", "evidence", "analyze", "analysis", "forensic", "lab", "sample", "dna", "print", "fiber", "ballistic", "swab", "weapon", "sweep", "scanner", "reyes", "crime scene", "fingerprint", "autopsy", "toxicology", "blood", "residue", "trace", "microscope", "chemical", "match", "profile")
+    analyst_hits = ("clue", "evidence", "analyze", "analysis", "forensic", "lab", "sample", "dna", "print", "fiber", "ballistic", "swab", "weapon", "sweep", "scanner", "reyes", "crime scene", "fingerprint", "autopsy", "toxicology", "blood", "residue", "trace", "microscope", "chemical", "match", "profile", "glitter", "shards", "toxic", "poison", "bullet", "casing", "shell", "finger", "dusting", "luminal", "uv light", "scanner", "microscopy")
+
     witness_hits = ("where were", "alibi", "saw you", "did you", "why did", "tell me about", "suspect", "witness", "were you", "you were", "know anything")
     narrator_hits = ("mood", "atmosphere", "recap", "summary", "story", "background", "setting", "scene", "describe")
     
@@ -19,11 +20,14 @@ def _classify_intent_keywords(user_input: str) -> str:
     return "narrator"
 
 def classify_intent(user_input: str) -> str:
-    # use keywords to save tokens
-    fallback_result = _classify_intent_keywords(user_input)
-    logger.debug(f"CLASSIFY_INTENT_FAST | Result: {fallback_result}")
-    return fallback_result
-        
+    # Use keywords for a first-pass speed boost
+    u = user_input.lower()
+    analyst_hits = ("clue", "evidence", "analyze", "analysis", "forensic", "lab", "sample", "dna", "print", "fiber", "ballistic", "swab", "weapon", "sweep", "scanner", "reyes", "crime scene", "fingerprint", "autopsy", "toxicology", "blood", "residue", "trace", "microscope", "chemical", "match", "profile")
+    if any(w in u for w in analyst_hits): 
+        logger.debug("CLASSIFY_INTENT_KEYWORD | Result: analyst")
+        return "analyst"
+
+    # For nuanced chat, we use the LLM
     prompt = f"Classify intent: '{user_input}'. Reply with EXACTLY one word: witness, analyst, or narrator."
     try:
         result = invoke_llm(prompt, "classify_intent").lower()
@@ -35,15 +39,11 @@ def classify_intent(user_input: str) -> str:
                 return agent
                 
         logger.warning(f"CLASSIFY_INTENT_NO_MATCH | Using fallback for: '{result}'")
-        fallback_result = _classify_intent_keywords(user_input)
-        logger.debug(f"CLASSIFY_INTENT_FALLBACK | Result: {fallback_result}")
-        return fallback_result
+        return _classify_intent_keywords(user_input)
         
     except LLMUnavailableError as e:
         logger.error(f"CLASSIFY_INTENT_LLM_ERROR | {str(e)}")
-        fallback_result = _classify_intent_keywords(user_input)
-        logger.debug(f"CLASSIFY_INTENT_FALLBACK | Result: {fallback_result}")
-        return fallback_result
+        return _classify_intent_keywords(user_input)
 
 def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, suspect_name: str | None = None) -> dict:
     start_time = time.time()
@@ -63,7 +63,6 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
     # Main interaction logic
     if intent == "witness":
         logger.debug(f"AGENT_DISPATCH | witness_agent")
-        # SINGLE CALL: Only the character speaks
         agent_res = witness_agent(user_input, case, target_suspect=suspect_name)
         response = agent_res["response"]
         reasoning = agent_res["reasoning"]
@@ -71,8 +70,23 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
         
         log_agent_interaction("witness", user_input, response, reasoning)
         
-        # Auditor and Narrator disabled for High-Efficiency Mode
+        # AUDITOR: Check if they just lied
+        audit_results = auditor_agent(user_input, response, case)
+        audit_comment = ""
+        if audit_results.contradiction:
+            logger.info(f"AUDIT_HIT | Contradiction detected: {audit_results.explanation}")
+            audit_comment = f"\n\n[DETECTIVE'S INTUITION: Something doesn't add up... {audit_results.explanation}]"
+
+        # NARRATOR: Add atmosphere to the encounter
+        narrative = narrator_agent(f"Detective interrogated {suspect_name if suspect_name else 'witness'}. Witness responded: {response}", case_file)
+        
+        # Assemble optimized response
+        response = f"{response}{audit_comment}\n\n[Narrator: {narrative}]"
+        
         updated_case_file = case_file + f"\nInterrogated {suspect_name if suspect_name else 'witness'}."
+        if audit_results.contradiction:
+            updated_case_file += f" (Contradiction: {audit_results.explanation})"
+
 
     elif intent == "analyst":
         logger.debug(f"AGENT_DISPATCH | analyst_agent")
@@ -87,8 +101,7 @@ def orchestrate(user_input: str, case: dict, case_file: str, case_history: str, 
 
     else:
         logger.debug(f"AGENT_DISPATCH | narrator_agent")
-        # Use simple template for Narrator to save tokens
-        response = f"Vegas doesn't care about the truth, only the stakes. {user_input[:50]}..." if not is_live_llm_enabled() else narrator_agent(user_input, case_file)
+        response = narrator_agent(user_input, case_file)
         agent_used = "NARRATOR"
         reasoning = "Generating narrative update."
         updated_case_file = case_file + "\n" + response

@@ -1,4 +1,3 @@
-
 import logging
 import re
 import json
@@ -55,26 +54,34 @@ def _witness_scripted(question: str, case: dict) -> str:
     motive = other["motive"]
     motive_phrase = (motive[0].lower() + motive[1:]) if motive else "their own secrets"
     
-    if "where were" in question_lower or "alibi" in question_lower:
+    if "where were" in question_lower or "were you" in question_lower or "alibi" in question_lower:
+        location_guess = "at home" if "at home" in question_lower else "somewhere else"
+        was_at_alibi = suspect['alibi'].lower() in question_lower or "yes" if suspect['alibi'].lower() in question_lower else "no"
+        
+        # Determine if the user is asking correctly about the alibi
+        if any(term in question_lower for term in suspect['alibi'].lower().split()):
+            return f"[{suspect['name']} nods firmly] Exactly. I was {suspect['alibi']}. Like I said, I didn't see anything because I wasn't even there."
+        
         return (
+            f"No, I wasn't {location_guess if '?' in question else 'there'}. I was {suspect['alibi']}. "
             f"[{suspect['name']} shifts nervously] "
-            f"I was {suspect['alibi']}. "
-            f"That's where I was the whole time. "
-            f"I already told security this."
+            f"That's where I was the whole time. I already told security this."
         )
     elif "victim" in question_lower or victim["name"].lower() in question_lower:
         return (
-            f"[{suspect['name']} looks away momentarily] "
             f"{victim['name']}? We knew each other, but not well. "
+            f"[{suspect['name']} looks away momentarily] "
             f"I didn't wish them harm, if that's what you're asking."
         )
     else:
         return (
-            f"[{suspect['name']} avoids eye contact, voice tight] "
             f"Look, I was {suspect['alibi']}. "
+            f"[{suspect['name']} avoids eye contact, voice tight] "
             f"You should ask {other['name']} - "
             f"they had more reason than anyone: {motive_phrase}."
         )
+
+
 
 def witness_agent(question: str, case: dict, rethink_instruction: str = "", target_suspect: str | None = None):
     # Detect which suspect is being addressed
@@ -141,16 +148,18 @@ INTERROGATION CONTEXT:
 CRITICAL: You must answer the detective's specific question directly. The detective is asking: "{question}"
 
 RESPONSE GUIDELINES:
-1. READ THE QUESTION CAREFULLY and answer what was actually asked.
-2. Embody your Personality Trait exactly. Use vocabulary, sentence structure, and tone that matches it. Do not act uniformly nervous unless your trait dictates it.
-3. If asked about your location/alibi: Provide your alibi details naturally in conversation. Don't recite it like a robot.
-4. If asked about the victim: Respond based on your relationship as defined by motive.
-5. Speak naturally like a real person under pressure.
-6. Include realistic emotions and physical actions in [brackets] matching your trait (e.g. [rolls eyes], [adjusts tie], [stammers]).
-7. If guilty: Defend yourself but don't confess. Be manipulative, aggressive, or defensive according to your trait.
-8. If innocent: Act consistently with your trait (e.g., indignant, confused, scared).
+1. READ THE QUESTION CAREFULLY and answer what was actually asked. 
+2. START YOUR RESPONSE WITH A DIRECT ANSWER. Confirm or deny immediately (e.g., "No, I wasn't at home" or "Yes, Felix is my friend"). Do NOT start with physical actions or evasive flavor text.
+3. Embody your Personality Trait exactly. Use vocabulary, sentence structure, and tone that matches it.
+4. After the direct answer, you may include realistic emotions and physical actions in [brackets] matching your trait.
+5. Provide your alibi details naturally in conversation. Don't recite it like a robot.
+6. Speak naturally like a real person under pressure. No generic "noir" cliches unless they fit your trait.
+7. If guilty: Defend yourself but don't confess. Be manipulative or aggressive as needed.
+8. If innocent: Act consistently (indignant, scared, etc.).
 9. Keep responses to 2-4 natural sentences.
 10. NEVER redirect to other suspects unless directly asked.
+
+
 
 First write your internal thinking under "REASONING:"
 Then write your direct answer under "RESPONSE:"
@@ -280,13 +289,14 @@ RESPONSE GUIDELINES:
 4. If a "recap" or "summary" was requested, summarize the mood of the case so far."""
     
     fallbacks = [
-        f"Vegas doesn't care about the truth, only the stakes. {event[:60]}...",
-        f"The neon signs flicker, casting long shadows over the new evidence. The city is breathing down our necks. {event[:60]}...",
-        f"Another secret buried in the desert dirt where the wind never stops screaming. {event[:60]}...",
-        f"In a city built on illusions, you have to look closely to see the bloodstains underneath the glitter. {event[:60]}...",
-        f"The heat off the asphalt still feels like a warning. The chips are down, and the house is winning. {event[:60]}...",
-        f"The slot machines keep chiming, a funeral march for the latest victim of the Strip. {event[:60]}..."
+        "Vegas doesn't care about the truth, only the stakes. The city is a graveyard of secrets, and we're just digging up the latest one. Everything feels heavy, like the desert heat before a storm.",
+        "The neon signs flicker, casting long shadows over the evidence. The city is breathing down our necks, waiting for us to fold. There's a scent of cheap perfume and ozone in the air.",
+        "Another secret buried in the desert dirt where the wind never stops screaming. The lights of the Strip look like distant, uncaring stars. Luck is running out.",
+        "In a city built on illusions, you have to look closely to see the bloodstains underneath the glitter. The clatter of slot machines sounds like bone on bone.",
+        "The heat off the asphalt still feels like a warning. The chips are down, and the house is winning. It's time to decide if you're a player or just another victim.",
+        "The slot machines keep chiming, a funeral march for the latest victim of the Strip. Shadows dance in the alleyway, hiding things better left unseen."
     ]
+
     
     if not is_live_llm_enabled():
         return random.choice(fallbacks)
